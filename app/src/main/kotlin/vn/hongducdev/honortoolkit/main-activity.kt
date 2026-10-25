@@ -64,14 +64,14 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     Home(R.string.nav_home, Icons.Rounded.Home),
     CircleSearch(R.string.nav_circle_search, Icons.Rounded.Search),
     Apps(R.string.nav_apps, Icons.Rounded.Apps),
-    NotificationFix(R.string.nav_notification_fix, Icons.Rounded.Notifications),
     Connection(R.string.nav_connection, Icons.Rounded.Link, inToolbar = false),
     // Sub-pages reached from Home or Apps stay off the toolbar, which holds at most four tabs.
+    NotificationFix(R.string.nav_notification_fix, Icons.Rounded.Notifications, inToolbar = false),
     Debloat(R.string.nav_debloat, Icons.Rounded.Apps, inToolbar = false),
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
     ;
 
-    val needsAdb: Boolean get() = this == Apps || this == Debloat || this == Permissions
+    val needsAdb: Boolean get() = this == Debloat || this == Permissions
 }
 
 private val ToolbarHeight = 64.dp
@@ -92,11 +92,11 @@ class MainActivity : ComponentActivity() {
                 var screen by rememberSaveable { mutableStateOf(Screen.Home) }
                 val adbState by AdbSession.get(application).state.collectAsState()
                 val connected = adbState == AdbState.Connected
-                // Apps, Debloat and Permissions need ADB; fall back to Home if the connection drops while one is open.
-                LaunchedEffect(connected, screen) { if (!connected && screen.needsAdb) screen = Screen.Home }
+                // Debloat and Permissions need ADB; fall back to Apps if the connection drops while one is open.
+                LaunchedEffect(connected, screen) { if (!connected && screen.needsAdb) screen = Screen.Apps }
                 val motionEnabled = rememberMotionEnabled()
                 when (screen) {
-                    Screen.Debloat, Screen.Permissions -> BackHandler { screen = Screen.Apps }
+                    Screen.NotificationFix, Screen.Debloat, Screen.Permissions -> BackHandler { screen = Screen.Apps }
                     Screen.Home -> {}
                     else -> BackHandler { screen = Screen.Home }
                 }
@@ -130,16 +130,17 @@ class MainActivity : ComponentActivity() {
                         Screen.Debloat -> DebloatScreen(onBack = { screen = Screen.Apps })
                         Screen.Permissions -> PermissionsScreen(onBack = { screen = Screen.Apps })
                         Screen.Apps -> AppsScreen(
+                            adbConnected = connected,
+                            onOpenNotificationFix = { screen = Screen.NotificationFix },
                             onOpenDebloat = { screen = Screen.Debloat },
                             onOpenPermissions = { screen = Screen.Permissions },
                         )
                         Screen.CircleSearch -> CircleSearchScreen()
-                        Screen.NotificationFix -> NotificationFixScreen()
+                        Screen.NotificationFix -> NotificationFixScreen(onBack = { screen = Screen.Apps })
                         Screen.Connection -> ConnectionScreen(onBack = { screen = Screen.Home })
                         Screen.Home -> HomeScreen(
                             onOpenApps = { screen = Screen.Apps },
                             onOpenCircleSearch = { screen = Screen.CircleSearch },
-                            onOpenNotificationFix = { screen = Screen.NotificationFix },
                             onOpenConnection = { screen = Screen.Connection },
                         )
                     }

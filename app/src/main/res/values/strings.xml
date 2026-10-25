@@ -34,7 +34,7 @@
     <string name="home_connection_description">Ghép cặp, kết nối lại và kiểm tra quyền shell</string>
     <string name="apps_title">Ứng dụng</string>
     <string name="home_open_apps">Ứng dụng</string>
-    <string name="home_apps_description">Gỡ ứng dụng hệ thống và quản lý quyền</string>
+    <string name="home_apps_description">Fix thông báo, gỡ ứng dụng hệ thống và quản lý quyền</string>
     <string name="home_open_debloat">Gỡ ứng dụng hệ thống</string>
     <string name="home_open_permissions">Quyền ứng dụng</string>
     <string name="home_permissions_description">Cấp hoặc thu hồi quyền và AppOps, mỗi thay đổi đều được đọc lại</string>

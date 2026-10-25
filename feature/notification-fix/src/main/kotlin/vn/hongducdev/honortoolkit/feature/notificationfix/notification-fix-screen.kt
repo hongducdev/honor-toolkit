@@ -28,7 +28,7 @@ import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationFixScreen(modifier: Modifier = Modifier) {
+fun NotificationFixScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbar = remember { SnackbarHostState() }
@@ -40,7 +40,13 @@ fun NotificationFixScreen(modifier: Modifier = Modifier) {
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { ToolkitTopBar(title = stringResource(R.string.notification_fix_title)) },
+        topBar = {
+            ToolkitTopBar(
+                title = stringResource(R.string.notification_fix_title),
+                onBack = onBack,
+                backDescription = stringResource(R.string.notification_fix_back),
+            )
+        },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         Column(

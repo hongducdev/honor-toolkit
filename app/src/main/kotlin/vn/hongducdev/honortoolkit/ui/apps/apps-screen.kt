@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -18,10 +19,16 @@ import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 
-/** Entry point for the two ADB-backed app management tools, grouped here so the bottom toolbar stays short. */
+/** Entry point for app-related tools, grouped here so the bottom toolbar stays short; the ADB-backed ones appear only when connected. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppsScreen(onOpenDebloat: () -> Unit, onOpenPermissions: () -> Unit, modifier: Modifier = Modifier) {
+fun AppsScreen(
+    adbConnected: Boolean,
+    onOpenNotificationFix: () -> Unit,
+    onOpenDebloat: () -> Unit,
+    onOpenPermissions: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = { ToolkitTopBar(title = stringResource(R.string.apps_title)) },
@@ -29,17 +36,25 @@ fun AppsScreen(onOpenDebloat: () -> Unit, onOpenPermissions: () -> Unit, modifie
         Column(modifier = Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             SettingsGroup(title = null) {
                 NavRow(
-                    Icons.Rounded.DeleteSweep,
-                    stringResource(R.string.home_open_debloat),
-                    stringResource(R.string.home_debloat_description),
-                    onOpenDebloat,
+                    Icons.Rounded.Notifications,
+                    stringResource(R.string.home_open_notification_fix),
+                    stringResource(R.string.home_notification_fix_description),
+                    onOpenNotificationFix,
                 )
-                NavRow(
-                    Icons.Rounded.Lock,
-                    stringResource(R.string.home_open_permissions),
-                    stringResource(R.string.home_permissions_description),
-                    onOpenPermissions,
-                )
+                if (adbConnected) {
+                    NavRow(
+                        Icons.Rounded.DeleteSweep,
+                        stringResource(R.string.home_open_debloat),
+                        stringResource(R.string.home_debloat_description),
+                        onOpenDebloat,
+                    )
+                    NavRow(
+                        Icons.Rounded.Lock,
+                        stringResource(R.string.home_open_permissions),
+                        stringResource(R.string.home_permissions_description),
+                        onOpenPermissions,
+                    )
+                }
             }
         }
     }
