@@ -1,6 +1,30 @@
 package vn.hongducdev.honortoolkit.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material3.Icon
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,11 +60,27 @@ fun HomeScreen(
     onOpenApps: () -> Unit,
     onOpenCircleSearch: () -> Unit,
     onOpenConnection: () -> Unit,
+    onOpenDeviceInfo: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val pullState = rememberPullToRefreshState()
+    var refreshing by remember { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
+    val pullFraction = pullState.distanceFraction
+    val armed = pullFraction >= 1f
+
+    LaunchedEffect(armed) { if (armed) haptics.performHapticFeedback(HapticFeedbackType.ContextClick) }
+    LaunchedEffect(refreshing) {
+        if (refreshing) {
+            onOpenDeviceInfo()
+            // Let the page start sliding in before the pull state resets behind it.
+            delay(PullResetDelayMs)
+            refreshing = false
+        }
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize().nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -48,13 +88,21 @@ fun HomeScreen(
             LargeTopAppBar(title = { Text(stringResource(R.string.app_name)) }, scrollBehavior = scrollBehavior)
         },
     ) { padding ->
+        PullToRefreshBox(
+            isRefreshing = refreshing,
+            onRefresh = { refreshing = true },
+            state = pullState,
+            indicator = {},
+            modifier = Modifier.padding(padding).fillMaxSize(),
+        ) {
         Column(
             modifier = Modifier
-                .padding(padding)
+                .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            PullHintCard(fraction = if (refreshing) 1f else pullFraction, armed = armed || refreshing)
             ConnectionStatusCard(state = state.adb, busy = state.busy, onReconnect = viewModel::reconnect)
             SettingsGroup(stringResource(R.string.home_tools_heading)) {
                 // Circle to Search works without ADB (only setting the assistant needs it), so it is always listed.
@@ -80,5 +128,39 @@ fun HomeScreen(
                 )
             }
         }
+        }
     }
 }
+
+@Composable
+private fun PullHintCard(fraction: Float, armed: Boolean) {
+    val scheme = MaterialTheme.colorScheme
+    val height by animateDpAsState(
+        targetValue = PullHintHeight * fraction.coerceIn(0f, 1f),
+        animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+        label = "pullHintHeight",
+    )
+    val container by animateColorAsState(if (armed) scheme.primary else scheme.surfaceContainerHigh, label = "pullHintContainer")
+    val content by animateColorAsState(if (armed) scheme.onPrimary else scheme.onSurfaceVariant, label = "pullHintContent")
+    if (height <= 0.dp) return
+    Box(
+        modifier = Modifier.fillMaxWidth().height(height).clip(MaterialTheme.shapes.extraLarge).background(container),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(
+            modifier = Modifier.wrapContentHeight(unbounded = true).graphicsLayer { alpha = fraction.coerceIn(0f, 1f) },
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(Icons.Rounded.KeyboardArrowDown, contentDescription = null, tint = content)
+            Text(
+                stringResource(if (armed) R.string.home_pull_release else R.string.home_pull_hint),
+                style = MaterialTheme.typography.titleMedium,
+                color = content,
+            )
+        }
+    }
+}
+
+private val PullHintHeight = 72.dp
+private const val PullResetDelayMs = 300L

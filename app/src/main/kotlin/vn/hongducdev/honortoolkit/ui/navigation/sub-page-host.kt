@@ -33,6 +33,7 @@ fun <T : Any> SubPageHost(
     reveal: () -> Float,
     backProgress: () -> Float,
     modifier: Modifier = Modifier,
+    fromTop: Boolean = false,
     content: @Composable (T) -> Unit,
 ) {
     if (page == null) return
@@ -42,7 +43,11 @@ fun <T : Any> SubPageHost(
             .fillMaxSize()
             .graphicsLayer {
                 val back = backProgress()
-                translationX = (1f - reveal()) * size.width + back * BackShift * size.width
+                if (fromTop) {
+                    translationY = -(1f - reveal()) * size.height
+                } else {
+                    translationX = (1f - reveal()) * size.width + back * BackShift * size.width
+                }
                 scaleX = 1f - back * BackScaleDrop
                 scaleY = 1f - back * BackScaleDrop
                 shadowElevation = PageShadow
@@ -56,9 +61,9 @@ fun <T : Any> SubPageHost(
 }
 
 /** Pushes the tabs back a little while a sub-page slides over them. */
-fun Modifier.subPageUnderlay(reveal: () -> Float): Modifier = graphicsLayer {
+fun Modifier.subPageUnderlay(fromTop: Boolean = false, reveal: () -> Float): Modifier = graphicsLayer {
     val progress = reveal()
-    translationX = -progress * UnderlayShift * size.width
+    if (fromTop) translationY = progress * UnderlayShift * size.height else translationX = -progress * UnderlayShift * size.width
     scaleX = 1f - progress * UnderlayScaleDrop
     scaleY = 1f - progress * UnderlayScaleDrop
 }
