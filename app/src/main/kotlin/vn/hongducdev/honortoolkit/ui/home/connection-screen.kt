@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -31,6 +33,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import vn.hongducdev.honortoolkit.R
 import vn.hongducdev.honortoolkit.core.adb.AdbState
 import vn.hongducdev.honortoolkit.core.adb.ShellResult
+import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
+import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
+import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
+import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 
 @Composable
@@ -41,6 +47,10 @@ fun ConnectionScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = v
         viewModel.startPairing()
     }
 
+    ProvideToolbar(
+        ToolbarSpec.Tabs(fab = ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.status_reconnect), viewModel::reconnect)),
+    )
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
@@ -48,7 +58,7 @@ fun ConnectionScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = v
         },
     ) { padding ->
         Column(
-            modifier = Modifier.padding(padding).padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
+            modifier = Modifier.padding(padding).padding(horizontal = 16.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ConnectionStatusCard(state = state.adb, busy = state.busy, onReconnect = viewModel::reconnect)

@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.SwipeUp
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Widgets
 import androidx.compose.material.icons.rounded.TouchApp
 import androidx.compose.material3.Button
@@ -45,11 +46,15 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 import vn.hongducdev.honortoolkit.core.ui.SettingsNote
 import vn.hongducdev.honortoolkit.core.ui.SliderRow
 import vn.hongducdev.honortoolkit.core.ui.SwitchRow
+import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
+import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
+import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
 
@@ -78,19 +83,28 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
         }
     }
 
+    ProvideToolbar(
+        if (page == CsPage.Hub) {
+            ToolbarSpec.Tabs()
+        } else {
+            ToolbarSpec.Page(
+                title = stringResource(page.titleRes),
+                backDescription = stringResource(R.string.cs_back),
+                onBack = { page = CsPage.Hub },
+                fab = if (page == CsPage.Trigger) ToolbarAction(Icons.Rounded.PlayArrow, stringResource(R.string.cs_test_button), viewModel::test) else null,
+            )
+        },
+    )
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            ToolkitTopBar(
-                title = stringResource(page.titleRes),
-                onBack = if (page == CsPage.Hub) null else ({ page = CsPage.Hub }),
-                backDescription = stringResource(R.string.cs_back),
-            )
+            if (page == CsPage.Hub) ToolkitTopBar(title = stringResource(page.titleRes))
         },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         Column(
-            modifier = Modifier.padding(padding).padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
+            modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = if (page == CsPage.Hub) 0.dp else 8.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             when (page) {
@@ -108,7 +122,6 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
                         SliderRow({ stringResource(R.string.cs_tile_delay_label, it) }, state.tileDelayMs, 0, TriggerConfig.MAX_DELAY_MS, STEP_MS, viewModel::setTileDelay)
                         SwitchRow(stringResource(R.string.cs_vibrate_label), state.vibrate, viewModel::setVibrate)
                     }
-                    FilledTonalButton(onClick = viewModel::test) { Text(stringResource(R.string.cs_test_button)) }
                     if (state.lastResult.isNotEmpty()) {
                         Text(
                             stringResource(R.string.cs_last_result, state.lastResult),

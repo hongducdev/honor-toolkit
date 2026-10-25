@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.FileDownload
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,13 +51,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
+import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.CookieShape
-import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
+import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
+import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
+import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PermissionsScreen(modifier: Modifier = Modifier, viewModel: PermissionsViewModel = viewModel()) {
+fun PermissionsScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: PermissionsViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -79,35 +84,25 @@ fun PermissionsScreen(modifier: Modifier = Modifier, viewModel: PermissionsViewM
 
     val selected = state.selected
     if (selected != null) BackHandler(onBack = viewModel::close)
-    var menuOpen by remember { mutableStateOf(false) }
+    ProvideToolbar(
+        ToolbarSpec.Page(
+            title = selected?.label ?: stringResource(R.string.permissions_title),
+            backDescription = stringResource(R.string.permissions_back),
+            onBack = if (selected != null) viewModel::close else onBack,
+            actions = listOf(
+                ToolbarAction(Icons.Rounded.FileDownload, stringResource(R.string.permissions_export)) { exportLauncher.launch("honor-toolkit-permissions.txt") },
+            ),
+            fab = ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.permissions_refresh)) {
+                if (selected == null) viewModel.refresh() else viewModel.open(selected)
+            },
+        ),
+    )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            ToolkitTopBar(
-                title = selected?.label ?: stringResource(R.string.permissions_title),
-                onBack = if (selected != null) viewModel::close else null,
-                backDescription = stringResource(R.string.permissions_back),
-                actions = {
-                    IconButton(onClick = { menuOpen = true }) {
-                        Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.permissions_menu))
-                    }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.permissions_refresh)) },
-                            onClick = { menuOpen = false; if (selected == null) viewModel.refresh() else viewModel.open(selected) },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.permissions_export)) },
-                            onClick = { menuOpen = false; exportLauncher.launch("honor-toolkit-permissions.txt") },
-                        )
-                    }
-                },
-            )
-        },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             if (state.loading) WavyProgressIndicator()
             if (selected == null) AppList(state, viewModel) else AppDetail(state, viewModel)
         }
@@ -126,7 +121,7 @@ private fun AppList(state: PermissionsUiState, viewModel: PermissionsViewModel) 
     )
     val visible = state.visibleApps
     if (visible.isEmpty() && !state.loading) Text(stringResource(R.string.permissions_empty), style = MaterialTheme.typography.bodyMedium)
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalToolbarClearance.current)) {
         items(visible, key = { it.packageName }) { app ->
             ListItem(
                 modifier = Modifier.clickable { viewModel.open(app) },
@@ -154,7 +149,7 @@ private fun AppList(state: PermissionsUiState, viewModel: PermissionsViewModel) 
 private fun AppDetail(state: PermissionsUiState, viewModel: PermissionsViewModel) {
     val detail = state.detail ?: return
     val blocked = detail.blocked
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalToolbarClearance.current)) {
         if (blocked != null) {
             item { Text(blockText(blocked), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.tertiary) }
         }

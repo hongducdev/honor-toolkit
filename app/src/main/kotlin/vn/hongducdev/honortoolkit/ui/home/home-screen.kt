@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Link
-import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LargeTopAppBar
@@ -27,15 +27,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import vn.hongducdev.honortoolkit.R
 import vn.hongducdev.honortoolkit.core.adb.AdbState
+import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onOpenDebloat: () -> Unit,
-    onOpenPermissions: () -> Unit,
+    onOpenApps: () -> Unit,
     onOpenCircleSearch: () -> Unit,
+    onOpenNotificationFix: () -> Unit,
     onOpenConnection: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
@@ -53,7 +54,7 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(padding)
                 .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ConnectionStatusCard(state = state.adb, busy = state.busy, onReconnect = viewModel::reconnect)
@@ -65,18 +66,18 @@ fun HomeScreen(
                     stringResource(R.string.home_circle_search_description),
                     onOpenCircleSearch,
                 )
+                NavRow(
+                    Icons.Rounded.Notifications,
+                    stringResource(R.string.home_open_notification_fix),
+                    stringResource(R.string.home_notification_fix_description),
+                    onOpenNotificationFix,
+                )
                 if (state.adb == AdbState.Connected) {
                     NavRow(
-                        Icons.Rounded.DeleteSweep,
-                        stringResource(R.string.home_open_debloat),
-                        stringResource(R.string.home_debloat_description),
-                        onOpenDebloat,
-                    )
-                    NavRow(
-                        Icons.Rounded.Lock,
-                        stringResource(R.string.home_open_permissions),
-                        stringResource(R.string.home_permissions_description),
-                        onOpenPermissions,
+                        Icons.Rounded.Apps,
+                        stringResource(R.string.home_open_apps),
+                        stringResource(R.string.home_apps_description),
+                        onOpenApps,
                     )
                 }
                 NavRow(

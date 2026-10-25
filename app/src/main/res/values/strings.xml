@@ -24,16 +24,24 @@
     <string name="home_tools_heading">Công cụ</string>
     <string name="nav_home">Trang chủ</string>
     <string name="nav_circle_search">Circle</string>
+    <string name="nav_apps">Ứng dụng</string>
     <string name="nav_debloat">Gỡ app</string>
     <string name="nav_permissions">Quyền</string>
+    <string name="nav_notification_fix">Thông báo</string>
     <string name="nav_connection">ADB</string>
     <string name="back">Quay lại</string>
     <string name="home_open_connection">Kết nối ADB</string>
     <string name="home_connection_description">Ghép cặp, kết nối lại và kiểm tra quyền shell</string>
+    <string name="apps_title">Ứng dụng</string>
+    <string name="home_open_apps">Ứng dụng</string>
+    <string name="home_apps_description">Gỡ ứng dụng hệ thống và quản lý quyền</string>
     <string name="home_open_debloat">Gỡ ứng dụng hệ thống</string>
     <string name="home_open_permissions">Quyền ứng dụng</string>
     <string name="home_permissions_description">Cấp hoặc thu hồi quyền và AppOps, mỗi thay đổi đều được đọc lại</string>
     <string name="home_debloat_description">Tắt ứng dụng thừa, bật lại bất cứ lúc nào</string>
+
+    <string name="home_open_notification_fix">Fix thông báo</string>
+    <string name="home_notification_fix_description">4 bước khắc phục trễ hoặc mất thông báo Zalo, Facebook, Messenger, ngân hàng…</string>
 
     <string name="home_open_circle_search">Circle to Search</string>
     <string name="home_circle_search_description">Mở bằng ô cài đặt nhanh, nút AI hoặc giữ thanh điều hướng</string>

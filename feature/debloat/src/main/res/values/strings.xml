@@ -23,4 +23,5 @@
     <string name="debloat_msg_scan_failed">Không quét được danh sách gói. Kiểm tra kết nối ADB</string>
     <string name="debloat_msg_exported">Đã xuất nhật ký</string>
     <string name="debloat_empty">Không có gói nào</string>
+    <string name="debloat_back">Quay lại</string>
 </resources>

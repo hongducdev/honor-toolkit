@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_fix_title">Fix thông báo</string>
+    <string name="notification_fix_back">Quay lại</string>
+    <string name="notification_fix_intro">Khắc phục lỗi trễ hoặc mất thông báo (Zalo, Facebook, Messenger, ngân hàng…) trên máy Honor nội địa. Làm đủ 4 bước dưới đây, mỗi bước có nút mở nhanh màn hình cài đặt tương ứng.</string>
+
+    <string name="notification_fix_step1_title">1. Bật quyền thông báo và đánh thức màn hình</string>
+    <string name="notification_fix_step1_desc">Bật “Đánh thức màn hình khi có thông báo”, sau đó cuộn xuống và bật “Cho phép thông báo” cho từng ứng dụng cần nhận tin (MB Bank, Messenger, Zalo, Facebook…).</string>
+    <string name="notification_fix_step1_action">Mở Thông báo và thanh trạng thái</string>
+
+    <string name="notification_fix_step2_title">2. Giữ kết nối mạng khi máy nghỉ</string>
+    <string name="notification_fix_step2_desc">Vào Pin → Cài đặt pin khác, bật “Duy trì kết nối trong khi thiết bị ở chế độ ngủ”.</string>
+    <string name="notification_fix_step2_action">Mở Pin</string>
+
+    <string name="notification_fix_step3_title">3. Cho phép ứng dụng chạy ngầm</string>
+    <string name="notification_fix_step3_desc">Vào Ứng dụng → Khởi chạy ứng dụng, tắt “Quản lý tự động” cho app cần fix, rồi bật cả 3 mục: Tự động khởi chạy, Khởi chạy thứ cấp, Chạy dưới nền.</string>
+    <string name="notification_fix_step3_action">Mở Khởi chạy ứng dụng</string>
+
+    <string name="notification_fix_step4_title">4. Tắt tối ưu hóa pin cho ứng dụng</string>
+    <string name="notification_fix_step4_desc">Lọc danh sách theo “Tất cả ứng dụng” và đổi thiết lập của Facebook, Zalo, Messenger, app ngân hàng… thành “Không cho phép” để hệ thống không tự đóng ứng dụng khi chạy ngầm.</string>
+    <string name="notification_fix_step4_action">Mở Tối ưu hóa pin</string>
+
+    <string name="notification_fix_open_failed">Không mở được màn hình này trên máy của bạn, hãy vào Cài đặt và tìm thủ công theo mô tả ở trên.</string>
+    <string name="notification_fix_source">Theo hướng dẫn: Fix thông báo điện thoại Honor Magic nội địa</string>
+</resources>

@@ -7,26 +7,29 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.graphics.Brush
+import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.CookieShape
 import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.MoreVert
-import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
+import androidx.compose.material.icons.rounded.FileDownload
+import androidx.compose.material.icons.rounded.Refresh
+import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
+import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
+import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,7 +64,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DebloatScreen(modifier: Modifier = Modifier, viewModel: DebloatViewModel = viewModel()) {
+fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: DebloatViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -84,33 +87,23 @@ fun DebloatScreen(modifier: Modifier = Modifier, viewModel: DebloatViewModel = v
         }
     }
 
-    var menuOpen by remember { mutableStateOf(false) }
+    ProvideToolbar(
+        ToolbarSpec.Page(
+            title = stringResource(R.string.debloat_title),
+            backDescription = stringResource(R.string.debloat_back),
+            onBack = onBack,
+            actions = listOf(
+                ToolbarAction(Icons.Rounded.FileDownload, stringResource(R.string.debloat_export)) { exportLauncher.launch("honor-toolkit-debloat.txt") },
+            ),
+            fab = ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.debloat_refresh), viewModel::refresh),
+        ),
+    )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            ToolkitTopBar(
-                title = stringResource(R.string.debloat_title),
-                actions = {
-                    IconButton(onClick = { menuOpen = true }) {
-                        Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.debloat_menu))
-                    }
-                    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.debloat_refresh)) },
-                            onClick = { menuOpen = false; viewModel.refresh() },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.debloat_export)) },
-                            onClick = { menuOpen = false; exportLauncher.launch("honor-toolkit-debloat.txt") },
-                        )
-                    }
-                },
-            )
-        },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedTextField(
                 value = state.query,
                 onValueChange = viewModel::setQuery,
@@ -137,7 +130,7 @@ fun DebloatScreen(modifier: Modifier = Modifier, viewModel: DebloatViewModel = v
                 Text(stringResource(R.string.debloat_empty), style = MaterialTheme.typography.bodyMedium)
             }
             Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalToolbarClearance.current)) {
                     items(visible, key = { it.packageName }) { entry ->
                         PackageRow(entry, onDisable = { viewModel.requestDisable(entry) }, onEnable = { viewModel.enable(entry) })
                     }
