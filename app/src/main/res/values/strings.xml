@@ -25,6 +25,12 @@
     <string name="home_open_debloat">Gỡ ứng dụng hệ thống</string>
     <string name="home_debloat_description">Tắt ứng dụng thừa, bật lại bất cứ lúc nào</string>
 
+    <string name="home_open_circle_search">Circle to Search</string>
+    <string name="home_circle_search_description">Mở bằng ô cài đặt nhanh, nút AI hoặc giữ thanh điều hướng</string>
+    <string name="shortcut_circle_search">Circle to Search</string>
+    <string name="shortcut_gemini">Gemini</string>
+    <string name="shortcut_search_live">Search Live</string>
+
     <string name="probe_heading">Kiểm tra quyền shell</string>
     <string name="probe_run">Chạy lệnh id</string>
 </resources>

@@ -56,6 +56,7 @@ android {
 dependencies {
     implementation(project(":core:adb"))
     implementation(project(":core:ui"))
+    implementation(project(":feature:circle-search"))
     implementation(project(":feature:debloat"))
     implementation(platform("androidx.compose:compose-bom:2026.05.01"))
     implementation("androidx.compose.material3:material3")

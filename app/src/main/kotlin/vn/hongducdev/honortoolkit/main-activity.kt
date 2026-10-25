@@ -24,11 +24,14 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import vn.hongducdev.honortoolkit.core.ui.rememberMotionEnabled
+import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchScreen
 import vn.hongducdev.honortoolkit.feature.debloat.DebloatScreen
 import vn.hongducdev.honortoolkit.ui.home.HomeScreen
 import vn.hongducdev.honortoolkit.ui.theme.HonorToolkitTheme
 
 private val TransitionBlur = 18.dp
+
+private enum class Screen { Home, Debloat, CircleSearch }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,11 +39,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HonorToolkitTheme {
-                var showDebloat by rememberSaveable { mutableStateOf(false) }
+                var screen by rememberSaveable { mutableStateOf(Screen.Home) }
                 val motionEnabled = rememberMotionEnabled()
-                if (showDebloat) BackHandler { showDebloat = false }
+                if (screen != Screen.Home) BackHandler { screen = Screen.Home }
                 AnimatedContent(
-                    targetState = showDebloat,
+                    targetState = screen,
                     transitionSpec = {
                         if (motionEnabled) {
                             (fadeIn(spring(stiffness = Spring.StiffnessMediumLow)) + scaleIn(initialScale = 0.94f)) togetherWith
@@ -50,15 +53,19 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     label = "screen",
-                ) { debloat ->
+                ) { target ->
                     val blurRadius: Dp by transition.animateDp(label = "screen-blur") { state ->
                         if (motionEnabled && state != EnterExitState.Visible) TransitionBlur else 0.dp
                     }
                     val blurModifier = if (blurRadius > 0.dp) Modifier.blur(blurRadius) else Modifier
-                    if (debloat) {
-                        DebloatScreen(onBack = { showDebloat = false }, modifier = blurModifier)
-                    } else {
-                        HomeScreen(onOpenDebloat = { showDebloat = true }, modifier = blurModifier)
+                    when (target) {
+                        Screen.Debloat -> DebloatScreen(onBack = { screen = Screen.Home }, modifier = blurModifier)
+                        Screen.CircleSearch -> CircleSearchScreen(onBack = { screen = Screen.Home }, modifier = blurModifier)
+                        Screen.Home -> HomeScreen(
+                            onOpenDebloat = { screen = Screen.Debloat },
+                            onOpenCircleSearch = { screen = Screen.CircleSearch },
+                            modifier = blurModifier,
+                        )
                     }
                 }
             }

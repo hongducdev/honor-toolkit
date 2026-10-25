@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="entry_gemini_label">Gemini</string>
+    <string name="entry_live_label">Search Live</string>
+    <string name="toast_quick_launch_failed">Không mở được ứng dụng đích</string>
+    <string name="tile_label">Circle to Search</string>
+    <string name="strip_tile_label">Dải thanh điều hướng</string>
+    <string name="result_ok">Đã kích hoạt</string>
+    <string name="result_failed">Thất bại: %1$s</string>
+    <string name="toast_failed">Không mở được Circle to Search</string>
+    <string name="strip_notification_title">Dải Circle Search đang bật</string>
+    <string name="strip_notification_text">Giữ vạch điều hướng để mở Circle to Search.</string>
+
+    <string name="cs_title">Circle to Search</string>
+    <string name="cs_back">Quay lại</string>
+    <string name="cs_status_no_google">Chưa cài ứng dụng Google. Circle to Search cần ứng dụng này.</string>
+    <string name="cs_status_not_assistant">Google chưa là trợ lý số mặc định nên yêu cầu sẽ bị từ chối.</string>
+    <string name="cs_status_ready">Đã cài Google và đặt làm trợ lý mặc định.</string>
+    <string name="cs_assistant_set">Đặt Google làm trợ lý</string>
+    <string name="cs_assistant_needs_adb">Cần kết nối ADB ở màn hình chính để tự đặt trợ lý.</string>
+    <string name="cs_assistant_done">Đã đặt Google làm trợ lý mặc định.</string>
+    <string name="cs_assistant_failed">Không đặt được trợ lý: %1$s</string>
+    <string name="cs_assistant_restore">Khôi phục trợ lý trước đó</string>
+    <string name="cs_assistant_restored">Đã khôi phục trợ lý trước đó.</string>
+    <string name="cs_assistant_nothing_to_restore">Không có trợ lý nào được lưu để khôi phục.</string>
+    <string name="cs_trigger_heading">Kích hoạt</string>
+    <string name="cs_delay_label">Độ trễ khi mở từ phím tắt: %1$d ms</string>
+    <string name="cs_tile_delay_label">Độ trễ khi mở từ ô cài đặt nhanh: %1$d ms</string>
+    <string name="cs_vibrate_label">Rung khi kích hoạt</string>
+    <string name="cs_test_button">Thử sau 2 giây</string>
+    <string name="cs_test_pending">Sẽ kích hoạt sau 2 giây…</string>
+    <string name="cs_last_result">Kết quả gần nhất: %1$s</string>
+    <string name="cs_assign_heading">Gán vào nút bấm</string>
+    <string name="cs_assign_body">Nhấn giữ biểu tượng Honor Toolkit và chọn lối tắt Circle to Search, hoặc thêm ô Circle to Search vào Cài đặt nhanh. Có thể gán lối tắt đó cho nút AI hoặc thao tác bấm đúp. Nó mở Circle to Search ngay trên ứng dụng bạn đang dùng.</string>
+    <string name="cs_launcher_heading">Biểu tượng riêng cho nút và cử chỉ</string>
+    <string name="cs_launcher_body">Nếu cài đặt của Honor chỉ cho chọn ứng dụng (ví dụ bấm đúp nút nguồn), bật biểu tượng tương ứng rồi chọn nó trong danh sách. Mỗi biểu tượng mở thẳng một tính năng thay vì mở app. Tắt đi để bỏ biểu tượng.</string>
+    <string name="cs_launcher_circle_search">Circle to Search</string>
+    <string name="cs_launcher_gemini">Gemini (trợ lý)</string>
+    <string name="cs_launcher_live">Search Live (hội thoại giọng nói và camera của Google)</string>
+    <string name="cs_old_app_note">Nếu đã cài ứng dụng Circle Search Trigger cũ, hãy gỡ nó để tránh trùng lặp.</string>
+    <string name="cs_strip_heading">Giữ thanh điều hướng</string>
+    <string name="cs_strip_hint">Đặt một dải vô hình lên vạch điều hướng; giữ vào đó để mở Circle to Search. Tính năng dùng quyền "hiển thị trên ứng dụng khác", không dùng trợ năng. Một số app ngân hàng có thể từ chối chạy khi quyền này đã cấp: hãy tắt dải trước khi mở chúng.</string>
+    <string name="cs_strip_no_permission">Dải: chưa cấp quyền "hiển thị trên ứng dụng khác".</string>
+    <string name="cs_strip_on">Dải: đang bật. Giữ ngay phía trên vạch điều hướng.</string>
+    <string name="cs_strip_off">Dải: đang tắt.</string>
+    <string name="cs_strip_switch_label">Bật dải giữ thanh điều hướng</string>
+    <string name="cs_strip_width_label">Chiều rộng dải: %1$d%% màn hình</string>
+    <string name="cs_strip_height_label">Chiều cao dải: %1$d dp</string>
+    <string name="cs_strip_offset_label">Lệch so với mép trên thanh điều hướng: %1$d dp (số âm = hạ thấp)</string>
+    <string name="cs_strip_visible_label">Hiện dải (để căn chỉnh)</string>
+</resources>

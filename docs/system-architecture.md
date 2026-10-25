@@ -10,8 +10,14 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | `:core:adb` | ADB client over Wireless debugging, pairing service, diagnostic log. No UI |
 | `:core:ui` | Shared motion helpers: wavy progress, scroll motion blur, cookie shape, motion guard |
 | `:feature:debloat` | Package scan, disable/enable through `AdbShell`, denylist, journal, Compose screen |
+| `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, assistant setup, Compose screen |
 
-`:feature:circle-search` is added in its own phase.
+## Circle to Search (`:feature:circle-search`)
+
+- `CircleSearchLauncher` opens an assist session of the voice interaction service through `HiddenApiBypass`; no ADB needed. The module ships a consumer proguard rule keeping the bypass library.
+- `TriggerActivity` is exported but is not a launcher activity (the app keeps one icon). It is reached through a static shortcut on `MainActivity`, the Quick Settings tile, or key assignment; it only runs the fixed action.
+- `AssistantSetup` (needs ADB) records the current ASSISTANT role holder, adds Google as holder, then sets the `assistant` and `voice_interaction_service` secure settings if the role alone did not make the setting match. `restore` re-adds the recorded holder.
+- The strip (`NavBarStripService`, foreground `specialUse`, notification id 2) is opt-in and off by default; `BootReceiver` is not exported.
 
 ## Debloat (`:feature:debloat`)
 

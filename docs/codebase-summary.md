@@ -48,6 +48,18 @@ Strings are Vietnamese in `res/values/strings.xml`.
 | `verified-packages.kt` | Packages confirmed safe on the Magic7 Pro (empty until checked on device) |
 | `debloat-view-model.kt`, `debloat-screen.kt` | Compose list, search, enabled/disabled filter, confirm dialog, journal export |
 
+## `:feature:circle-search` (`feature/circle-search/src/main/kotlin/vn/hongducdev/honortoolkit/feature/circlesearch`)
+
+| File | Concern |
+| --- | --- |
+| `circle-search-launcher.kt`, `trigger-runner.kt` | Hidden-API assist session launch, delayed run, vibrate, last result |
+| `trigger-activity.kt`, `trigger-tile-service.kt` | Non-launcher entry point and its Quick Settings tile |
+| `nav-bar-strip-service.kt`, `strip-toggle-tile-service.kt`, `boot-receiver.kt` | Opt-in long-press overlay strip, its tile, restore after boot |
+| `trigger-config.kt` | SharedPreferences for delays, vibration and strip geometry |
+| `assistant-setup.kt` | Set Google as assistant through `AdbShell`, remember and restore the previous holder |
+| `launcher-alias.kt`, `quick-launch-activities.kt` | Opt-in extra launcher icons (Circle to Search, Gemini, Search Live) for pickers that only list apps; Gemini and Search Live activities start one public intent |
+| `circle-search-view-model.kt`, `circle-search-screen.kt` | Compose screen: readiness card, trigger settings, strip settings |
+
 ## Docs and plans
 
 `docs/` holds these notes. `plans/` holds the plan and phase checklists.

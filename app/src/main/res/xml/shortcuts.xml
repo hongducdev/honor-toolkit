@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_entry_circle_search"
+        android:shortcutId="circle_search"
+        android:shortcutShortLabel="@string/shortcut_circle_search">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="vn.hongducdev.honortoolkit.feature.circlesearch.TriggerActivity"
+            android:targetPackage="vn.hongducdev.honortoolkit" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_entry_gemini"
+        android:shortcutId="gemini"
+        android:shortcutShortLabel="@string/shortcut_gemini">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="vn.hongducdev.honortoolkit.feature.circlesearch.GeminiActivity"
+            android:targetPackage="vn.hongducdev.honortoolkit" />
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_entry_live"
+        android:shortcutId="search_live"
+        android:shortcutShortLabel="@string/shortcut_search_live">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="vn.hongducdev.honortoolkit.feature.circlesearch.SearchLiveActivity"
+            android:targetPackage="vn.hongducdev.honortoolkit" />
+    </shortcut>
+</shortcuts>

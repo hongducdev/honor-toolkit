@@ -40,7 +40,7 @@ import vn.hongducdev.honortoolkit.core.adb.ShellResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(onOpenDebloat: () -> Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
+fun HomeScreen(onOpenDebloat: () -> Unit, onOpenCircleSearch: () -> Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -62,13 +62,19 @@ fun HomeScreen(onOpenDebloat: () -> Unit, modifier: Modifier = Modifier, viewMod
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ConnectionStatusCard(state = state.adb, busy = state.busy, onReconnect = viewModel::reconnect)
+            Text(
+                stringResource(R.string.home_tools_heading),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+            // Circle to Search works without ADB (only setting the assistant needs it), so it is always listed.
+            ToolCard(
+                title = stringResource(R.string.home_open_circle_search),
+                description = stringResource(R.string.home_circle_search_description),
+                onClick = onOpenCircleSearch,
+            )
             if (state.adb == AdbState.Connected) {
-                Text(
-                    stringResource(R.string.home_tools_heading),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(start = 8.dp),
-                )
                 ToolCard(
                     title = stringResource(R.string.home_open_debloat),
                     description = stringResource(R.string.home_debloat_description),
