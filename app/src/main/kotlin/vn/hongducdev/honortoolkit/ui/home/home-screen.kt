@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import vn.hongducdev.honortoolkit.R
+import vn.hongducdev.honortoolkit.core.adb.AdbState
 import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
@@ -63,12 +64,14 @@ fun HomeScreen(
                     stringResource(R.string.home_circle_search_description),
                     onOpenCircleSearch,
                 )
-                NavRow(
-                    Icons.Rounded.Apps,
-                    stringResource(R.string.home_open_apps),
-                    stringResource(R.string.home_apps_description),
-                    onOpenApps,
-                )
+                if (state.adb == AdbState.Connected) {
+                    NavRow(
+                        Icons.Rounded.Apps,
+                        stringResource(R.string.home_open_apps),
+                        stringResource(R.string.home_apps_description),
+                        onOpenApps,
+                    )
+                }
                 NavRow(
                     Icons.Rounded.Link,
                     stringResource(R.string.home_open_connection),

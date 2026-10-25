@@ -19,11 +19,10 @@ import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 
-/** Entry point for app-related tools, grouped here so the bottom toolbar stays short; the ADB-backed ones appear only when connected. */
+/** Entry point for the ADB-backed app tools, grouped here so the bottom toolbar stays short. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppsScreen(
-    adbConnected: Boolean,
     onOpenNotificationFix: () -> Unit,
     onOpenDebloat: () -> Unit,
     onOpenPermissions: () -> Unit,
@@ -41,20 +40,18 @@ fun AppsScreen(
                     stringResource(R.string.home_notification_fix_description),
                     onOpenNotificationFix,
                 )
-                if (adbConnected) {
-                    NavRow(
-                        Icons.Rounded.DeleteSweep,
-                        stringResource(R.string.home_open_debloat),
-                        stringResource(R.string.home_debloat_description),
-                        onOpenDebloat,
-                    )
-                    NavRow(
-                        Icons.Rounded.Lock,
-                        stringResource(R.string.home_open_permissions),
-                        stringResource(R.string.home_permissions_description),
-                        onOpenPermissions,
-                    )
-                }
+                NavRow(
+                    Icons.Rounded.DeleteSweep,
+                    stringResource(R.string.home_open_debloat),
+                    stringResource(R.string.home_debloat_description),
+                    onOpenDebloat,
+                )
+                NavRow(
+                    Icons.Rounded.Lock,
+                    stringResource(R.string.home_open_permissions),
+                    stringResource(R.string.home_permissions_description),
+                    onOpenPermissions,
+                )
             }
         }
     }

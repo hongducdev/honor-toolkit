@@ -41,7 +41,7 @@
     <string name="home_debloat_description">Tắt ứng dụng thừa, bật lại bất cứ lúc nào</string>
 
     <string name="home_open_notification_fix">Fix thông báo</string>
-    <string name="home_notification_fix_description">4 bước khắc phục trễ hoặc mất thông báo Zalo, Facebook, Messenger, ngân hàng…</string>
+    <string name="home_notification_fix_description">Chọn ứng dụng, tự đặt quyền thông báo và chạy nền qua ADB</string>
 
     <string name="home_open_circle_search">Circle to Search</string>
     <string name="home_circle_search_description">Mở bằng ô cài đặt nhanh, nút AI hoặc giữ thanh điều hướng</string>

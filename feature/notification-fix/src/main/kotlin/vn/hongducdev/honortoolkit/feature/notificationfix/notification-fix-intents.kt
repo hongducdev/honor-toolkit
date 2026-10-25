@@ -12,9 +12,6 @@ import android.provider.Settings
  */
 internal object NotificationFixIntents {
 
-    fun openNotificationSettings(context: Context): Boolean =
-        tryStart(context, Intent(Settings.ACTION_ALL_APPS_NOTIFICATION_SETTINGS), Intent(Settings.ACTION_SETTINGS))
-
     fun openBatterySettings(context: Context): Boolean =
         tryStart(context, Intent(Intent.ACTION_POWER_USAGE_SUMMARY), Intent(Settings.ACTION_SETTINGS))
 
@@ -27,9 +24,6 @@ internal object NotificationFixIntents {
             Intent().setClassName("com.hihonor.systemmanager", "com.hihonor.systemmanager.optimize.process.ProtectActivity"),
             Intent(Settings.ACTION_APPLICATION_SETTINGS),
         )
-
-    fun openBatteryOptimizationSettings(context: Context): Boolean =
-        tryStart(context, Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS), Intent(Settings.ACTION_SETTINGS))
 
     private fun tryStart(context: Context, vararg intents: Intent): Boolean {
         for (intent in intents) {

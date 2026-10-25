@@ -3,17 +3,30 @@ package vn.hongducdev.honortoolkit
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.PredictiveBackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.snap
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.interaction.collectIsDraggedAsState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.launch
+import vn.hongducdev.honortoolkit.ui.navigation.SubPageEnterSpec
+import vn.hongducdev.honortoolkit.ui.navigation.SubPageExitSpec
+import vn.hongducdev.honortoolkit.ui.navigation.SubPageHost
+import vn.hongducdev.honortoolkit.ui.navigation.SubPageSettleSpec
+import vn.hongducdev.honortoolkit.ui.navigation.subPageUnderlay
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -68,7 +81,7 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
     ;
 
-    val needsAdb: Boolean get() = this == Debloat || this == Permissions
+    val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions
 }
 
 private val ToolbarHeight = 64.dp
@@ -76,8 +89,6 @@ private val ToolbarBottomMargin = 12.dp
 private val ToolbarContentGap = 16.dp
 private val ToolbarFadeExtra = 24.dp
 private const val ToolbarFadeAlpha = 0.9f
-private const val ScreenFadeInMillis = 200
-private const val ScreenFadeOutMillis = 90
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 class MainActivity : ComponentActivity() {
@@ -86,70 +97,108 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HonorToolkitTheme {
-                var screen by rememberSaveable { mutableStateOf(Screen.Home) }
                 val adbState by AdbSession.get(application).state.collectAsState()
                 val connected = adbState == AdbState.Connected
-                // Debloat and Permissions need ADB; fall back to Apps if the connection drops while one is open.
-                LaunchedEffect(connected, screen) { if (!connected && screen.needsAdb) screen = Screen.Apps }
+                val tabs = remember(connected) { Screen.entries.filter { it.inToolbar && (!it.needsAdb || connected) } }
+                val pagerState = rememberPagerState(pageCount = { tabs.size })
+                var subPage by rememberSaveable { mutableStateOf<Screen?>(null) }
+                val scope = rememberCoroutineScope()
+                val haptics = LocalHapticFeedback.current
                 val motionEnabled = rememberMotionEnabled()
-                when (screen) {
-                    Screen.NotificationFix, Screen.Debloat, Screen.Permissions -> BackHandler { screen = Screen.Apps }
-                    Screen.Home -> {}
-                    else -> BackHandler { screen = Screen.Home }
+
+                // Apps and its sub-pages need ADB; leave them if the connection drops while one is open.
+                LaunchedEffect(connected) { if (!connected) subPage = null }
+                LaunchedEffect(tabs.size) { if (pagerState.currentPage >= tabs.size) pagerState.scrollToPage(0) }
+
+                val dragged by pagerState.interactionSource.collectIsDraggedAsState()
+                val currentlyDragged by rememberUpdatedState(dragged)
+                LaunchedEffect(pagerState) {
+                    snapshotFlow { pagerState.currentPage }.drop(1).collect {
+                        if (currentlyDragged) haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                    }
                 }
+
+                fun showTab(tab: Screen) {
+                    val index = tabs.indexOf(tab)
+                    if (index >= 0) scope.launch { if (motionEnabled) pagerState.animateScrollToPage(index) else pagerState.scrollToPage(index) }
+                }
+
+                BackHandler(enabled = subPage == null && pagerState.currentPage != 0) { showTab(Screen.Home) }
+                val backProgress = remember { Animatable(0f) }
+                // 0 = closed, 1 = open. The page stays composed until the close animation ends, so it can slide out.
+                val reveal = remember { Animatable(if (subPage != null) 1f else 0f) }
+                var shownPage by remember { mutableStateOf(subPage) }
+                LaunchedEffect(subPage) {
+                    if (subPage != null) {
+                        // The page being opened must not inherit the shrink left over from the last back gesture.
+                        backProgress.snapTo(0f)
+                        shownPage = subPage
+                        if (motionEnabled) reveal.animateTo(1f, SubPageEnterSpec) else reveal.snapTo(1f)
+                    } else {
+                        if (motionEnabled) reveal.animateTo(0f, SubPageExitSpec) else reveal.snapTo(0f)
+                        shownPage = null
+                    }
+                }
+                PredictiveBackHandler(enabled = subPage != null) { progress ->
+                    try {
+                        progress.collect { backProgress.snapTo(it.progress) }
+                        subPage = null
+                    } catch (e: CancellationException) {
+                        backProgress.animateTo(0f, SubPageSettleSpec)
+                        throw e
+                    }
+                }
+
                 val toolbarHost = remember { ToolbarHost() }
-                val destinations = remember(connected) {
-                    Screen.entries
-                        .filter { it.inToolbar && (!it.needsAdb || connected) }
-                        .map { ToolbarDestination(it, it.labelRes, it.icon) }
-                }
+                val destinations = remember(tabs) { tabs.map { ToolbarDestination(it, it.labelRes, it.icon) } }
                 // Screens scroll behind the toolbar; each leaves this much room at its end (Scaffold already pads the navigation bar).
                 val toolbarClearance = ToolbarHeight + ToolbarBottomMargin + ToolbarContentGap
                 val fadeHeight = toolbarClearance + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + ToolbarFadeExtra
                 val fadeOverlay = MaterialTheme.colorScheme.background.copy(alpha = ToolbarFadeAlpha)
                 Box {
-                CompositionLocalProvider(LocalToolbarClearance provides toolbarClearance, LocalToolbarHost provides toolbarHost) {
-                AnimatedContent(
-                    modifier = Modifier.bottomFade(height = fadeHeight, overlay = fadeOverlay),
-                    targetState = screen,
-                    transitionSpec = {
-                        // Cross-fade only: both screens stay composed during the transition, so scaling them costs frames.
-                        if (motionEnabled) {
-                            fadeIn(tween(ScreenFadeInMillis, delayMillis = ScreenFadeOutMillis)) togetherWith fadeOut(tween(ScreenFadeOutMillis))
-                        } else {
-                            fadeIn(snap()) togetherWith fadeOut(snap())
+                    CompositionLocalProvider(LocalToolbarClearance provides toolbarClearance, LocalToolbarHost provides toolbarHost) {
+                        Box(modifier = Modifier.bottomFade(height = fadeHeight, overlay = fadeOverlay)) {
+                            HorizontalPager(
+                                state = pagerState,
+                                modifier = Modifier.fillMaxSize().subPageUnderlay { reveal.value },
+                                userScrollEnabled = subPage == null,
+                                key = { tabs[it] },
+                            ) { index ->
+                                when (tabs[index]) {
+                                    Screen.Home -> HomeScreen(
+                                        onOpenApps = { showTab(Screen.Apps) },
+                                        onOpenCircleSearch = { showTab(Screen.CircleSearch) },
+                                        onOpenConnection = { subPage = Screen.Connection },
+                                    )
+                                    Screen.CircleSearch -> CircleSearchScreen()
+                                    Screen.Apps -> AppsScreen(
+                                        onOpenNotificationFix = { subPage = Screen.NotificationFix },
+                                        onOpenDebloat = { subPage = Screen.Debloat },
+                                        onOpenPermissions = { subPage = Screen.Permissions },
+                                    )
+                                    else -> Unit
+                                }
+                            }
+                            SubPageHost(page = shownPage, reveal = { reveal.value }, backProgress = { backProgress.value }) { target ->
+                                val close = { subPage = null }
+                                when (target) {
+                                    Screen.Connection -> ConnectionScreen(onBack = close)
+                                    Screen.NotificationFix -> NotificationFixScreen(onBack = close)
+                                    Screen.Debloat -> DebloatScreen(onBack = close)
+                                    Screen.Permissions -> PermissionsScreen(onBack = close)
+                                    else -> Unit
+                                }
+                            }
                         }
-                    },
-                    label = "screen",
-                ) { target ->
-                    when (target) {
-                        Screen.Debloat -> DebloatScreen(onBack = { screen = Screen.Apps })
-                        Screen.Permissions -> PermissionsScreen(onBack = { screen = Screen.Apps })
-                        Screen.Apps -> AppsScreen(
-                            adbConnected = connected,
-                            onOpenNotificationFix = { screen = Screen.NotificationFix },
-                            onOpenDebloat = { screen = Screen.Debloat },
-                            onOpenPermissions = { screen = Screen.Permissions },
-                        )
-                        Screen.CircleSearch -> CircleSearchScreen()
-                        Screen.NotificationFix -> NotificationFixScreen(onBack = { screen = Screen.Apps })
-                        Screen.Connection -> ConnectionScreen(onBack = { screen = Screen.Home })
-                        Screen.Home -> HomeScreen(
-                            onOpenApps = { screen = Screen.Apps },
-                            onOpenCircleSearch = { screen = Screen.CircleSearch },
-                            onOpenConnection = { screen = Screen.Connection },
-                        )
                     }
-                }
-                }
-                ToolkitFloatingToolbar(
-                    destinations = destinations,
-                    selectedId = screen,
-                    onSelect = { screen = it },
-                    spec = toolbarHost.active,
-                    motionEnabled = motionEnabled,
-                    modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = ToolbarBottomMargin),
-                )
+                    ToolkitFloatingToolbar(
+                        destinations = destinations,
+                        selectedId = tabs.getOrElse(pagerState.currentPage) { Screen.Home },
+                        onSelect = ::showTab,
+                        spec = toolbarHost.active,
+                        motionEnabled = motionEnabled,
+                        modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = ToolbarBottomMargin),
+                    )
                 }
             }
         }

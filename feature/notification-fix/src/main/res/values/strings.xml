@@ -2,24 +2,36 @@
 <resources>
     <string name="notification_fix_title">Fix thông báo</string>
     <string name="notification_fix_back">Quay lại</string>
-    <string name="notification_fix_intro">Khắc phục lỗi trễ hoặc mất thông báo (Zalo, Facebook, Messenger, ngân hàng…) trên máy Honor nội địa. Làm đủ 4 bước dưới đây, mỗi bước có nút mở nhanh màn hình cài đặt tương ứng.</string>
+    <string name="notification_fix_refresh">Tải lại</string>
+    <string name="notification_fix_intro">Chọn ứng dụng bị trễ hoặc mất thông báo (Zalo, Facebook, Messenger, ngân hàng…). Honor Toolkit sẽ tự đặt các thiết lập cần thiết qua ADB, bạn không phải làm từng bước.</string>
+    <string name="notification_fix_search">Tìm ứng dụng</string>
+    <string name="notification_fix_empty">Không có ứng dụng nào.</string>
 
-    <string name="notification_fix_step1_title">1. Bật quyền thông báo và đánh thức màn hình</string>
-    <string name="notification_fix_step1_desc">Bật “Đánh thức màn hình khi có thông báo”, sau đó cuộn xuống và bật “Cho phép thông báo” cho từng ứng dụng cần nhận tin (MB Bank, Messenger, Zalo, Facebook…).</string>
-    <string name="notification_fix_step1_action">Mở Thông báo và thanh trạng thái</string>
+    <string name="notification_fix_detail_intro">Trạng thái hiện tại của ứng dụng này. Nhấn Áp dụng để bật những mục đang tắt.</string>
+    <string name="notification_fix_apply">Áp dụng tự động</string>
+    <string name="notification_fix_all_done">Đã bật đủ</string>
 
-    <string name="notification_fix_step2_title">2. Giữ kết nối mạng khi máy nghỉ</string>
-    <string name="notification_fix_step2_desc">Vào Pin → Cài đặt pin khác, bật “Duy trì kết nối trong khi thiết bị ở chế độ ngủ”.</string>
-    <string name="notification_fix_step2_action">Mở Pin</string>
+    <string name="notification_fix_step_notifications">Quyền thông báo</string>
+    <string name="notification_fix_step_notifications_desc">Cấp quyền hiện thông báo (Android 13 trở lên)</string>
+    <string name="notification_fix_step_doze">Tắt tối ưu pin (Doze)</string>
+    <string name="notification_fix_step_doze_desc">Không để hệ thống tạm dừng ứng dụng khi máy ngủ</string>
+    <string name="notification_fix_step_background">Chạy nền không giới hạn</string>
+    <string name="notification_fix_step_background_desc">Cho phép chạy và nhận tin dưới nền</string>
+    <string name="notification_fix_step_alarm">Báo thức chính xác</string>
+    <string name="notification_fix_step_alarm_desc">Cần cho OTP và nhắc nhở đúng giờ (Android 12 trở lên)</string>
 
-    <string name="notification_fix_step3_title">3. Cho phép ứng dụng chạy ngầm</string>
-    <string name="notification_fix_step3_desc">Vào Ứng dụng → Khởi chạy ứng dụng, tắt “Quản lý tự động” cho app cần fix, rồi bật cả 3 mục: Tự động khởi chạy, Khởi chạy thứ cấp, Chạy dưới nền.</string>
-    <string name="notification_fix_step3_action">Mở Khởi chạy ứng dụng</string>
+    <string name="notification_fix_status_on">Đã bật</string>
+    <string name="notification_fix_status_off">Chưa bật</string>
+    <string name="notification_fix_status_na">Không cần</string>
+    <string name="notification_fix_status_failed">Không áp dụng được</string>
 
-    <string name="notification_fix_step4_title">4. Tắt tối ưu hóa pin cho ứng dụng</string>
-    <string name="notification_fix_step4_desc">Lọc danh sách theo “Tất cả ứng dụng” và đổi thiết lập của Facebook, Zalo, Messenger, app ngân hàng… thành “Không cho phép” để hệ thống không tự đóng ứng dụng khi chạy ngầm.</string>
-    <string name="notification_fix_step4_action">Mở Tối ưu hóa pin</string>
+    <string name="notification_fix_manual_title">Còn lại phải làm trong Cài đặt</string>
+    <string name="notification_fix_manual_desc">MagicOS không cho đặt “Khởi chạy ứng dụng” và “Duy trì kết nối khi ngủ” qua ADB. Mở thẳng màn hình đó để bật cho ứng dụng này.</string>
+    <string name="notification_fix_open_launch">Mở Khởi chạy ứng dụng</string>
+    <string name="notification_fix_open_battery">Mở Pin</string>
 
-    <string name="notification_fix_open_failed">Không mở được màn hình này trên máy của bạn, hãy vào Cài đặt và tìm thủ công theo mô tả ở trên.</string>
-    <string name="notification_fix_source">Theo hướng dẫn: Fix thông báo điện thoại Honor Magic nội địa</string>
+    <string name="notification_fix_msg_applied">Đã áp dụng và kiểm tra lại</string>
+    <string name="notification_fix_msg_partial">Một số mục hệ thống không cho thay đổi</string>
+    <string name="notification_fix_msg_shell_failed">Không chạy được lệnh ADB, kiểm tra lại kết nối</string>
+    <string name="notification_fix_open_failed">Không mở được màn hình này, hãy vào Cài đặt và tìm thủ công.</string>
 </resources>
