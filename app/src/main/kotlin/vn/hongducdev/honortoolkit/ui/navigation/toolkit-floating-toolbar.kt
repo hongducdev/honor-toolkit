@@ -54,6 +54,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
@@ -70,6 +71,9 @@ private const val CompactDestinationCount = 3
 
 // A fifth tab plus a floating action makes the bar wider than a phone and the layout jumps.
 private const val MaxTabs = 4
+
+// The overload with a floating action lays the bar out taller than the one without, which lifts it off the bottom edge.
+private val BarHeight = 64.dp
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -133,7 +137,11 @@ fun <T : Any> ToolkitFloatingToolbar(
             expanded = true,
             colors = toolbarColors,
             floatingActionButton = { ToolbarFab(fab, haptics) },
-            modifier = modifier,
+            modifier = modifier.layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                val height = BarHeight.roundToPx()
+                layout(placeable.width, height) { placeable.place(0, (height - placeable.height) / 2) }
+            },
             content = content,
         )
     } else {
