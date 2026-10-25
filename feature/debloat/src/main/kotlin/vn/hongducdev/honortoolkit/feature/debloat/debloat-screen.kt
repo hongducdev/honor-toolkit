@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.ui.graphics.Brush
 import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.CookieShape
-import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
+import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Column
@@ -124,7 +124,7 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
                     label = { Text(stringResource(R.string.debloat_filter_disabled)) },
                 )
             }
-            if (state.loading) WavyProgressIndicator()
+            if (state.loading) ToolkitLoadingIndicator()
             val visible = state.visible
             if (visible.isEmpty() && !state.loading) {
                 Text(stringResource(R.string.debloat_empty), style = MaterialTheme.typography.bodyMedium)

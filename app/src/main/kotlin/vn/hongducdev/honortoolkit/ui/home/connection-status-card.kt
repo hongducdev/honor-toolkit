@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import vn.hongducdev.honortoolkit.R
 import vn.hongducdev.honortoolkit.core.adb.AdbState
 import vn.hongducdev.honortoolkit.core.ui.CookieShape
-import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
+import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
 
 @Composable
 fun ConnectionStatusCard(state: AdbState, busy: Boolean, onReconnect: () -> Unit) {
@@ -67,7 +67,7 @@ fun ConnectionStatusCard(state: AdbState, busy: Boolean, onReconnect: () -> Unit
                 }
             }
             if (state == AdbState.Connecting || busy) {
-                WavyProgressIndicator(color = content, trackColor = content.copy(alpha = 0.18f))
+                ToolkitLoadingIndicator(color = content)
             }
             if (state is AdbState.Failed) {
                 Text(text = state.message, style = MaterialTheme.typography.bodyMedium)

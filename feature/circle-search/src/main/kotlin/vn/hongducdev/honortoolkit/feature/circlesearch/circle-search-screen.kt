@@ -56,7 +56,7 @@ import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
-import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
+import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
 
 // The hub is a top-level destination (no back arrow); system back from a sub-page returns to the hub.
 @Composable
@@ -211,7 +211,7 @@ private fun StatusCard(state: CircleSearchUiState, viewModel: CircleSearchViewMo
                 ),
                 style = MaterialTheme.typography.bodyLarge,
             )
-            if (state.busy) WavyProgressIndicator()
+            if (state.busy) ToolkitLoadingIndicator()
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (state.readiness == Readiness.NotAssistant) {
                     Button(onClick = viewModel::setGoogleAsAssistant, enabled = !state.busy) {

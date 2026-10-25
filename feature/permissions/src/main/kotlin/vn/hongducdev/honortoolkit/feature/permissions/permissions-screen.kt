@@ -56,7 +56,7 @@ import vn.hongducdev.honortoolkit.core.ui.CookieShape
 import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
-import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
+import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,7 +103,7 @@ fun PermissionsScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewMod
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         Column(modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (state.loading) WavyProgressIndicator()
+            if (state.loading) ToolkitLoadingIndicator()
             if (selected == null) AppList(state, viewModel) else AppDetail(state, viewModel)
         }
     }
