@@ -28,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import vn.hongducdev.honortoolkit.core.ui.rememberMotionEnabled
 import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchScreen
 import vn.hongducdev.honortoolkit.feature.debloat.DebloatScreen
+import vn.hongducdev.honortoolkit.feature.permissions.PermissionsScreen
 import vn.hongducdev.honortoolkit.ui.home.ConnectionScreen
 import vn.hongducdev.honortoolkit.ui.home.HomeScreen
 import vn.hongducdev.honortoolkit.ui.theme.HonorToolkitTheme
@@ -61,7 +63,11 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector) {
     Home(R.string.nav_home, Icons.Rounded.Home),
     CircleSearch(R.string.nav_circle_search, Icons.Rounded.Search),
     Debloat(R.string.nav_debloat, Icons.Rounded.DeleteSweep),
+    Permissions(R.string.nav_permissions, Icons.Rounded.Lock),
     Connection(R.string.nav_connection, Icons.Rounded.Link),
+    ;
+
+    val needsAdb: Boolean get() = this == Debloat || this == Permissions
 }
 
 private val ToolbarClearance = 88.dp
@@ -76,8 +82,8 @@ class MainActivity : ComponentActivity() {
                 var screen by rememberSaveable { mutableStateOf(Screen.Home) }
                 val adbState by AdbSession.get(application).state.collectAsState()
                 val connected = adbState == AdbState.Connected
-                // Debloat needs ADB; fall back to Home if the connection drops while it is open.
-                LaunchedEffect(connected, screen) { if (!connected && screen == Screen.Debloat) screen = Screen.Home }
+                // Debloat and Permissions need ADB; fall back to Home if the connection drops while one is open.
+                LaunchedEffect(connected, screen) { if (!connected && screen.needsAdb) screen = Screen.Home }
                 val motionEnabled = rememberMotionEnabled()
                 if (screen != Screen.Home) BackHandler { screen = Screen.Home }
                 val toolbarScroll = FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = FloatingToolbarExitDirection.Bottom)
@@ -99,10 +105,12 @@ class MainActivity : ComponentActivity() {
                 ) { target ->
                     when (target) {
                         Screen.Debloat -> DebloatScreen()
+                        Screen.Permissions -> PermissionsScreen()
                         Screen.CircleSearch -> CircleSearchScreen()
                         Screen.Connection -> ConnectionScreen()
                         Screen.Home -> HomeScreen(
                             onOpenDebloat = { screen = Screen.Debloat },
+                            onOpenPermissions = { screen = Screen.Permissions },
                             onOpenCircleSearch = { screen = Screen.CircleSearch },
                             onOpenConnection = { screen = Screen.Connection },
                         )
@@ -114,7 +122,7 @@ class MainActivity : ComponentActivity() {
                     scrollBehavior = toolbarScroll,
                     modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 12.dp),
                 ) {
-                    Screen.entries.filter { it != Screen.Debloat || connected }.forEach { item ->
+                    Screen.entries.filter { !it.needsAdb || connected }.forEach { item ->
                         val label = stringResource(item.labelRes)
                         val select = {
                             if (item != screen) haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)

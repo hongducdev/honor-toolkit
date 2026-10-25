@@ -10,6 +10,7 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | `:core:adb` | ADB client over Wireless debugging, pairing service, diagnostic log. No UI |
 | `:core:ui` | Shared motion helpers: wavy progress, scroll motion blur, cookie shape, motion guard |
 | `:feature:debloat` | Package scan, disable/enable through `AdbShell`, denylist, journal, Compose screen |
+| `:feature:permissions` | Runtime permission grant/revoke and AppOps for third-party apps through `AdbShell`, guard, read-back verification, journal, Compose screen |
 | `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, assistant setup, Compose screen |
 
 ## Circle to Search (`:feature:circle-search`)

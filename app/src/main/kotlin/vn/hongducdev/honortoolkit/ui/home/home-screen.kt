@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Link
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LargeTopAppBar
@@ -33,6 +34,7 @@ import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 @Composable
 fun HomeScreen(
     onOpenDebloat: () -> Unit,
+    onOpenPermissions: () -> Unit,
     onOpenCircleSearch: () -> Unit,
     onOpenConnection: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,6 +71,12 @@ fun HomeScreen(
                         stringResource(R.string.home_open_debloat),
                         stringResource(R.string.home_debloat_description),
                         onOpenDebloat,
+                    )
+                    NavRow(
+                        Icons.Rounded.Lock,
+                        stringResource(R.string.home_open_permissions),
+                        stringResource(R.string.home_permissions_description),
+                        onOpenPermissions,
                     )
                 }
                 NavRow(

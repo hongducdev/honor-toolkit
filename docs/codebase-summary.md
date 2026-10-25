@@ -6,11 +6,11 @@ Entry points and where each concern lives. Architecture and rationale: `system-a
 
 | File | Concern |
 | --- | --- |
-| `main-activity.kt` | Launcher activity, edge-to-edge, hosts the screens behind an M3 Expressive `HorizontalFloatingToolbar` (Home, Circle, Debloat when ADB is connected, ADB) |
+| `main-activity.kt` | Launcher activity, edge-to-edge, hosts the screens behind an M3 Expressive `HorizontalFloatingToolbar` (Home, Circle, Debloat and Permissions when ADB is connected, ADB) |
 | `ui/theme/honor-toolkit-theme.kt` | Material 3 theme with dynamic color on Android 12+ |
 | `ui/home/home-view-model.kt` | `HomeUiState`, combines `AdbSession` flows, reconnects on start |
 | `core/ui/toolkit-components.kt` | Shared `ToolkitTopBar`, `SettingsGroup`/`SettingsRow`, `SwitchRow`, `SliderRow`, `NavRow` (haptics on interaction) |
-| `ui/home/home-screen.kt` | Home: connection status + tool list (Circle to Search, Debloat, ADB connection) |
+| `ui/home/home-screen.kt` | Home: connection status + tool list (Circle to Search, Debloat, Permissions, ADB connection) |
 | `ui/home/connection-screen.kt` | ADB connection screen: pairing flow, notification-permission request, shell probe card |
 | `ui/home/connection-status-card.kt` | Connection state and reconnect button |
 | `ui/home/pairing-card.kt` | Pairing steps, start button, in-app code field |
@@ -49,6 +49,17 @@ Strings are Vietnamese in `res/values/strings.xml`.
 | `package-name-validator.kt` | Rejects anything that is not a plain package name before it reaches a shell |
 | `verified-packages.kt` | Packages confirmed safe on the Magic7 Pro (empty until checked on device) |
 | `debloat-view-model.kt`, `debloat-screen.kt` | Compose list, search, enabled/disabled filter, confirm dialog, journal export |
+
+
+## `:feature:permissions` (`feature/permissions/src/main/kotlin/vn/hongducdev/honortoolkit/feature/permissions`)
+
+| File | Role |
+|---|---|
+| `permission-parsers.kt` | Parses user 0 `runtime permissions:` from `dumpsys package` and `cmd appops get` output |
+| `permission-guard.kt` | Name validation; only third-party apps without a shared UID; SYSTEM_FIXED / POLICY_FIXED permissions are read-only |
+| `permissions-controller.kt` | `setGranted` (`pm grant/revoke --user 0`) and `setAppOp` (`cmd appops set --user 0`); every change is read back and reported as failed if the ROM ignored it |
+| `permissions-journal.kt` | Append-only `files/permissions-journal.tsv` with previous value, export text with PC revert commands |
+| `permissions-view-model.kt`, `permissions-screen.kt` | App list, per-app permission switches, collapsible AppOps section |
 
 ## `:feature:circle-search` (`feature/circle-search/src/main/kotlin/vn/hongducdev/honortoolkit/feature/circlesearch`)
 

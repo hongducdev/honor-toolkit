@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="permissions_title">Quyền ứng dụng</string>
+    <string name="permissions_menu">Tùy chọn</string>
+    <string name="permissions_back">Quay lại</string>
+    <string name="permissions_refresh">Quét lại</string>
+    <string name="permissions_export">Xuất nhật ký</string>
+    <string name="permissions_search">Tìm theo tên hoặc gói</string>
+    <string name="permissions_empty">Không có ứng dụng nào</string>
+    <string name="permissions_none">Ứng dụng này không có quyền cần cấp khi chạy</string>
+    <string name="permissions_group_runtime">Quyền</string>
+    <string name="permissions_fixed">Do hệ thống quản lý, không đổi được</string>
+    <string name="permissions_advanced">Nâng cao: AppOps</string>
+    <string name="permissions_advanced_note">AppOps không đồng nghĩa với quyền ở trên. Mỗi thay đổi được đọc lại để xác nhận.</string>
+    <string name="permissions_appops_none">Không có AppOps nào được ghi nhận</string>
+    <string name="permissions_mode_allow">Cho phép</string>
+    <string name="permissions_mode_ignore">Bỏ qua</string>
+    <string name="permissions_mode_deny">Từ chối</string>
+    <string name="permissions_mode_foreground">Khi dùng</string>
+    <string name="permissions_mode_default">Mặc định</string>
+    <string name="permissions_msg_changed">Đã đổi và xác nhận</string>
+    <string name="permissions_msg_failed">Lệnh thất bại: %1$s</string>
+    <string name="permissions_msg_scan_failed">Không đọc được dữ liệu. Kiểm tra kết nối ADB</string>
+    <string name="permissions_msg_exported">Đã xuất nhật ký</string>
+    <string name="permissions_blocked_invalid">Tên không hợp lệ</string>
+    <string name="permissions_blocked_not_user_app">Chỉ áp dụng cho ứng dụng người dùng cài</string>
+    <string name="permissions_blocked_shared_uid">Ứng dụng dùng chung UID với ứng dụng khác nên chỉ xem</string>
+    <string name="permissions_blocked_fixed">Quyền do hệ thống hoặc chính sách cố định</string>
+    <string name="permissions_blocked_not_changeable">Không đổi được quyền này</string>
+</resources>

@@ -25,11 +25,14 @@
     <string name="nav_home">Trang chủ</string>
     <string name="nav_circle_search">Circle</string>
     <string name="nav_debloat">Gỡ app</string>
+    <string name="nav_permissions">Quyền</string>
     <string name="nav_connection">ADB</string>
     <string name="back">Quay lại</string>
     <string name="home_open_connection">Kết nối ADB</string>
     <string name="home_connection_description">Ghép cặp, kết nối lại và kiểm tra quyền shell</string>
     <string name="home_open_debloat">Gỡ ứng dụng hệ thống</string>
+    <string name="home_open_permissions">Quyền ứng dụng</string>
+    <string name="home_permissions_description">Cấp hoặc thu hồi quyền và AppOps, mỗi thay đổi đều được đọc lại</string>
     <string name="home_debloat_description">Tắt ứng dụng thừa, bật lại bất cứ lúc nào</string>
 
     <string name="home_open_circle_search">Circle to Search</string>
