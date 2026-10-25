@@ -8,8 +8,17 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | --- | --- |
 | `:app` | Compose UI (`ui/home`), `MainActivity`, release signing config, `WRITE_SECURE_SETTINGS` declaration |
 | `:core:adb` | ADB client over Wireless debugging, pairing service, diagnostic log. No UI |
+| `:core:ui` | Shared motion helpers: wavy progress, scroll motion blur, cookie shape, motion guard |
+| `:feature:debloat` | Package scan, disable/enable through `AdbShell`, denylist, journal, Compose screen |
 
-Feature modules (`:feature:debloat`, `:feature:circle-search`) are added in their own phases.
+`:feature:circle-search` is added in its own phase.
+
+## Debloat (`:feature:debloat`)
+
+- Disables with `pm disable-user --user 0 <pkg>` and re-enables with `pm enable --user 0 <pkg>`; never uninstalls.
+- `DebloatDenylist` blocks core packages by name/prefix; packages holding the HOME, SMS, DIALER, ASSISTANT or BROWSER role, the default IME and this app are resolved on the device and blocked as "in use". `DebloatController.disable` re-checks this on every call, so the UI cannot override it.
+- Each successful change is appended to `files/debloat-journal.tsv`. "Xuất nhật ký" writes a text file (Storage Access Framework) with `adb shell pm enable --user 0 <pkg>` lines for everything this app still holds disabled.
+- Packages not in `verifiedOnMagic7Pro` are shown as "Chưa đánh giá".
 
 ## Self ADB flow (`:core:adb`)
 

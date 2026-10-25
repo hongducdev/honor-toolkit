@@ -27,6 +27,27 @@ Strings are Vietnamese in `res/values/strings.xml`.
 | `pairing-foreground-service.kt` | Foreground service and notification code entry |
 | `diagnostic-log.kt` | File log readable with `run-as` |
 
+## `:core:ui` (`core/ui/src/main/kotlin/vn/hongducdev/honortoolkit/core/ui`)
+
+| File | Concern |
+| --- | --- |
+| `toolkit-motion.kt` | `rememberMotionEnabled`: off in battery saver or when animations are disabled |
+| `scroll-motion-blur-modifier.kt` | AGSL vertical blur proportional to scroll speed (Android 13+, no-op below) |
+| `wavy-progress-indicator.kt` | Animated sine-wave indeterminate progress |
+| `cookie-shape.kt` | Scalloped badge shape from graphics-shapes |
+
+## `:feature:debloat` (`feature/debloat/src/main/kotlin/vn/hongducdev/honortoolkit/feature/debloat`)
+
+| File | Concern |
+| --- | --- |
+| `debloat-denylist.kt` | Hard denylist (exact names, prefixes) plus runtime "in use" packages |
+| `package-scanner.kt` | `pm list packages -s [-d]`, labels, role holders and default IME lookup |
+| `debloat-controller.kt` | `disable` / `enable` with name validation and denylist re-check |
+| `debloat-journal.kt` | Append-only `files/debloat-journal.tsv`, export text with PC recovery commands |
+| `package-name-validator.kt` | Rejects anything that is not a plain package name before it reaches a shell |
+| `verified-packages.kt` | Packages confirmed safe on the Magic7 Pro (empty until checked on device) |
+| `debloat-view-model.kt`, `debloat-screen.kt` | Compose list, search, enabled/disabled filter, confirm dialog, journal export |
+
 ## Docs and plans
 
 `docs/` holds these notes. `plans/` holds the plan and phase checklists.

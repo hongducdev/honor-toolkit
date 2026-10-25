@@ -18,3 +18,5 @@ dependencyResolutionManagement {
 rootProject.name = "honor-toolkit"
 include(":app")
 include(":core:adb")
+include(":core:ui")
+include(":feature:debloat")
