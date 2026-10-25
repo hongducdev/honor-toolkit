@@ -65,8 +65,8 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     CircleSearch(R.string.nav_circle_search, Icons.Rounded.Search),
     Apps(R.string.nav_apps, Icons.Rounded.Apps),
     NotificationFix(R.string.nav_notification_fix, Icons.Rounded.Notifications),
-    Connection(R.string.nav_connection, Icons.Rounded.Link),
-    // Reached only through Apps, so they stay off the toolbar and keep it short.
+    Connection(R.string.nav_connection, Icons.Rounded.Link, inToolbar = false),
+    // Sub-pages reached from Home or Apps stay off the toolbar, which holds at most four tabs.
     Debloat(R.string.nav_debloat, Icons.Rounded.Apps, inToolbar = false),
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
     ;
@@ -135,7 +135,7 @@ class MainActivity : ComponentActivity() {
                         )
                         Screen.CircleSearch -> CircleSearchScreen()
                         Screen.NotificationFix -> NotificationFixScreen()
-                        Screen.Connection -> ConnectionScreen()
+                        Screen.Connection -> ConnectionScreen(onBack = { screen = Screen.Home })
                         Screen.Home -> HomeScreen(
                             onOpenApps = { screen = Screen.Apps },
                             onOpenCircleSearch = { screen = Screen.CircleSearch },

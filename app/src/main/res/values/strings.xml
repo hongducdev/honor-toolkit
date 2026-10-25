@@ -51,4 +51,5 @@
 
     <string name="probe_heading">Kiểm tra quyền shell</string>
     <string name="probe_run">Chạy lệnh id</string>
+    <string name="connection_back">Quay lại</string>
 </resources>

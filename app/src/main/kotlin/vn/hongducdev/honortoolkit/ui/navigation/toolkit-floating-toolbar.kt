@@ -69,6 +69,9 @@ private const val LabelHiddenFontScale = 1.25f
 private const val CompactScreenWidthDp = 400
 private const val CompactDestinationCount = 3
 
+// A fifth tab plus a floating action makes the bar wider than a phone and the layout jumps.
+private const val MaxTabs = 4
+
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun <T : Any> ToolkitFloatingToolbar(
@@ -80,6 +83,7 @@ fun <T : Any> ToolkitFloatingToolbar(
     motionEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    require(destinations.size <= MaxTabs) { "The toolbar holds at most $MaxTabs tabs, got ${destinations.size}" }
     val colors = MaterialTheme.colorScheme
     val haptics = LocalHapticFeedback.current
     val fontScale = LocalDensity.current.fontScale

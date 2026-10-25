@@ -37,10 +37,9 @@ import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
-import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 
 @Composable
-fun ConnectionScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
+fun ConnectionScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -48,17 +47,17 @@ fun ConnectionScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = v
     }
 
     ProvideToolbar(
-        ToolbarSpec.Tabs(fab = ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.status_reconnect), viewModel::reconnect)),
+        ToolbarSpec.Page(
+            title = stringResource(R.string.home_open_connection),
+            backDescription = stringResource(R.string.connection_back),
+            onBack = onBack,
+            fab = ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.status_reconnect), viewModel::reconnect),
+        ),
     )
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            ToolkitTopBar(title = stringResource(R.string.home_open_connection))
-        },
-    ) { padding ->
+    Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         Column(
-            modifier = Modifier.padding(padding).padding(horizontal = 16.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
+            modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = 8.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             ConnectionStatusCard(state = state.adb, busy = state.busy, onReconnect = viewModel::reconnect)
