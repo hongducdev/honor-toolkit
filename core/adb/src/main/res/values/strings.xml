@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pairing_channel_name">Ghép cặp ADB</string>
+    <string name="pairing_title">Honor Toolkit</string>    <string name="pairing_searching">Mở Tùy chọn nhà phát triển → Gỡ lỗi qua WLAN → Ghép cặp bằng mã ghép cặp</string>
+    <string name="pairing_enter_code">Đã thấy hộp thoại ghép cặp. Nhập mã 6 số</string>
+    <string name="pairing_enter_code_action">Nhập mã</string>
+    <string name="pairing_code_label">Mã ghép cặp</string>
+    <string name="pairing_done">Đã ghép cặp và kết nối</string>
+    <string name="pairing_failed">Ghép cặp thất bại. Hãy lấy mã mới và thử lại</string>
+    <string name="pairing_timed_out">Hết thời gian chờ ghép cặp</string>
+</resources>

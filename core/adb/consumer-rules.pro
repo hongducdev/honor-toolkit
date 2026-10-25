@@ -1,0 +1,4 @@
+-dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.**
+-keep class org.conscrypt.** { *; }
+-keep class io.github.muntashirakon.adb.** { *; }

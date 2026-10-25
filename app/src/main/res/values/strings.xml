@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Honor Toolkit</string>
+
+    <string name="status_disconnected">Chưa kết nối</string>
+    <string name="status_connecting">Đang kết nối…</string>
+    <string name="status_needs_pairing">Cần ghép cặp</string>
+    <string name="status_connected">Đã kết nối (quyền shell)</string>
+    <string name="status_failed">Kết nối thất bại</string>
+    <string name="status_reconnect">Kết nối lại</string>
+
+    <string name="pairing_heading">Ghép cặp với chính máy này</string>
+    <string name="pairing_steps">1. Bật Tùy chọn nhà phát triển và Gỡ lỗi qua WLAN (cần Wi-Fi).\n2. Bấm Bắt đầu ghép cặp bên dưới.\n3. Vào Gỡ lỗi qua WLAN → Ghép cặp thiết bị bằng mã ghép cặp, giữ hộp thoại mở.\n4. Kéo thanh thông báo xuống, bấm Nhập mã và gõ mã 6 số.</string>
+    <string name="pairing_reboot_note">Sau mỗi lần khởi động lại máy, Android xóa ghép cặp nên cần làm lại các bước này.</string>
+    <string name="pairing_open_developer_options">Mở Tùy chọn nhà phát triển</string>
+    <string name="pairing_start">Bắt đầu ghép cặp</string>
+    <string name="pairing_code_found">Đã thấy hộp thoại ghép cặp. Nhập mã tại đây nếu không dùng được thông báo.</string>
+    <string name="pairing_code_field">Mã 6 số</string>
+    <string name="pairing_submit">Ghép cặp</string>
+
+    <string name="probe_heading">Kiểm tra quyền shell</string>
+    <string name="probe_run">Chạy lệnh id</string>
+</resources>
