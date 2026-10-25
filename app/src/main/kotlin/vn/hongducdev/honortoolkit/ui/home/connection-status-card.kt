@@ -1,5 +1,6 @@
 package vn.hongducdev.honortoolkit.ui.home
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,12 +9,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Smartphone
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +31,7 @@ import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
 @Composable
 fun ConnectionStatusCard(state: AdbState, busy: Boolean, onReconnect: () -> Unit) {
     val connected = state == AdbState.Connected
+    val deviceName = remember { "${Build.MANUFACTURER.replaceFirstChar { it.uppercase() }} ${Build.MODEL}" }
     val scheme = MaterialTheme.colorScheme
     val container = when {
         connected -> scheme.primaryContainer
@@ -43,9 +49,22 @@ fun ConnectionStatusCard(state: AdbState, busy: Boolean, onReconnect: () -> Unit
         colors = CardDefaults.cardColors(containerColor = container, contentColor = content),
     ) {
         Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Box(modifier = Modifier.size(20.dp).background(if (connected) scheme.primary else scheme.outline, CookieShape))
-                Text(text = stateLabel(state), style = MaterialTheme.typography.titleLarge)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Box(
+                    modifier = Modifier.size(64.dp).background(if (connected) scheme.primary else scheme.outline, CookieShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Rounded.Smartphone,
+                        contentDescription = null,
+                        tint = if (connected) scheme.onPrimary else scheme.surface,
+                        modifier = Modifier.size(32.dp),
+                    )
+                }
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(text = deviceName, style = MaterialTheme.typography.titleLarge)
+                    Text(text = stateLabel(state), style = MaterialTheme.typography.bodyLarge)
+                }
             }
             if (state == AdbState.Connecting || busy) {
                 WavyProgressIndicator(color = content, trackColor = content.copy(alpha = 0.18f))

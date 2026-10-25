@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="debloat_title">Gỡ ứng dụng hệ thống</string>
-    <string name="debloat_back">Quay lại</string>
+    <string name="debloat_menu">Tùy chọn</string>
     <string name="debloat_refresh">Quét lại</string>
     <string name="debloat_export">Xuất nhật ký</string>
     <string name="debloat_search">Tìm theo tên hoặc gói</string>

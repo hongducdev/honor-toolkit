@@ -12,12 +12,18 @@
     <string name="strip_notification_text">Giữ vạch điều hướng để mở Circle to Search.</string>
 
     <string name="cs_title">Circle to Search</string>
+    <string name="cs_page_trigger">Kích hoạt và gán nút</string>
+    <string name="cs_page_trigger_desc">Độ trễ, rung, thử kích hoạt, cách gán vào nút AI</string>
+    <string name="cs_page_launcher">Biểu tượng riêng</string>
+    <string name="cs_page_launcher_desc">Biểu tượng mở thẳng Circle to Search, Gemini, Search Live</string>
+    <string name="cs_page_strip">Giữ thanh điều hướng</string>
+    <string name="cs_page_strip_desc">Dải vô hình trên vạch điều hướng để mở bằng cách giữ</string>
     <string name="cs_back">Quay lại</string>
     <string name="cs_status_no_google">Chưa cài ứng dụng Google. Circle to Search cần ứng dụng này.</string>
     <string name="cs_status_not_assistant">Google chưa là trợ lý số mặc định nên yêu cầu sẽ bị từ chối.</string>
     <string name="cs_status_ready">Đã cài Google và đặt làm trợ lý mặc định.</string>
     <string name="cs_assistant_set">Đặt Google làm trợ lý</string>
-    <string name="cs_assistant_needs_adb">Cần kết nối ADB ở màn hình chính để tự đặt trợ lý.</string>
+    <string name="cs_assistant_needs_adb">Cần kết nối ADB ở màn hình Kết nối ADB để tự đặt trợ lý.</string>
     <string name="cs_assistant_done">Đã đặt Google làm trợ lý mặc định.</string>
     <string name="cs_assistant_failed">Không đặt được trợ lý: %1$s</string>
     <string name="cs_assistant_restore">Khôi phục trợ lý trước đó</string>

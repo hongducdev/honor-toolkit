@@ -6,10 +6,12 @@ Entry points and where each concern lives. Architecture and rationale: `system-a
 
 | File | Concern |
 | --- | --- |
-| `main-activity.kt` | Launcher activity, edge-to-edge, hosts `HomeScreen` |
+| `main-activity.kt` | Launcher activity, edge-to-edge, hosts the screens behind an M3 Expressive `HorizontalFloatingToolbar` (Home, Circle, Debloat when ADB is connected, ADB) |
 | `ui/theme/honor-toolkit-theme.kt` | Material 3 theme with dynamic color on Android 12+ |
 | `ui/home/home-view-model.kt` | `HomeUiState`, combines `AdbSession` flows, reconnects on start |
-| `ui/home/home-screen.kt` | Scaffold, notification-permission request, shell probe card |
+| `core/ui/toolkit-components.kt` | Shared `ToolkitTopBar`, `SettingsGroup`/`SettingsRow`, `SwitchRow`, `SliderRow`, `NavRow` (haptics on interaction) |
+| `ui/home/home-screen.kt` | Home: connection status + tool list (Circle to Search, Debloat, ADB connection) |
+| `ui/home/connection-screen.kt` | ADB connection screen: pairing flow, notification-permission request, shell probe card |
 | `ui/home/connection-status-card.kt` | Connection state and reconnect button |
 | `ui/home/pairing-card.kt` | Pairing steps, start button, in-app code field |
 
@@ -58,7 +60,7 @@ Strings are Vietnamese in `res/values/strings.xml`.
 | `trigger-config.kt` | SharedPreferences for delays, vibration and strip geometry |
 | `assistant-setup.kt` | Set Google as assistant through `AdbShell`, remember and restore the previous holder |
 | `launcher-alias.kt`, `quick-launch-activities.kt` | Opt-in extra launcher icons (Circle to Search, Gemini, Search Live) for pickers that only list apps; Gemini and Search Live activities start one public intent |
-| `circle-search-view-model.kt`, `circle-search-screen.kt` | Compose screen: readiness card, trigger settings, strip settings |
+| `circle-search-view-model.kt`, `circle-search-screen.kt` | Compose hub (readiness card + links) with sub-pages: trigger, launcher icons, nav-bar strip |
 
 ## Docs and plans
 

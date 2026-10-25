@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.ui.graphics.Brush
 import vn.hongducdev.honortoolkit.core.ui.CookieShape
 import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
-import vn.hongducdev.honortoolkit.core.ui.rememberMotionEnabled
-import vn.hongducdev.honortoolkit.core.ui.scrollMotionBlur
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Column
@@ -24,7 +22,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreVert
+import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,7 +39,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,7 +61,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: DebloatViewModel = viewModel()) {
+fun DebloatScreen(modifier: Modifier = Modifier, viewModel: DebloatViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -75,7 +76,6 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
         }
     }
 
-    val backLabel = stringResource(R.string.debloat_back)
     val messageText = state.message?.let { messageText(it) }
     LaunchedEffect(messageText) {
         if (messageText != null) {
@@ -89,17 +89,12 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.debloat_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Text("←", style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics {
-                            contentDescription = backLabel
-                        })
-                    }
-                },
+            ToolkitTopBar(
+                title = stringResource(R.string.debloat_title),
                 actions = {
-                    IconButton(onClick = { menuOpen = true }) { Text("⋮", style = MaterialTheme.typography.titleLarge) }
+                    IconButton(onClick = { menuOpen = true }) {
+                        Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.debloat_menu))
+                    }
                     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.debloat_refresh)) },
@@ -141,9 +136,8 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
             if (visible.isEmpty() && !state.loading) {
                 Text(stringResource(R.string.debloat_empty), style = MaterialTheme.typography.bodyMedium)
             }
-            val motionEnabled = rememberMotionEnabled()
             Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(modifier = Modifier.fillMaxSize().scrollMotionBlur(motionEnabled)) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(visible, key = { it.packageName }) { entry ->
                         PackageRow(entry, onDisable = { viewModel.requestDisable(entry) }, onEnable = { viewModel.enable(entry) })
                     }

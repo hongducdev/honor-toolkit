@@ -12,51 +12,56 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.SwipeUp
+import androidx.compose.material.icons.rounded.Widgets
+import androidx.compose.material.icons.rounded.TouchApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import vn.hongducdev.honortoolkit.core.ui.NavRow
+import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
+import vn.hongducdev.honortoolkit.core.ui.SettingsNote
+import vn.hongducdev.honortoolkit.core.ui.SliderRow
+import vn.hongducdev.honortoolkit.core.ui.SwitchRow
+import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 import vn.hongducdev.honortoolkit.core.ui.WavyProgressIndicator
 
-@OptIn(ExperimentalMaterial3Api::class)
+// The hub is a top-level destination (no back arrow); system back from a sub-page returns to the hub.
 @Composable
-fun CircleSearchScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: CircleSearchViewModel = viewModel()) {
+fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
-    val backLabel = stringResource(R.string.cs_back)
+    var page by rememberSaveable { mutableStateOf(CsPage.Hub) }
 
-    BackHandler(onBack = onBack)
+    BackHandler(enabled = page != CsPage.Hub) { page = CsPage.Hub }
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -76,15 +81,10 @@ fun CircleSearchScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewMo
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.cs_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Text("←", style = MaterialTheme.typography.titleLarge, modifier = Modifier.semantics {
-                            contentDescription = backLabel
-                        })
-                    }
-                },
+            ToolkitTopBar(
+                title = stringResource(page.titleRes),
+                onBack = if (page == CsPage.Hub) null else ({ page = CsPage.Hub }),
+                backDescription = stringResource(R.string.cs_back),
             )
         },
         snackbarHost = { SnackbarHost(snackbar) },
@@ -93,79 +93,88 @@ fun CircleSearchScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewMo
             modifier = Modifier.padding(padding).padding(horizontal = 16.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            StatusCard(state, viewModel)
-            SectionCard(stringResource(R.string.cs_trigger_heading)) {
-                LabeledSlider(R.string.cs_delay_label, state.delayMs, 0, TriggerConfig.MAX_DELAY_MS, STEP_MS, viewModel::setDelay)
-                LabeledSlider(R.string.cs_tile_delay_label, state.tileDelayMs, 0, TriggerConfig.MAX_DELAY_MS, STEP_MS, viewModel::setTileDelay)
-                SwitchRow(stringResource(R.string.cs_vibrate_label), state.vibrate, viewModel::setVibrate)
-                FilledTonalButton(onClick = viewModel::test) { Text(stringResource(R.string.cs_test_button)) }
-                if (state.lastResult.isNotEmpty()) {
-                    Text(
-                        stringResource(R.string.cs_last_result, state.lastResult),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
-            SectionCard(stringResource(R.string.cs_assign_heading)) {
-                Text(stringResource(R.string.cs_assign_body), style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    stringResource(R.string.cs_old_app_note),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            SectionCard(stringResource(R.string.cs_launcher_heading)) {
-                Text(stringResource(R.string.cs_launcher_body), style = MaterialTheme.typography.bodyMedium)
-                listOf(
-                    LauncherEntry.CircleSearch to R.string.cs_launcher_circle_search,
-                    LauncherEntry.Gemini to R.string.cs_launcher_gemini,
-                    LauncherEntry.SearchLive to R.string.cs_launcher_live,
-                ).forEach { (entry, label) ->
-                    SwitchRow(stringResource(label), entry in state.launcherEntries) { viewModel.setLauncherEntry(entry, it) }
-                }
-            }
-            SectionCard(stringResource(R.string.cs_strip_heading)) {
-                Text(
-                    stringResource(R.string.cs_strip_hint),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    stringResource(
-                        when {
-                            !state.overlayGranted -> R.string.cs_strip_no_permission
-                            state.stripEnabled -> R.string.cs_strip_on
-                            else -> R.string.cs_strip_off
-                        },
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-                SwitchRow(
-                    stringResource(R.string.cs_strip_switch_label),
-                    state.stripEnabled && state.overlayGranted,
-                ) { enabled ->
-                    viewModel.setStripEnabled(enabled)
-                    if (enabled && !state.overlayGranted) {
-                        context.startActivity(
-                            Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")),
-                        )
+            when (page) {
+                CsPage.Hub -> {
+                    StatusCard(state, viewModel)
+                    SettingsGroup(null) {
+                        CsPage.entries.filter { it != CsPage.Hub }.forEach { target ->
+                            NavRow(target.icon, stringResource(target.titleRes), stringResource(target.descriptionRes)) { page = target }
+                        }
                     }
                 }
-                LabeledSlider(R.string.cs_strip_width_label, state.stripWidthPercent, 5, TriggerConfig.MAX_STRIP_WIDTH_PERCENT, 5, viewModel::setStripWidth)
-                LabeledSlider(R.string.cs_strip_height_label, state.stripHeightDp, 2, TriggerConfig.MAX_STRIP_HEIGHT_DP, 2, viewModel::setStripHeight)
-                LabeledSlider(
-                    R.string.cs_strip_offset_label,
-                    state.stripOffsetDp,
-                    TriggerConfig.MIN_STRIP_OFFSET_DP,
-                    TriggerConfig.MAX_STRIP_OFFSET_DP,
-                    2,
-                    viewModel::setStripOffset,
-                )
-                SwitchRow(stringResource(R.string.cs_strip_visible_label), state.stripVisible, viewModel::setStripVisible)
+                CsPage.Trigger -> {
+                    SettingsGroup(stringResource(R.string.cs_trigger_heading)) {
+                        SliderRow({ stringResource(R.string.cs_delay_label, it) }, state.delayMs, 0, TriggerConfig.MAX_DELAY_MS, STEP_MS, viewModel::setDelay)
+                        SliderRow({ stringResource(R.string.cs_tile_delay_label, it) }, state.tileDelayMs, 0, TriggerConfig.MAX_DELAY_MS, STEP_MS, viewModel::setTileDelay)
+                        SwitchRow(stringResource(R.string.cs_vibrate_label), state.vibrate, viewModel::setVibrate)
+                    }
+                    FilledTonalButton(onClick = viewModel::test) { Text(stringResource(R.string.cs_test_button)) }
+                    if (state.lastResult.isNotEmpty()) {
+                        Text(
+                            stringResource(R.string.cs_last_result, state.lastResult),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    SettingsGroup(stringResource(R.string.cs_assign_heading)) {
+                        SettingsNote(stringResource(R.string.cs_assign_body))
+                        SettingsNote(stringResource(R.string.cs_old_app_note))
+                    }
+                }
+                CsPage.Launcher -> SettingsGroup(stringResource(R.string.cs_launcher_heading)) {
+                    SettingsNote(stringResource(R.string.cs_launcher_body))
+                    listOf(
+                        LauncherEntry.CircleSearch to R.string.cs_launcher_circle_search,
+                        LauncherEntry.Gemini to R.string.cs_launcher_gemini,
+                        LauncherEntry.SearchLive to R.string.cs_launcher_live,
+                    ).forEach { (entry, label) ->
+                        SwitchRow(stringResource(label), entry in state.launcherEntries) { viewModel.setLauncherEntry(entry, it) }
+                    }
+                }
+                CsPage.Strip -> SettingsGroup(stringResource(R.string.cs_strip_heading)) {
+                    SettingsNote(stringResource(R.string.cs_strip_hint))
+                    SettingsNote(
+                        stringResource(
+                            when {
+                                !state.overlayGranted -> R.string.cs_strip_no_permission
+                                state.stripEnabled -> R.string.cs_strip_on
+                                else -> R.string.cs_strip_off
+                            },
+                        ),
+                    )
+                    SwitchRow(
+                        stringResource(R.string.cs_strip_switch_label),
+                        state.stripEnabled && state.overlayGranted,
+                    ) { enabled ->
+                        viewModel.setStripEnabled(enabled)
+                        if (enabled && !state.overlayGranted) {
+                            context.startActivity(
+                                Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")),
+                            )
+                        }
+                    }
+                    SliderRow({ stringResource(R.string.cs_strip_width_label, it) }, state.stripWidthPercent, 5, TriggerConfig.MAX_STRIP_WIDTH_PERCENT, 5, viewModel::setStripWidth)
+                    SliderRow({ stringResource(R.string.cs_strip_height_label, it) }, state.stripHeightDp, 2, TriggerConfig.MAX_STRIP_HEIGHT_DP, 2, viewModel::setStripHeight)
+                    SliderRow(
+                        { stringResource(R.string.cs_strip_offset_label, it) },
+                        state.stripOffsetDp,
+                        TriggerConfig.MIN_STRIP_OFFSET_DP,
+                        TriggerConfig.MAX_STRIP_OFFSET_DP,
+                        2,
+                        viewModel::setStripOffset,
+                    )
+                    SwitchRow(stringResource(R.string.cs_strip_visible_label), state.stripVisible, viewModel::setStripVisible)
+                }
             }
         }
     }
+}
+
+private enum class CsPage(val titleRes: Int, val descriptionRes: Int, val icon: ImageVector) {
+    Hub(R.string.cs_title, 0, Icons.Rounded.Apps),
+    Trigger(R.string.cs_page_trigger, R.string.cs_page_trigger_desc, Icons.Rounded.TouchApp),
+    Launcher(R.string.cs_page_launcher, R.string.cs_page_launcher_desc, Icons.Rounded.Widgets),
+    Strip(R.string.cs_page_strip, R.string.cs_page_strip_desc, Icons.Rounded.SwipeUp),
 }
 
 @Composable
@@ -175,7 +184,7 @@ private fun StatusCard(state: CircleSearchUiState, viewModel: CircleSearchViewMo
     val content = if (ready) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(containerColor = container, contentColor = content),
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -203,46 +212,6 @@ private fun StatusCard(state: CircleSearchUiState, viewModel: CircleSearchViewMo
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun SectionCard(title: String, content: @Composable () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
-        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
-            content()
-        }
-    }
-}
-
-@Composable
-private fun SwitchRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-        Switch(checked = checked, onCheckedChange = onChange)
-    }
-}
-
-// labelRes takes one %d placeholder for the current value. The slider keeps its own position while
-// dragging and writes the setting only when the drag ends.
-@Composable
-private fun LabeledSlider(labelRes: Int, value: Long, min: Long, max: Long, step: Long, onCommit: (Long) -> Unit) {
-    var dragging by remember(value) { mutableFloatStateOf(value.toFloat()) }
-    val snapped = (min + ((dragging.toLong() - min) / step) * step).coerceIn(min, max)
-    Column {
-        Text(stringResource(labelRes, snapped), style = MaterialTheme.typography.bodyMedium)
-        Slider(
-            value = snapped.toFloat(),
-            onValueChange = { dragging = it },
-            onValueChangeFinished = { onCommit(snapped) },
-            valueRange = min.toFloat()..max.toFloat(),
-            steps = ((max - min) / step - 1).toInt().coerceAtLeast(0),
-        )
     }
 }
 
