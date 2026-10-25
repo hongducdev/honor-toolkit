@@ -36,7 +36,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarScrollBehavior
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -64,9 +63,9 @@ data class ToolbarDestination<T : Any>(
     val icon: ImageVector,
 )
 
-// Labels need roughly 80dp each; past these limits the selected pill would push the toolbar off-screen.
+// Four tabs with the longest label need about 300dp, so labels fit on 365dp phones; below 340dp or at large font they would push the bar off-screen.
 private const val LabelHiddenFontScale = 1.25f
-private const val CompactScreenWidthDp = 400
+private const val CompactScreenWidthDp = 340
 private const val CompactDestinationCount = 3
 
 // A fifth tab plus a floating action makes the bar wider than a phone and the layout jumps.
@@ -79,7 +78,6 @@ fun <T : Any> ToolkitFloatingToolbar(
     selectedId: T,
     onSelect: (T) -> Unit,
     spec: ToolbarSpec,
-    scrollBehavior: FloatingToolbarScrollBehavior,
     motionEnabled: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -135,7 +133,6 @@ fun <T : Any> ToolkitFloatingToolbar(
             expanded = true,
             colors = toolbarColors,
             floatingActionButton = { ToolbarFab(fab, haptics) },
-            scrollBehavior = scrollBehavior,
             modifier = modifier,
             content = content,
         )
@@ -143,7 +140,6 @@ fun <T : Any> ToolkitFloatingToolbar(
         HorizontalFloatingToolbar(
             expanded = true,
             colors = toolbarColors,
-            scrollBehavior = scrollBehavior,
             modifier = modifier,
             content = content,
         )

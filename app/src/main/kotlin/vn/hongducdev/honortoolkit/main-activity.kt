@@ -18,8 +18,6 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
@@ -28,7 +26,6 @@ import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -101,7 +98,6 @@ class MainActivity : ComponentActivity() {
                     else -> BackHandler { screen = Screen.Home }
                 }
                 val toolbarHost = remember { ToolbarHost() }
-                val toolbarScroll = FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = FloatingToolbarExitDirection.Bottom)
                 val destinations = remember(connected) {
                     Screen.entries
                         .filter { it.inToolbar && (!it.needsAdb || connected) }
@@ -111,7 +107,7 @@ class MainActivity : ComponentActivity() {
                 val toolbarClearance = ToolbarHeight + ToolbarBottomMargin + ToolbarContentGap
                 val fadeHeight = toolbarClearance + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + ToolbarFadeExtra
                 val fadeOverlay = MaterialTheme.colorScheme.background.copy(alpha = ToolbarFadeAlpha)
-                Box(modifier = Modifier.nestedScroll(toolbarScroll)) {
+                Box {
                 CompositionLocalProvider(LocalToolbarClearance provides toolbarClearance, LocalToolbarHost provides toolbarHost) {
                 AnimatedContent(
                     modifier = Modifier.bottomFade(height = fadeHeight, overlay = fadeOverlay),
@@ -151,7 +147,6 @@ class MainActivity : ComponentActivity() {
                     selectedId = screen,
                     onSelect = { screen = it },
                     spec = toolbarHost.active,
-                    scrollBehavior = toolbarScroll,
                     motionEnabled = motionEnabled,
                     modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = ToolbarBottomMargin),
                 )
