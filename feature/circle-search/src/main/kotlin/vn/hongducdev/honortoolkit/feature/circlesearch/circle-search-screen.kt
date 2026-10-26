@@ -55,7 +55,6 @@ import vn.hongducdev.honortoolkit.core.ui.SwitchRow
 import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
-import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
 
 // The hub is a top-level destination (no back arrow); system back from a sub-page returns to the hub.
@@ -98,13 +97,10 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            if (page == CsPage.Hub) ToolkitTopBar(title = stringResource(page.titleRes))
-        },
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         Column(
-            modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = if (page == CsPage.Hub) 0.dp else 8.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
+            modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = 8.dp).verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             when (page) {

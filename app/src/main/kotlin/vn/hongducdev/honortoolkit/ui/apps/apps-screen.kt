@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import vn.hongducdev.honortoolkit.R
 import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
-import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
 
 /** Entry point for the ADB-backed app tools, grouped here so the bottom toolbar stays short. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,9 +29,8 @@ fun AppsScreen(
 ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = { ToolkitTopBar(title = stringResource(R.string.apps_title)) },
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        Column(modifier = Modifier.padding(padding).padding(horizontal = 16.dp).padding(top = 8.dp),verticalArrangement = Arrangement.spacedBy(16.dp)) {
             SettingsGroup(title = null) {
                 NavRow(
                     Icons.Rounded.Notifications,
