@@ -21,10 +21,13 @@ data class DeviceInfo(
     val securityPatch: String,
     val build: String,
     val totalStorage: Long,
+    val usedStorage: Long,
     val totalRam: Long,
+    val usedRam: Long,
 )
 
 fun readDeviceInfo(context: Context): DeviceInfo {
+    val dataDir = StatFs(Environment.getDataDirectory().path)
     val memory = ActivityManager.MemoryInfo().also { context.getSystemService(ActivityManager::class.java).getMemoryInfo(it) }
     val deviceName = Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME)
         ?: Settings.Secure.getString(context.contentResolver, "bluetooth_name")
@@ -38,8 +41,10 @@ fun readDeviceInfo(context: Context): DeviceInfo {
         sdkInt = Build.VERSION.SDK_INT,
         securityPatch = Build.VERSION.SECURITY_PATCH,
         build = Build.DISPLAY,
-        totalStorage = StatFs(Environment.getDataDirectory().path).totalBytes,
+        totalStorage = dataDir.totalBytes,
+        usedStorage = dataDir.totalBytes - dataDir.availableBytes,
         totalRam = memory.totalMem,
+        usedRam = memory.totalMem - memory.availMem,
     )
 }
 

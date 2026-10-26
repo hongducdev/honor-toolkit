@@ -5,10 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.text.format.Formatter
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,6 +28,7 @@ import androidx.compose.material.icons.rounded.BatteryFull
 import androidx.compose.material.icons.rounded.Dns
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,7 +69,7 @@ private val CardGap = 2.dp
 private val LogoSize = 200.dp
 
 @Composable
-fun DeviceInfoScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
+fun DeviceInfoScreen(onBack: () -> Unit, onOpenUsage: () -> Unit, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val info = remember { readDeviceInfo(context) }
     val scope = rememberCoroutineScope()
@@ -120,7 +124,7 @@ fun DeviceInfoScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(CardGap),
         ) {
             VersionCard(info)
-            HardwareCard(info)
+            HardwareCard(info, onOpenUsage)
             BatteryCard()
         }
     }
@@ -165,11 +169,18 @@ private fun DeviceHero(info: DeviceInfo, stretch: () -> Float) {
 }
 
 @Composable
-private fun InfoCard(vertical: androidx.compose.ui.unit.Dp = 16.dp, content: @Composable () -> Unit) {
+private fun InfoCard(
+    vertical: androidx.compose.ui.unit.Dp = 16.dp,
+    onClick: (() -> Unit)? = null,
+    content: @Composable () -> Unit,
+) {
+    val shape = MaterialTheme.shapes.extraSmall
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceBright, MaterialTheme.shapes.extraSmall)
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceBright)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 16.dp, vertical = vertical),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) { content() }
@@ -204,22 +215,39 @@ private fun VersionCard(info: DeviceInfo) {
 }
 
 @Composable
-private fun HardwareCard(info: DeviceInfo) {
-    InfoCard {
+private fun HardwareCard(info: DeviceInfo, onClick: () -> Unit) {
+    val context = LocalContext.current
+    InfoCard(onClick = onClick) {
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-            HardwareStat(Icons.Rounded.Dns, stringResource(R.string.device_info_storage), formatHardwareSize(info.totalStorage))
-            HardwareStat(Icons.Rounded.Memory, stringResource(R.string.device_info_ram), formatHardwareSize(info.totalRam))
+            HardwareStat(
+                Icons.Rounded.Dns,
+                stringResource(R.string.device_info_storage),
+                stringResource(R.string.device_info_usage, Formatter.formatShortFileSize(context, info.usedStorage), formatHardwareSize(info.totalStorage)),
+                info.usedStorage.toFloat() / info.totalStorage,
+            )
+            HardwareStat(
+                Icons.Rounded.Memory,
+                stringResource(R.string.device_info_ram),
+                stringResource(R.string.device_info_usage, Formatter.formatShortFileSize(context, info.usedRam), formatHardwareSize(info.totalRam)),
+                info.usedRam.toFloat() / info.totalRam,
+            )
         }
+        Text(
+            stringResource(R.string.device_info_usage_hint),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
 @Composable
-private fun HardwareStat(icon: ImageVector, label: String, value: String) {
+private fun HardwareStat(icon: ImageVector, label: String, value: String, fraction: Float) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+            LinearProgressIndicator(progress = { fraction.coerceIn(0f, 1f) }, modifier = Modifier.width(96.dp))
         }
     }
 }

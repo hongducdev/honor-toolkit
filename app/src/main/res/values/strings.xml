@@ -61,4 +61,11 @@
     <string name="device_info_battery">Pin</string>
     <string name="device_info_storage">Lưu trữ</string>
     <string name="device_info_ram">RAM</string>
+    <string name="device_info_usage">%1$s / %2$s</string>
+    <string name="device_info_usage_hint">Bấm để xem từng ứng dụng dùng bao nhiêu</string>
+    <string name="device_usage_title">Dung lượng ứng dụng</string>
+    <string name="device_usage_of_total">/ %1$s</string>
+    <string name="device_usage_app_count">%1$d ứng dụng</string>
+    <string name="device_usage_refresh">Tải lại</string>
+    <string name="device_usage_failed">Không đọc được dữ liệu qua ADB: %1$s</string>
 </resources>

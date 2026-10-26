@@ -65,6 +65,7 @@ import vn.hongducdev.honortoolkit.feature.permissions.PermissionsScreen
 import vn.hongducdev.honortoolkit.ui.apps.AppsScreen
 import vn.hongducdev.honortoolkit.ui.home.ConnectionScreen
 import vn.hongducdev.honortoolkit.ui.home.DeviceInfoScreen
+import vn.hongducdev.honortoolkit.ui.home.DeviceUsageScreen
 import vn.hongducdev.honortoolkit.ui.home.HomeScreen
 import vn.hongducdev.honortoolkit.ui.navigation.ToolbarDestination
 import vn.hongducdev.honortoolkit.ui.navigation.ToolkitFloatingToolbar
@@ -77,6 +78,7 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     Apps(R.string.nav_apps, Icons.Rounded.Apps),
     Connection(R.string.nav_connection, Icons.Rounded.Link, inToolbar = false),
     DeviceInfo(R.string.device_info_title, Icons.Rounded.Home, inToolbar = false),
+    DeviceUsage(R.string.device_usage_title, Icons.Rounded.Home, inToolbar = false),
     // Sub-pages reached from Home or Apps stay off the toolbar, which holds at most four tabs.
     NotificationFix(R.string.nav_notification_fix, Icons.Rounded.Notifications, inToolbar = false),
     Debloat(R.string.nav_debloat, Icons.Rounded.Apps, inToolbar = false),
@@ -85,6 +87,8 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
 
     val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions
 }
+
+private fun Screen?.opensFromTop(): Boolean = this == Screen.DeviceInfo || this == Screen.DeviceUsage
 
 private val ToolbarHeight = 64.dp
 private val ToolbarBottomMargin = 12.dp
@@ -144,7 +148,7 @@ class MainActivity : ComponentActivity() {
                 PredictiveBackHandler(enabled = subPage != null) { progress ->
                     try {
                         progress.collect { backProgress.snapTo(it.progress) }
-                        subPage = null
+                        subPage = if (subPage == Screen.DeviceUsage) Screen.DeviceInfo else null
                     } catch (e: CancellationException) {
                         backProgress.animateTo(0f, SubPageSettleSpec)
                         throw e
@@ -162,7 +166,7 @@ class MainActivity : ComponentActivity() {
                         Box(modifier = Modifier.bottomFade(height = fadeHeight, overlay = fadeOverlay)) {
                             HorizontalPager(
                                 state = pagerState,
-                                modifier = Modifier.fillMaxSize().subPageUnderlay(fromTop = shownPage == Screen.DeviceInfo) { reveal.value },
+                                modifier = Modifier.fillMaxSize().subPageUnderlay(fromTop = shownPage.opensFromTop()) { reveal.value },
                                 userScrollEnabled = subPage == null,
                                 key = { tabs[it] },
                             ) { index ->
@@ -182,11 +186,12 @@ class MainActivity : ComponentActivity() {
                                     else -> Unit
                                 }
                             }
-                            SubPageHost(page = shownPage, reveal = { reveal.value }, backProgress = { backProgress.value }, fromTop = shownPage == Screen.DeviceInfo) { target ->
+                            SubPageHost(page = shownPage, reveal = { reveal.value }, backProgress = { backProgress.value }, fromTop = shownPage.opensFromTop()) { target ->
                                 val close = { subPage = null }
                                 when (target) {
                                     Screen.Connection -> ConnectionScreen(onBack = close)
-                                    Screen.DeviceInfo -> DeviceInfoScreen(onBack = close)
+                                    Screen.DeviceInfo -> DeviceInfoScreen(onBack = close, onOpenUsage = { subPage = Screen.DeviceUsage })
+                                    Screen.DeviceUsage -> DeviceUsageScreen(onBack = { subPage = Screen.DeviceInfo })
                                     Screen.NotificationFix -> NotificationFixScreen(onBack = close)
                                     Screen.Debloat -> DebloatScreen(onBack = close)
                                     Screen.Permissions -> PermissionsScreen(onBack = close)
