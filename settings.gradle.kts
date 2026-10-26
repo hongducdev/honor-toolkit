@@ -18,6 +18,8 @@ dependencyResolutionManagement {
 rootProject.name = "honor-toolkit"
 include(":app")
 include(":core:adb")
+include(":core:quickshare")
+include(":feature:quickshare")
 include(":core:ui")
 include(":feature:circle-search")
 include(":feature:debloat")

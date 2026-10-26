@@ -8,10 +8,24 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | --- | --- |
 | `:app` | Compose UI (`ui/home`), `MainActivity`, release signing config, `WRITE_SECURE_SETTINGS` declaration |
 | `:core:adb` | ADB client over Wireless debugging, pairing service, diagnostic log. No UI |
+| `:core:quickshare` | Quick Share / Nearby Share protocol engine for phones without GMS. Pure JVM (no `android.*`), protobuf-javalite, JVM unit tests. No UI, no discovery yet |
 | `:core:ui` | Shared motion helpers: wavy progress, scroll motion blur, cookie shape, motion guard |
 | `:feature:debloat` | Package scan, disable/enable through `AdbShell`, denylist, journal, Compose screen |
 | `:feature:permissions` | Runtime permission grant/revoke and AppOps for third-party apps through `AdbShell`, guard, read-back verification, journal, Compose screen |
 | `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, assistant setup, Compose screen |
+
+## Quick Share engine (`:core:quickshare`)
+
+Written from NearDrop's `PROTOCOL.md` and Swift sources (Unlicense) and the protos in `src/main/proto` (Google, Apache-2.0). Bada has no licence, so none of its code is used; its interop notes were used only as a checklist of observed peer behaviour.
+
+- The receiver listens on a TCP port and advertises mDNS type `_FC9F5ED42C8A._tcp` with a base64url name from `EndpointNaming.mdnsServiceName` and a TXT `n` record from `EndpointNaming.endpointInfoRecord`. The sender connects. Discovery and the foreground service are not part of this module.
+- Flow: plain `ConnectionRequest` → UKEY2 (`Ukey2Client` / `Ukey2Server`, P256_SHA512) → plain `ConnectionResponse` → everything else through `SecureChannel` (AES-256-CBC + HMAC-SHA256, MAC checked before decryption, sequence numbers checked). Sharing frames (paired key, introduction, response) travel as BYTES payloads sent as a data chunk plus an empty LAST_CHUNK.
+- `InboundConnection` / `OutboundConnection` are blocking: `run()` returns a `TransferOutcome`, `cancel()` stops it from another thread. Consent is asynchronous: `InboundListener.onOffer` receives a `ConsentResponder` to answer later from any thread. Keep-alives go out every 10 s; the read timeout is 30 s.
+- Behaviour that Samsung One UI needs and is implemented: OS type ANDROID, `multiplex_socket_bitmask = 0`, `safe_to_disconnect_version = 1` in the connection response; `use_case = NEARBY_SHARE` and `FileMetadata.id = payload_id` in the introduction; an empty LAST_CHUNK frame after each file; a Disconnection with `request_safe_to_disconnect` followed by up to 1.5 s of waiting for the peer.
+- Open point: the ECDH x-coordinate is hashed as its minimal magnitude (NearDrop). If GMS hashes the fixed 32-byte form, roughly 1 handshake in 256 fails; check on a device.
+- Receiving is wired in `:feature:quickshare` (service, mDNS advertise, MediaStore sink, notification consent with PIN). Verified on a Samsung SM-S721B only that the foreground service starts and mDNS registers; no transfer from a real Quick Share sender has been tested yet.
+- Sending: `QuickShareSendActivity` (share-sheet target in `:app`) browses mDNS through `MdnsBrowser`, shows the PIN and streams the files. Verified: Honor Magic7 Pro to the stock Samsung SM-S721B Quick Share, 318134-byte JPEG received with the same size, PINs matched. A stock receiver in contacts mode sets the hidden bit and publishes no name, so it is listed as "Thiết bị Quick Share" with its IP.
+- Not done: BLE (service UUIDs 0xFE2C / 0xFEF3), Wi-Fi Direct upgrade, share-sheet send activity. Tracked in `plans/261026-1200-quick-share-from-bada.md`.
 
 ## Circle to Search (`:feature:circle-search`)
 
@@ -45,6 +59,12 @@ Public surface: `AdbSession`, `AdbState`, `AdbShell`, `ShellResult`, `PairingFor
 Not used by the pairing notification. Verified on the Magic7 Pro: an ongoing notification that sets the extra `android.requestPromotedOngoing` (and the manifest permission `POST_PROMOTED_NOTIFICATIONS`, granted automatically) is promoted by the framework (`PROMOTED_ONGOING`) and shows in Magic Capsule with the app icon and an elapsed-time counter. Tapping the capsule expands it with title, text and the notification actions, but a `RemoteInput` action gets no text field there: the reply button fires its `PendingIntent` immediately with no text, so the 6-digit code cannot be typed in the capsule. Use it for progress or status only, with a title and no custom `RemoteViews`.
 
 The typed setter `Notification.Builder.setRequestPromotedOngoing` exists only from SDK 37, so on SDK 36 set the extra key directly. Honor also asks the user per app ("Cho phép thông báo dạng nang"), which the app cannot grant itself.
+
+## Quick Share offers on MagicOS (verified on Magic7 Pro)
+
+- The offer notification is ongoing, carries `android.requestPromotedOngoing` and a chronometer; with the app in the background it shows in Magic Capsule, and tapping the capsule shows the Nhận / Từ chối actions. The framework promotes it only after `cmd appops set <pkg> POST_PROMOTED_NOTIFICATIONS allow` (the screen runs it when ADB is connected).
+- Magic Capsule is not shown for the foreground app, and MagicOS lowers the new "offer" channel to importance 3 (no banner) whatever the app requests. `QuickShareOfferDialog` therefore shows a dialog on every screen while an offer is pending (`ReceiverStatus.offer`).
+- Answering an offer writes to the peer socket, so it runs on the service executor, never on the main thread.
 
 ## MagicOS behaviour the design depends on (verified on Magic7 Pro)
 

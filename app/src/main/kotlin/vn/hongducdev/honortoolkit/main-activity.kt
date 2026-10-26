@@ -38,6 +38,7 @@ import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
@@ -62,6 +63,8 @@ import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchScreen
 import vn.hongducdev.honortoolkit.feature.debloat.DebloatScreen
 import vn.hongducdev.honortoolkit.feature.notificationfix.NotificationFixScreen
 import vn.hongducdev.honortoolkit.feature.permissions.PermissionsScreen
+import vn.hongducdev.honortoolkit.feature.quickshare.QuickShareOfferDialog
+import vn.hongducdev.honortoolkit.feature.quickshare.QuickShareScreen
 import vn.hongducdev.honortoolkit.ui.apps.AppsScreen
 import vn.hongducdev.honortoolkit.ui.home.ConnectionScreen
 import vn.hongducdev.honortoolkit.ui.home.DeviceInfoScreen
@@ -83,6 +86,7 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     NotificationFix(R.string.nav_notification_fix, Icons.Rounded.Notifications, inToolbar = false),
     Debloat(R.string.nav_debloat, Icons.Rounded.Apps, inToolbar = false),
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
+    QuickShare(R.string.nav_quick_share, Icons.Rounded.Share, inToolbar = false),
     ;
 
     val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions
@@ -161,6 +165,7 @@ class MainActivity : ComponentActivity() {
                 val toolbarClearance = ToolbarHeight + ToolbarBottomMargin + ToolbarContentGap
                 val fadeHeight = toolbarClearance + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + ToolbarFadeExtra
                 val fadeOverlay = MaterialTheme.colorScheme.background.copy(alpha = ToolbarFadeAlpha)
+                QuickShareOfferDialog()
                 Box {
                     CompositionLocalProvider(LocalToolbarClearance provides toolbarClearance, LocalToolbarHost provides toolbarHost) {
                         Box(modifier = Modifier.bottomFade(height = fadeHeight, overlay = fadeOverlay)) {
@@ -176,6 +181,7 @@ class MainActivity : ComponentActivity() {
                                         onOpenCircleSearch = { showTab(Screen.CircleSearch) },
                                         onOpenConnection = { subPage = Screen.Connection },
                                         onOpenDeviceInfo = { subPage = Screen.DeviceInfo },
+                                        onOpenQuickShare = { subPage = Screen.QuickShare },
                                     )
                                     Screen.CircleSearch -> CircleSearchScreen()
                                     Screen.Apps -> AppsScreen(
@@ -195,6 +201,7 @@ class MainActivity : ComponentActivity() {
                                     Screen.NotificationFix -> NotificationFixScreen(onBack = close)
                                     Screen.Debloat -> DebloatScreen(onBack = close)
                                     Screen.Permissions -> PermissionsScreen(onBack = close)
+                                    Screen.QuickShare -> QuickShareScreen(onBack = close)
                                     else -> Unit
                                 }
                             }

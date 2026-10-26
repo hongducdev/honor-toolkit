@@ -27,6 +27,9 @@
     <string name="nav_apps">Ứng dụng</string>
     <string name="nav_debloat">Gỡ app</string>
     <string name="nav_permissions">Quyền</string>
+    <string name="nav_quick_share">Quick Share</string>
+    <string name="home_open_quick_share">Quick Share</string>
+    <string name="home_quick_share_description">Nhận file từ Samsung, Pixel qua Wi-Fi</string>
     <string name="nav_notification_fix">Thông báo</string>
     <string name="nav_connection">ADB</string>
     <string name="back">Quay lại</string>

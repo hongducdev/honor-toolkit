@@ -34,6 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +62,7 @@ fun HomeScreen(
     onOpenCircleSearch: () -> Unit,
     onOpenConnection: () -> Unit,
     onOpenDeviceInfo: () -> Unit,
+    onOpenQuickShare: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
 ) {
@@ -120,6 +122,12 @@ fun HomeScreen(
                         onOpenApps,
                     )
                 }
+                NavRow(
+                    Icons.Rounded.Share,
+                    stringResource(R.string.home_open_quick_share),
+                    stringResource(R.string.home_quick_share_description),
+                    onOpenQuickShare,
+                )
                 NavRow(
                     Icons.Rounded.Link,
                     stringResource(R.string.home_open_connection),

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="quick_share_title">Quick Share</string>
+    <string name="quick_share_back">Quay lại</string>
+    <string name="quick_share_intro">Nhận file từ điện thoại Android khác qua Wi-Fi cùng mạng. Máy hiện trong Quick Share của Samsung và Pixel khi bạn bật nhận.</string>
+    <string name="quick_share_receive">Cho phép nhận file</string>
+    <string name="quick_share_status_off">Đang tắt</string>
+    <string name="quick_share_status_listening">Đang chờ — máy hiện với tên “%1$s”</string>
+    <string name="quick_share_status_receiving">Đang nhận %1$d%%</string>
+    <string name="quick_share_save_folder">Lưu vào thư mục Download/QuickShare</string>
+    <string name="quick_share_last_done">Lần trước: đã nhận xong</string>
+    <string name="quick_share_last_rejected">Lần trước: đã từ chối</string>
+    <string name="quick_share_last_cancelled">Lần trước: người gửi đã hủy</string>
+    <string name="quick_share_last_failed">Lần trước: lỗi — xem nhật ký chẩn đoán</string>
+    <string name="quick_share_notification_hint">Nếu không thấy thông báo hỏi nhận file, hãy cho phép thông báo cho ứng dụng này.</string>
+    <string name="quick_share_banner_title">Biểu ngữ và thông báo dạng nang</string>
+    <string name="quick_share_banner_description">Mở cài đặt kênh “Yêu cầu nhận file”, bật biểu ngữ để thấy yêu cầu ngay khi có người gửi</string>
+
+    <string name="quick_share_pick_files">Chọn file để gửi</string>
+    <string name="quick_share_pick_files_description">Gửi tới Samsung, Pixel gần đây mà không cần mở bảng chia sẻ</string>
+    <string name="quick_share_send_title">Gửi qua Quick Share</string>
+    <string name="quick_share_send_files">Đang gửi %1$d file</string>
+    <string name="quick_share_send_searching">Đang tìm thiết bị gần đây…</string>
+    <string name="quick_share_send_hint">Máy nhận phải cùng Wi-Fi, mở Quick Share và đặt hiển thị cho “Mọi người”.</string>
+    <string name="quick_share_send_nearby">Thiết bị gần đây</string>
+    <string name="quick_share_send_unnamed">Thiết bị Quick Share</string>
+    <string name="quick_share_send_connecting">Đang kết nối…</string>
+    <string name="quick_share_send_waiting">Chờ máy kia chấp nhận</string>
+    <string name="quick_share_send_pin_hint">Mã này phải giống mã trên máy nhận</string>
+    <string name="quick_share_send_sending">Đang gửi %1$d%%</string>
+    <string name="quick_share_send_cancel">Hủy</string>
+    <string name="quick_share_send_close">Đóng</string>
+    <string name="quick_share_send_done">Đã gửi xong</string>
+    <string name="quick_share_send_rejected">Máy kia đã từ chối</string>
+    <string name="quick_share_send_cancelled">Đã hủy</string>
+    <string name="quick_share_send_failed">Không gửi được — xem nhật ký chẩn đoán</string>
+    <string name="quick_share_channel_service">Quick Share đang chờ</string>
+    <string name="quick_share_channel_offer">Yêu cầu nhận file</string>
+    <string name="quick_share_service_text">Đang chờ file qua Wi-Fi</string>
+    <string name="quick_share_stop">Tắt</string>
+    <string name="quick_share_accept">Nhận</string>
+    <string name="quick_share_decline">Từ chối</string>
+    <string name="quick_share_offer_title">%1$s muốn gửi file</string>
+    <string name="quick_share_offer_text">Mã %1$s · %2$s</string>
+    <string name="quick_share_offer_files">%1$d file</string>
+    <string name="quick_share_offer_text_item">1 đoạn văn bản</string>
+    <string name="quick_share_received_title">Đã nhận file</string>
+    <string name="quick_share_received_text">Đã lưu vào Download/QuickShare</string>
+    <string name="quick_share_text_title">Đoạn văn bản từ %1$s</string>
+</resources>

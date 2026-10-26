@@ -38,6 +38,36 @@ Strings are Vietnamese in `res/values/strings.xml`.
 | `wavy-progress-indicator.kt` | Animated sine-wave indeterminate progress |
 | `cookie-shape.kt` | Scalloped badge shape from graphics-shapes |
 
+## `:core:quickshare` (`core/quickshare/src/main/kotlin/vn/hongducdev/honortoolkit/core/quickshare`)
+
+| File | Concern |
+| --- | --- |
+| `crypto/hkdf.kt`, `crypto/key-derivation.kt` | HKDF-SHA256, UKEY2 auth/next secrets, D2D and SecureMessage keys per role, 4-digit PIN |
+| `crypto/p256-keys.kt` | P-256 key pairs, `GenericPublicKey` encoding, on-curve check, ECDH |
+| `ukey2/ukey2-handshake.kt` | `Ukey2Server` and `Ukey2Client`, alert mapping |
+| `transport/framed-connection.kt` | 4-byte length framing, 5 MB cap |
+| `channel/secure-channel.kt` | Encrypt, sign, verify, decrypt, sequence numbers |
+| `endpoint/endpoint-info.kt` | Endpoint info bytes, endpoint id, mDNS service name and TXT value |
+| `connection/frame-builders.kt` | Offline and sharing frame constructors |
+| `connection/nearby-connection.kt` | Shared read loop, keep-alive, bytes payload reassembly, shutdown |
+| `connection/inbound-connection.kt`, `connection/outbound-connection.kt` | Receiver and sender state machines, public `InboundConnection` / `OutboundConnection` |
+| `connection/transfer-types.kt` | Public listeners, offers, sinks, `TransferOutcome` |
+| `src/main/proto/*.proto` | Wire formats copied from NearDrop (Google's, Apache-2.0) |
+
+Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpoint info, and loopback transfers between `OutboundConnection` and `InboundConnection` over real sockets.
+
+## `:feature:quickshare` (`feature/quickshare/src/main/kotlin/vn/hongducdev/honortoolkit/feature/quickshare`)
+
+| File | Concern |
+| --- | --- |
+| `quick-share-receiver-service.kt` | Foreground service (`connectedDevice`): `ServerSocket`, accept loop, one `InboundConnection` per peer, consent and progress notifications, 60 s offer timeout |
+| `mdns-advertiser.kt` | `NsdManager` registration of `_FC9F5ED42C8A._tcp` with the TXT `n` record |
+| `media-store-file-sink.kt` | `FileSink` writing to Download/QuickShare through MediaStore (pending until commit), sanitised names |
+| `quick-share-offer-dialog.kt` | Consent dialog hosted in `MainActivity`, shown over any screen while an offer is pending |
+| `quick-share-send-view-model.kt`, `quick-share-send-screen.kt`, `mdns-browser.kt`, `shared-stream-uris.kt` | Sending: browse receivers, connect with `OutboundConnection`, PIN, progress, cancel; `QuickShareSendActivity` in `:app` hosts it for the share sheet |
+| `quick-share-state.kt` | `ReceiverStatus` flow shared by service and screen |
+| `quick-share-screen.kt` | Sub-page opened from Home: receive switch, status, last result, notification permission request |
+
 ## `:feature:debloat` (`feature/debloat/src/main/kotlin/vn/hongducdev/honortoolkit/feature/debloat`)
 
 | File | Concern |
