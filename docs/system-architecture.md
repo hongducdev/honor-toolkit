@@ -12,6 +12,7 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | `:core:ui` | Shared motion helpers: wavy progress, scroll motion blur, cookie shape, motion guard |
 | `:feature:debloat` | Package scan, disable/enable through `AdbShell`, denylist, journal, Compose screen |
 | `:feature:permissions` | Runtime permission grant/revoke and AppOps for third-party apps through `AdbShell`, guard, read-back verification, journal, Compose screen |
+| `:feature:gms-check` | Read-only check of Google Play Services, Services Framework, Play Store (installed, enabled, version) and the number of Google accounts, through `AdbShell` |
 | `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, assistant setup, Compose screen |
 
 ## Quick Share engine (`:core:quickshare`)
@@ -34,11 +35,21 @@ Written from NearDrop's `PROTOCOL.md` and Swift sources (Unlicense) and the prot
 - `AssistantSetup` (needs ADB) records the current ASSISTANT role holder, adds Google as holder, then sets the `assistant` and `voice_interaction_service` secure settings if the role alone did not make the setting match. `restore` re-adds the recorded holder.
 - The strip (`NavBarStripService`, foreground `specialUse`, notification id 2) is opt-in and off by default; `BootReceiver` is not exported.
 
+## GMS check (`:feature:gms-check`)
+
+- `GmsCheckController.check()` runs `pm list packages`, `pm list packages -d`, `dumpsys package <pkg>` (version) and `dumpsys account` (counts `type=com.google` accounts; addresses are never kept). It changes nothing.
+- Parsers are covered by unit tests on real `dumpsys` output. Push-notification (FCM) health is not checked: no verified read-only command yet.
+
+## Notification fix: standby bucket
+
+`FixStep.StandbyBucket` reads `am get-standby-bucket <pkg>` (satisfied at 20 or lower) and applies `am set-standby-bucket <pkg> active`. Like the other steps it is re-read afterwards, so a ROM that ignores it shows as `Failed`. Not yet verified on MagicOS.
+
 ## Debloat (`:feature:debloat`)
 
 - Disables with `pm disable-user --user 0 <pkg>` and re-enables with `pm enable --user 0 <pkg>`; never uninstalls.
 - `DebloatDenylist` blocks core packages by name/prefix; packages holding the HOME, SMS, DIALER, ASSISTANT or BROWSER role, the default IME and this app are resolved on the device and blocked as "in use". `DebloatController.disable` re-checks this on every call, so the UI cannot override it.
 - Each successful change is appended to `files/debloat-journal.tsv`. "Xuất nhật ký" writes a text file (Storage Access Framework) with `adb shell pm enable --user 0 <pkg>` lines for everything this app still holds disabled.
+- "Khôi phục tất cả" (toolbar action) re-enables, one at a time, the packages the journal still holds disabled that are also currently disabled on the device (`restorePackages`); it stops at the first failure and reports how many were restored.
 - Packages not in `verifiedOnMagic7Pro` are shown as "Chưa đánh giá".
 
 ## Self ADB flow (`:core:adb`)

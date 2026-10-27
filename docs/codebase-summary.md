@@ -68,6 +68,14 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 | `quick-share-state.kt` | `ReceiverStatus` flow shared by service and screen |
 | `quick-share-screen.kt` | Sub-page opened from Home: receive switch, status, last result, notification permission request |
 
+## `:feature:gms-check` (`feature/gms-check/src/main/kotlin/vn/hongducdev/honortoolkit/feature/gmscheck`)
+
+| File | Concern |
+| --- | --- |
+| `gms-check-parsers.kt` | `pm list packages`, `dumpsys package` version and `dumpsys account` parsers |
+| `gms-check-controller.kt` | `GmsCheckController.check()` builds a `GmsReport` through `AdbShell` |
+| `gms-check-view-model.kt`, `gms-check-screen.kt` | State and Compose sub-page opened from the Apps tab |
+
 ## `:feature:debloat` (`feature/debloat/src/main/kotlin/vn/hongducdev/honortoolkit/feature/debloat`)
 
 | File | Concern |
@@ -76,6 +84,7 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 | `package-scanner.kt` | `pm list packages -s [-d]`, labels, role holders and default IME lookup |
 | `debloat-controller.kt` | `disable` / `enable` with name validation and denylist re-check |
 | `debloat-journal.kt` | Append-only `files/debloat-journal.tsv`, export text with PC recovery commands |
+| `debloat-restore.kt` | `restorePackages`: sequential bulk re-enable, stops at first failure |
 | `package-name-validator.kt` | Rejects anything that is not a plain package name before it reaches a shell |
 | `verified-packages.kt` | Packages confirmed safe on the Magic7 Pro (empty until checked on device) |
 | `debloat-view-model.kt`, `debloat-screen.kt` | Compose list, search, enabled/disabled filter, confirm dialog, journal export |
