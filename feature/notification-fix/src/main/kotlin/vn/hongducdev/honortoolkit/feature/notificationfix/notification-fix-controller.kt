@@ -2,7 +2,7 @@ package vn.hongducdev.honortoolkit.feature.notificationfix
 
 import vn.hongducdev.honortoolkit.core.adb.AdbShell
 
-enum class FixStep { Notifications, DozeWhitelist, BackgroundRun, ExactAlarm }
+enum class FixStep { Notifications, DozeWhitelist, BackgroundRun, ExactAlarm, StandbyBucket }
 
 enum class StepStatus {
     Satisfied,
@@ -33,11 +33,14 @@ internal class NotificationFixController(private val shell: AdbShell) {
         val notification = parseNotificationGranted(dump.output)
         val background = BACKGROUND_OPS.map { appOpAllowed(packageName, it) ?: return null }
         val exactAlarm = if (declaresExactAlarm(dump.output)) appOpAllowed(packageName, EXACT_ALARM_OP) ?: return null else null
+        val bucket = shell.run("am get-standby-bucket $packageName")
+        val standby = if (bucket.isSuccess) parseStandbyBucket(bucket.output)?.let { it <= STANDBY_BUCKET_WORKING_SET } else null
         return listOf(
             StepState(FixStep.Notifications, notification.toStatus()),
             StepState(FixStep.DozeWhitelist, isDozeWhitelisted(whitelist.output, packageName).toStatus()),
             StepState(FixStep.BackgroundRun, background.all { it }.toStatus()),
             StepState(FixStep.ExactAlarm, exactAlarm.toStatus()),
+            StepState(FixStep.StandbyBucket, standby.toStatus()),
         )
     }
 
@@ -55,6 +58,7 @@ internal class NotificationFixController(private val shell: AdbShell) {
         FixStep.DozeWhitelist -> listOf("cmd deviceidle whitelist +$packageName")
         FixStep.BackgroundRun -> BACKGROUND_OPS.map { "cmd appops set --user 0 $packageName $it allow" }
         FixStep.ExactAlarm -> listOf("cmd appops set --user 0 $packageName $EXACT_ALARM_OP allow")
+        FixStep.StandbyBucket -> listOf("am set-standby-bucket $packageName active")
     }
 
     private suspend fun appOpAllowed(packageName: String, op: String): Boolean? {
@@ -73,5 +77,6 @@ internal class NotificationFixController(private val shell: AdbShell) {
     private companion object {
         val BACKGROUND_OPS = listOf("RUN_ANY_IN_BACKGROUND", "RUN_IN_BACKGROUND")
         const val EXACT_ALARM_OP = "SCHEDULE_EXACT_ALARM"
+        const val STANDBY_BUCKET_WORKING_SET = 20
     }
 }

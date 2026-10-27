@@ -47,4 +47,11 @@ class NotificationFixParsersTest {
         assertFalse(isValidPackageName("com.zing; reboot"))
         assertFalse(isValidPackageName("com.zing.zalo$(id)"))
     }
+
+    @Test
+    fun standbyBucketReadsPlainNumber() {
+        assertEquals(10, parseStandbyBucket("10\n"))
+        assertEquals(45, parseStandbyBucket(" 45 "))
+        assertNull(parseStandbyBucket("Unknown package"))
+    }
 }

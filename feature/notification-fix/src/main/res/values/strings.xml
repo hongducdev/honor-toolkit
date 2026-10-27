@@ -18,6 +18,8 @@
     <string name="notification_fix_step_background">Chạy nền không giới hạn</string>
     <string name="notification_fix_step_background_desc">Cho phép chạy và nhận tin dưới nền</string>
     <string name="notification_fix_step_alarm">Báo thức chính xác</string>
+    <string name="notification_fix_step_standby">Nhóm chờ ứng dụng</string>
+    <string name="notification_fix_step_standby_desc">Giữ ứng dụng ở nhóm hoạt động để hệ thống không hạn chế tin nhắn nền</string>
     <string name="notification_fix_step_alarm_desc">Cần cho OTP và nhắc nhở đúng giờ (Android 12 trở lên)</string>
 
     <string name="notification_fix_status_on">Đã bật</string>

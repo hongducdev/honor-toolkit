@@ -179,6 +179,7 @@ private fun stepTitle(step: FixStep): Int = when (step) {
     FixStep.DozeWhitelist -> R.string.notification_fix_step_doze
     FixStep.BackgroundRun -> R.string.notification_fix_step_background
     FixStep.ExactAlarm -> R.string.notification_fix_step_alarm
+    FixStep.StandbyBucket -> R.string.notification_fix_step_standby
 }
 
 private fun stepDescription(step: FixStep): Int = when (step) {
@@ -186,6 +187,7 @@ private fun stepDescription(step: FixStep): Int = when (step) {
     FixStep.DozeWhitelist -> R.string.notification_fix_step_doze_desc
     FixStep.BackgroundRun -> R.string.notification_fix_step_background_desc
     FixStep.ExactAlarm -> R.string.notification_fix_step_alarm_desc
+    FixStep.StandbyBucket -> R.string.notification_fix_step_standby_desc
 }
 
 private fun statusText(status: StepStatus): Int = when (status) {

@@ -31,3 +31,6 @@ internal fun parseAppOpAllowed(output: String): Boolean? {
     }
     return packageMode?.let { it == "allow" }
 }
+
+/** `am get-standby-bucket` prints the numeric bucket (10 active, 20 working set, 30 frequent, 40 rare, 45 restricted). */
+internal fun parseStandbyBucket(output: String): Int? = output.trim().toIntOrNull()
