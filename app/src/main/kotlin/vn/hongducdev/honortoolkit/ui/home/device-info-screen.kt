@@ -208,8 +208,8 @@ private fun VersionCard(info: DeviceInfo) {
         )
         Text(
             stringResource(R.string.device_info_build_line, info.build),
-            style = MaterialTheme.typography.labelSmall,
-            color = scheme.onSurfaceVariant.copy(alpha = 0.8f),
+            style = MaterialTheme.typography.labelMedium,
+            color = scheme.onSurfaceVariant,
         )
     }
 }

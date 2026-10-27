@@ -51,13 +51,13 @@ fun ConnectionStatusCard(state: AdbState, busy: Boolean, onReconnect: () -> Unit
         Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Box(
-                    modifier = Modifier.size(64.dp).background(if (connected) scheme.primary else scheme.outline, CookieShape),
+                    modifier = Modifier.size(64.dp).background(if (connected) scheme.primary else scheme.surfaceContainerHighest, CookieShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         Icons.Rounded.Smartphone,
                         contentDescription = null,
-                        tint = if (connected) scheme.onPrimary else scheme.surface,
+                        tint = if (connected) scheme.onPrimary else scheme.onSurfaceVariant,
                         modifier = Modifier.size(32.dp),
                     )
                 }
