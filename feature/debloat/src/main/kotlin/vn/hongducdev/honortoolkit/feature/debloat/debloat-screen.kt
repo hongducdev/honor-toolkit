@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FileDownload
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Restore
 import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
@@ -93,6 +94,7 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
             backDescription = stringResource(R.string.debloat_back),
             onBack = onBack,
             actions = listOf(
+                ToolbarAction(Icons.Rounded.Restore, stringResource(R.string.debloat_restore_all), viewModel::requestRestoreAll),
                 ToolbarAction(Icons.Rounded.FileDownload, stringResource(R.string.debloat_export)) { exportLauncher.launch("honor-toolkit-debloat.txt") },
             ),
             fab = ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.debloat_refresh), viewModel::refresh),
@@ -152,6 +154,16 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
             text = { Text(stringResource(R.string.debloat_confirm_body)) },
             confirmButton = { Button(onClick = viewModel::confirmDisable) { Text(stringResource(R.string.debloat_confirm_ok)) } },
             dismissButton = { OutlinedButton(onClick = viewModel::cancelDisable) { Text(stringResource(R.string.debloat_confirm_cancel)) } },
+        )
+    }
+
+    state.pendingRestore?.let { entries ->
+        AlertDialog(
+            onDismissRequest = viewModel::cancelRestoreAll,
+            title = { Text(stringResource(R.string.debloat_restore_title, entries.size)) },
+            text = { Text(stringResource(R.string.debloat_restore_body, entries.joinToString("\n") { "• ${it.label}" })) },
+            confirmButton = { Button(onClick = viewModel::confirmRestoreAll) { Text(stringResource(R.string.debloat_restore_ok)) } },
+            dismissButton = { OutlinedButton(onClick = viewModel::cancelRestoreAll) { Text(stringResource(R.string.debloat_confirm_cancel)) } },
         )
     }
 }
@@ -215,6 +227,9 @@ private fun messageText(message: DebloatMessage): String = when (message) {
         if (message.reason == ProtectionReason.CoreSystem) R.string.debloat_protected_core else R.string.debloat_protected_in_use,
     )
     is DebloatMessage.Failed -> stringResource(R.string.debloat_msg_failed, message.output)
-    DebloatMessage.ScanFailed -> stringResource(R.string.debloat_msg_scan_failed)
+    is DebloatMessage.Restored -> stringResource(R.string.debloat_msg_restored, message.count)
+    is DebloatMessage.RestoreFailed -> stringResource(R.string.debloat_msg_restore_failed, message.restored, message.packageName, message.output)
+    DebloatMessage.NothingToRestore -> stringResource(R.string.debloat_msg_restore_none)
+    DebloatMessage.ScanFailed ->stringResource(R.string.debloat_msg_scan_failed)
     DebloatMessage.Exported -> stringResource(R.string.debloat_msg_exported)
 }

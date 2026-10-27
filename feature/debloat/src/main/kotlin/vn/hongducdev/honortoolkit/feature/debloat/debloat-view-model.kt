@@ -19,6 +19,9 @@ sealed interface DebloatMessage {
     data class Enabled(val label: String) : DebloatMessage
     data class Blocked(val reason: ProtectionReason) : DebloatMessage
     data class Failed(val output: String) : DebloatMessage
+    data class Restored(val count: Int) : DebloatMessage
+    data class RestoreFailed(val restored: Int, val packageName: String, val output: String) : DebloatMessage
+    data object NothingToRestore : DebloatMessage
     data object ScanFailed : DebloatMessage
     data object Exported : DebloatMessage
 }
@@ -29,6 +32,7 @@ data class DebloatUiState(
     val filter: DebloatFilter = DebloatFilter.Enabled,
     val loading: Boolean = false,
     val pendingDisable: PackageEntry? = null,
+    val pendingRestore: List<PackageEntry>? = null,
     val message: DebloatMessage? = null,
 ) {
     val visible: List<PackageEntry>
@@ -81,6 +85,31 @@ class DebloatViewModel(application: Application) : AndroidViewModel(application)
 
     fun enable(entry: PackageEntry) =
         apply(entry, { controller.enable(entry.packageName) }, DebloatMessage.Enabled(entry.label))
+
+    fun requestRestoreAll() {
+        val heldByApp = journal.currentlyDisabled()
+        val targets = mutableState.value.entries.filter { !it.enabled && it.packageName in heldByApp }
+        mutableState.update {
+            if (targets.isEmpty()) it.copy(message = DebloatMessage.NothingToRestore) else it.copy(pendingRestore = targets)
+        }
+    }
+
+    fun cancelRestoreAll() = mutableState.update { it.copy(pendingRestore = null) }
+
+    fun confirmRestoreAll() {
+        val targets = mutableState.value.pendingRestore ?: return
+        mutableState.update { it.copy(pendingRestore = null, loading = true) }
+        viewModelScope.launch {
+            val result = restorePackages(targets.map { it.packageName }) { controller.enable(it) }
+            val message = if (result.failedPackage == null) {
+                DebloatMessage.Restored(result.restored)
+            } else {
+                DebloatMessage.RestoreFailed(result.restored, result.failedPackage, result.output)
+            }
+            mutableState.update { it.copy(message = message) }
+            refresh()
+        }
+    }
 
     fun consumeMessage() = mutableState.update { it.copy(message = null) }
 
