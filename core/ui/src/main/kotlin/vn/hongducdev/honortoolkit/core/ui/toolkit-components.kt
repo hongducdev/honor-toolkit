@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -19,6 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -34,6 +37,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 private val GroupGap = 2.dp
@@ -101,7 +106,7 @@ fun SwitchRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable { haptics.performHapticFeedback(HapticFeedbackType.ContextClick); onChange(!checked) }
+            .toggleable(value = checked, role = Role.Switch) { haptics.performHapticFeedback(HapticFeedbackType.ContextClick); onChange(it) }
             .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -132,6 +137,54 @@ fun SliderRow(label: @Composable (Long) -> String, value: Long, min: Long, max: 
     }
 }
 
+/** Shape for row [index] of a list that reads as one rounded block: large outer corners, small ones between rows. */
+fun groupedRowShape(index: Int, lastIndex: Int, outer: Dp = 24.dp, inner: Dp = 4.dp): RoundedCornerShape =
+    RoundedCornerShape(
+        topStart = if (index == 0) outer else inner,
+        topEnd = if (index == 0) outer else inner,
+        bottomStart = if (index == lastIndex) outer else inner,
+        bottomEnd = if (index == lastIndex) outer else inner,
+    )
+
+/** Rounded search box shared by the app-list pages. */
+@Composable
+fun ToolkitSearchField(value: String, onValueChange: (String) -> Unit, label: String, modifier: Modifier = Modifier) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        singleLine = true,
+        shape = CircleShape,
+        modifier = modifier.fillMaxWidth(),
+    )
+}
+
+/** Cookie-shaped badge showing the first letter of [label], used as a stand-in app icon. */
+@Composable
+fun LetterAvatar(label: String, modifier: Modifier = Modifier, size: Dp = 44.dp) {
+    Box(
+        modifier = modifier.size(size).background(MaterialTheme.colorScheme.secondaryContainer, CookieShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            label.firstOrNull()?.uppercase().orEmpty(),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+        )
+    }
+}
+
+/** Section heading for lists that are not wrapped in a [SettingsGroup]. */
+@Composable
+fun SectionTitle(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp),
+    )
+}
+
 /** Tappable row with a cookie-shaped icon badge, for lists of destinations. */
 @Composable
 fun NavRow(icon: ImageVector, title: String, description: String, onClick: () -> Unit) {
@@ -140,7 +193,7 @@ fun NavRow(icon: ImageVector, title: String, description: String, onClick: () ->
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable { haptics.performHapticFeedback(HapticFeedbackType.ContextClick); onClick() }
+            .clickable(role = Role.Button) { haptics.performHapticFeedback(HapticFeedbackType.ContextClick); onClick() }
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),

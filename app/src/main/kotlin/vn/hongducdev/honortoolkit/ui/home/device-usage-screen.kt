@@ -64,6 +64,7 @@ import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
+import vn.hongducdev.honortoolkit.core.ui.groupedRowShape
 
 private enum class UsageSort { Ram, Storage }
 
@@ -162,13 +163,7 @@ private fun UsageList(apps: List<AppUsage>, sort: UsageSort, device: DeviceInfo)
             Box(Modifier.padding(bottom = 14.dp)) { Summary(sort, device, sorted.size, context) }
         }
         itemsIndexed(sorted, key = { _, app -> app.packageName }) { index, app ->
-            val corner = 4.dp
-            val shape = RoundedCornerShape(
-                topStart = if (index == 0) GroupCorner else corner,
-                topEnd = if (index == 0) GroupCorner else corner,
-                bottomStart = if (index == sorted.lastIndex) GroupCorner else corner,
-                bottomEnd = if (index == sorted.lastIndex) GroupCorner else corner,
-            )
+            val shape = groupedRowShape(index, sorted.lastIndex, GroupCorner)
             UsageRow(app, sort, share = (if (sort == UsageSort.Ram) app.ramBytes else app.storageBytes).toFloat() / top, shape, context)
         }
     }
@@ -197,7 +192,7 @@ private fun Summary(sort: UsageSort, device: DeviceInfo, appCount: Int, context:
             Text(
                 stringResource(R.string.device_usage_of_total, formatHardwareSize(total)),
                 style = MaterialTheme.typography.titleMedium,
-                color = scheme.onPrimaryContainer.copy(alpha = 0.8f),
+                color = scheme.onPrimaryContainer,
                 modifier = Modifier.padding(bottom = 6.dp),
             )
         }
@@ -210,7 +205,7 @@ private fun Summary(sort: UsageSort, device: DeviceInfo, appCount: Int, context:
         Text(
             stringResource(R.string.device_usage_app_count, appCount),
             style = MaterialTheme.typography.labelLarge,
-            color = scheme.onPrimaryContainer.copy(alpha = 0.8f),
+            color = scheme.onPrimaryContainer,
         )
     }
 }

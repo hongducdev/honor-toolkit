@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.graphics.Brush
 import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
-import vn.hongducdev.honortoolkit.core.ui.CookieShape
+import vn.hongducdev.honortoolkit.core.ui.LetterAvatar
+import vn.hongducdev.honortoolkit.core.ui.groupedRowShape
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
+import vn.hongducdev.honortoolkit.core.ui.ToolkitSearchField
 import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -38,7 +43,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -106,14 +110,7 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
         snackbarHost = { SnackbarHost(snackbar) },
     ) { padding ->
         Column(modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(
-                value = state.query,
-                onValueChange = viewModel::setQuery,
-                label = { Text(stringResource(R.string.debloat_search)) },
-                singleLine = true,
-                shape = CircleShape,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            ToolkitSearchField(state.query, viewModel::setQuery, stringResource(R.string.debloat_search))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
                     selected = state.filter == DebloatFilter.Enabled,
@@ -132,9 +129,13 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
                 Text(stringResource(R.string.debloat_empty), style = MaterialTheme.typography.bodyMedium)
             }
             Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalToolbarClearance.current)) {
-                    items(visible, key = { it.packageName }) { entry ->
-                        PackageRow(entry, onDisable = { viewModel.requestDisable(entry) }, onEnable = { viewModel.enable(entry) })
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = LocalToolbarClearance.current),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                ) {
+                    itemsIndexed(visible, key = { _, entry -> entry.packageName }) { index, entry ->
+                        PackageRow(entry, groupedRowShape(index, visible.lastIndex), onDisable = { viewModel.requestDisable(entry) }, onEnable = { viewModel.enable(entry) })
                     }
                 }
                 Box(
@@ -169,7 +170,7 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
 }
 
 @Composable
-private fun PackageRow(entry: PackageEntry, onDisable: () -> Unit, onEnable: () -> Unit) {
+private fun PackageRow(entry: PackageEntry, shape: Shape, onDisable: () -> Unit, onEnable: () -> Unit) {
     val scheme = MaterialTheme.colorScheme
     val (badgeContainer, badgeContent) = when {
         entry.protection != null -> scheme.tertiaryContainer to scheme.onTertiaryContainer
@@ -177,18 +178,10 @@ private fun PackageRow(entry: PackageEntry, onDisable: () -> Unit, onEnable: () 
         else -> scheme.surfaceContainerHighest to scheme.onSurfaceVariant
     }
     ListItem(
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.clip(shape),
+        colors = ListItemDefaults.colors(containerColor = scheme.surfaceContainer),
         leadingContent = {
-            Box(
-                modifier = Modifier.size(44.dp).background(scheme.secondaryContainer, CookieShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    entry.label.firstOrNull()?.uppercase().orEmpty(),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = scheme.onSecondaryContainer,
-                )
-            }
+            LetterAvatar(entry.label)
         },
         headlineContent = { Text(entry.label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         supportingContent = {

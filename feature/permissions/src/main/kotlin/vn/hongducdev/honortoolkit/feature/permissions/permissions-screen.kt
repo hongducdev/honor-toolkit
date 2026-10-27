@@ -27,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -52,7 +51,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
-import vn.hongducdev.honortoolkit.core.ui.CookieShape
+import vn.hongducdev.honortoolkit.core.ui.LetterAvatar
+import vn.hongducdev.honortoolkit.core.ui.groupedRowShape
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.draw.clip
+import vn.hongducdev.honortoolkit.core.ui.SectionTitle
+import vn.hongducdev.honortoolkit.core.ui.ToolkitSearchField
+import androidx.compose.ui.semantics.Role
 import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
@@ -111,33 +116,19 @@ fun PermissionsScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewMod
 
 @Composable
 private fun AppList(state: PermissionsUiState, viewModel: PermissionsViewModel) {
-    OutlinedTextField(
-        value = state.query,
-        onValueChange = viewModel::setQuery,
-        label = { Text(stringResource(R.string.permissions_search)) },
-        singleLine = true,
-        shape = CircleShape,
-        modifier = Modifier.fillMaxWidth(),
-    )
+    ToolkitSearchField(state.query, viewModel::setQuery, stringResource(R.string.permissions_search))
     val visible = state.visibleApps
     if (visible.isEmpty() && !state.loading) Text(stringResource(R.string.permissions_empty), style = MaterialTheme.typography.bodyMedium)
-    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalToolbarClearance.current)) {
-        items(visible, key = { it.packageName }) { app ->
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = LocalToolbarClearance.current),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        itemsIndexed(visible, key = { _, app -> app.packageName }) { index, app ->
             ListItem(
-                modifier = Modifier.clickable { viewModel.open(app) },
-                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                leadingContent = {
-                    Box(
-                        modifier = Modifier.size(44.dp).background(MaterialTheme.colorScheme.secondaryContainer, CookieShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            app.label.firstOrNull()?.uppercase().orEmpty(),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        )
-                    }
-                },
+                modifier = Modifier.clip(groupedRowShape(index, visible.lastIndex)).clickable(role = Role.Button) { viewModel.open(app) },
+                colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                leadingContent = { LetterAvatar(app.label) },
                 headlineContent = { Text(app.label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 supportingContent = { Text(app.packageName, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             )
@@ -153,7 +144,7 @@ private fun AppDetail(state: PermissionsUiState, viewModel: PermissionsViewModel
         if (blocked != null) {
             item { Text(blockText(blocked), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.tertiary) }
         }
-        item { Text(stringResource(R.string.permissions_group_runtime), style = MaterialTheme.typography.titleSmall) }
+        item { SectionTitle(stringResource(R.string.permissions_group_runtime)) }
         if (detail.permissions.isEmpty()) item { Text(stringResource(R.string.permissions_none), style = MaterialTheme.typography.bodyMedium) }
         items(detail.permissions, key = { it.name }) { entry ->
             ListItem(

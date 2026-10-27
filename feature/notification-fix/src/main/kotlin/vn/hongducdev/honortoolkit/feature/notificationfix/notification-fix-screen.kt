@@ -21,7 +21,6 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -42,7 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
-import vn.hongducdev.honortoolkit.core.ui.CookieShape
+import vn.hongducdev.honortoolkit.core.ui.LetterAvatar
+import vn.hongducdev.honortoolkit.core.ui.groupedRowShape
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.ui.draw.clip
+import vn.hongducdev.honortoolkit.core.ui.SectionTitle
+import vn.hongducdev.honortoolkit.core.ui.ToolkitSearchField
+import androidx.compose.ui.semantics.Role
 import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
@@ -106,33 +111,19 @@ fun NotificationFixScreen(onBack: () -> Unit, modifier: Modifier = Modifier, vie
 @Composable
 private fun AppList(state: NotificationFixUiState, viewModel: NotificationFixViewModel) {
     Text(stringResource(R.string.notification_fix_intro), style = MaterialTheme.typography.bodyMedium)
-    OutlinedTextField(
-        value = state.query,
-        onValueChange = viewModel::setQuery,
-        label = { Text(stringResource(R.string.notification_fix_search)) },
-        singleLine = true,
-        shape = CircleShape,
-        modifier = Modifier.fillMaxWidth(),
-    )
+    ToolkitSearchField(state.query, viewModel::setQuery, stringResource(R.string.notification_fix_search))
     val visible = state.visibleApps
     if (visible.isEmpty() && !state.loading) Text(stringResource(R.string.notification_fix_empty), style = MaterialTheme.typography.bodyMedium)
-    LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalToolbarClearance.current)) {
-        items(visible, key = { it.packageName }) { app ->
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(bottom = LocalToolbarClearance.current),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        itemsIndexed(visible, key = { _, app -> app.packageName }) { index, app ->
             ListItem(
-                modifier = Modifier.clickable { viewModel.open(app) },
-                colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                leadingContent = {
-                    Box(
-                        modifier = Modifier.size(44.dp).background(MaterialTheme.colorScheme.secondaryContainer, CookieShape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            app.label.firstOrNull()?.uppercase().orEmpty(),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        )
-                    }
-                },
+                modifier = Modifier.clip(groupedRowShape(index, visible.lastIndex)).clickable(role = Role.Button) { viewModel.open(app) },
+                colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+                leadingContent = { LetterAvatar(app.label) },
                 headlineContent = { Text(app.label, maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 supportingContent = { Text(app.packageName, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis) },
             )
@@ -151,7 +142,7 @@ private fun AppDetail(state: NotificationFixUiState, onApply: () -> Unit, onOpen
                 Text(stringResource(if (state.canApply) R.string.notification_fix_apply else R.string.notification_fix_all_done))
             }
         }
-        item { Text(stringResource(R.string.notification_fix_manual_title), style = MaterialTheme.typography.titleSmall) }
+        item { SectionTitle(stringResource(R.string.notification_fix_manual_title)) }
         item { Text(stringResource(R.string.notification_fix_manual_desc), style = MaterialTheme.typography.bodySmall) }
         item { TextButton(onClick = onOpenLaunchManagement) { Text(stringResource(R.string.notification_fix_open_launch)) } }
         item { TextButton(onClick = onOpenBattery) { Text(stringResource(R.string.notification_fix_open_battery)) } }
