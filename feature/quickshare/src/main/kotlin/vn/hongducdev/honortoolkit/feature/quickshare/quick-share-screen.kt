@@ -36,7 +36,8 @@ import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 import vn.hongducdev.honortoolkit.core.ui.SettingsNote
 import vn.hongducdev.honortoolkit.core.ui.SettingsRow
 import vn.hongducdev.honortoolkit.core.ui.SwitchRow
-import vn.hongducdev.honortoolkit.core.ui.ToolkitTopBar
+import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
+import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 
 @Composable
 fun QuickShareScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
@@ -73,20 +74,19 @@ fun QuickShareScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
 
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { setReceiving(true) }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        topBar = {
-            ToolkitTopBar(
-                title = stringResource(R.string.quick_share_title),
-                onBack = onBack,
-                backDescription = stringResource(R.string.quick_share_back),
-            )
-        },
-    ) { padding ->
+    ProvideToolbar(
+        ToolbarSpec.Page(
+            title = stringResource(R.string.quick_share_title),
+            backDescription = stringResource(R.string.quick_share_back),
+            onBack = onBack,
+        ),
+    )
+
+    Scaffold(modifier = modifier.fillMaxSize()) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                 .verticalScroll(rememberScrollState())
                 .padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
