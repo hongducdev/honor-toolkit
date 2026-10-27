@@ -61,6 +61,7 @@ import vn.hongducdev.honortoolkit.core.ui.rememberMotionEnabled
 import vn.hongducdev.honortoolkit.ui.navigation.bottomFade
 import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchScreen
 import vn.hongducdev.honortoolkit.feature.debloat.DebloatScreen
+import vn.hongducdev.honortoolkit.feature.gmscheck.GmsCheckScreen
 import vn.hongducdev.honortoolkit.feature.notificationfix.NotificationFixScreen
 import vn.hongducdev.honortoolkit.feature.permissions.PermissionsScreen
 import vn.hongducdev.honortoolkit.feature.quickshare.QuickShareOfferDialog
@@ -86,10 +87,11 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     NotificationFix(R.string.nav_notification_fix, Icons.Rounded.Notifications, inToolbar = false),
     Debloat(R.string.nav_debloat, Icons.Rounded.Apps, inToolbar = false),
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
+    GmsCheck(R.string.nav_gms_check, Icons.Rounded.Apps, inToolbar = false),
     QuickShare(R.string.nav_quick_share, Icons.Rounded.Share, inToolbar = false),
     ;
 
-    val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions
+    val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions || this == GmsCheck
 }
 
 private fun Screen?.opensFromTop(): Boolean = this == Screen.DeviceInfo || this == Screen.DeviceUsage
@@ -188,6 +190,7 @@ class MainActivity : ComponentActivity() {
                                         onOpenNotificationFix = { subPage = Screen.NotificationFix },
                                         onOpenDebloat = { subPage = Screen.Debloat },
                                         onOpenPermissions = { subPage = Screen.Permissions },
+                                        onOpenGmsCheck = { subPage = Screen.GmsCheck },
                                     )
                                     else -> Unit
                                 }
@@ -201,6 +204,7 @@ class MainActivity : ComponentActivity() {
                                     Screen.NotificationFix -> NotificationFixScreen(onBack = close)
                                     Screen.Debloat -> DebloatScreen(onBack = close)
                                     Screen.Permissions -> PermissionsScreen(onBack = close)
+                                    Screen.GmsCheck -> GmsCheckScreen(onBack = close)
                                     Screen.QuickShare -> QuickShareScreen(onBack = close)
                                     else -> Unit
                                 }

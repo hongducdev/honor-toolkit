@@ -27,6 +27,9 @@
     <string name="nav_apps">Ứng dụng</string>
     <string name="nav_debloat">Gỡ app</string>
     <string name="nav_permissions">Quyền</string>
+    <string name="nav_gms_check">Dịch vụ Google</string>
+    <string name="home_open_gms_check">Dịch vụ Google</string>
+    <string name="home_gms_check_description">Kiểm tra Play Services, Cửa hàng Play và tài khoản Google đã hoạt động chưa</string>
     <string name="nav_quick_share">Quick Share</string>
     <string name="home_open_quick_share">Quick Share</string>
     <string name="home_quick_share_description">Nhận file từ Samsung, Pixel qua Wi-Fi</string>

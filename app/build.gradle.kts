@@ -59,6 +59,7 @@ dependencies {
     implementation(project(":feature:circle-search"))
     implementation(project(":feature:debloat"))
     implementation(project(":feature:notification-fix"))
+    implementation(project(":feature:gms-check"))
     implementation(project(":feature:permissions"))
     implementation(project(":feature:quickshare"))
     implementation(platform("androidx.compose:compose-bom:2026.05.01"))

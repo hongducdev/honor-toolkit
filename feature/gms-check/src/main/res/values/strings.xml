@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gms_check_title">Dịch vụ Google</string>
+    <string name="gms_check_back">Quay lại</string>
+    <string name="gms_check_refresh">Kiểm tra lại</string>
+    <string name="gms_check_failed">Không đọc được danh sách gói. Kiểm tra kết nối ADB</string>
+    <string name="gms_check_ready">Dịch vụ Google đang hoạt động</string>
+    <string name="gms_check_not_ready">Dịch vụ Google chưa đầy đủ</string>
+    <string name="gms_check_play_services">Google Play Services</string>
+    <string name="gms_check_framework">Google Services Framework</string>
+    <string name="gms_check_play_store">Cửa hàng Google Play</string>
+    <string name="gms_check_status_missing">Chưa cài</string>
+    <string name="gms_check_status_disabled">Đang tắt (phiên bản %1$s)</string>
+    <string name="gms_check_status_enabled">Đang bật (phiên bản %1$s)</string>
+    <string name="gms_check_advice_missing">Máy chưa có thành phần này. Thông báo đẩy của nhiều ứng dụng sẽ không hoạt động nếu thiếu Play Services.</string>
+    <string name="gms_check_advice_disabled">Bật lại trong Cài đặt &gt; Ứng dụng, hoặc ở màn Gỡ ứng dụng hệ thống nếu chính app này đã tắt nó.</string>
+    <string name="gms_check_account">Tài khoản Google</string>
+    <string name="gms_check_account_unknown">Không đọc được</string>
+    <string name="gms_check_account_none">Chưa đăng nhập tài khoản Google nào</string>
+    <string name="gms_check_account_count">Đã đăng nhập %1$d tài khoản</string>
+</resources>

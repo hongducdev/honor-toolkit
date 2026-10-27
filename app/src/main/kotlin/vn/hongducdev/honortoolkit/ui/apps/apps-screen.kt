@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteSweep
+import androidx.compose.material.icons.rounded.Cloud
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +26,7 @@ fun AppsScreen(
     onOpenNotificationFix: () -> Unit,
     onOpenDebloat: () -> Unit,
     onOpenPermissions: () -> Unit,
+    onOpenGmsCheck: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -49,6 +51,12 @@ fun AppsScreen(
                     stringResource(R.string.home_open_permissions),
                     stringResource(R.string.home_permissions_description),
                     onOpenPermissions,
+                )
+                NavRow(
+                    Icons.Rounded.Cloud,
+                    stringResource(R.string.home_open_gms_check),
+                    stringResource(R.string.home_gms_check_description),
+                    onOpenGmsCheck,
                 )
             }
         }
