@@ -60,6 +60,7 @@
     <string name="connection_back">Quay lại</string>
 
     <string name="home_pull_hint">Kéo xuống để xem thông tin máy</string>
+    <string name="home_open_device_info_action">Mở thông tin máy</string>
     <string name="home_pull_release">Thả để mở thông tin máy</string>
     <string name="device_info_title">Thông tin máy</string>
     <string name="device_info_api_patch">API %1$d • Bản vá: %2$s</string>

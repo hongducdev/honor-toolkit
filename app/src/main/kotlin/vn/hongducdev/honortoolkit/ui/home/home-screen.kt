@@ -43,6 +43,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -80,6 +83,7 @@ fun HomeScreen(
         }
     }
 
+    val openInfoLabel = stringResource(R.string.home_open_device_info_action)
     Scaffold(
         modifier = modifier.fillMaxSize(),
     ) { padding ->
@@ -95,6 +99,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .padding(top = 8.dp)
+                .semantics { customActions = listOf(CustomAccessibilityAction(openInfoLabel) { onOpenDeviceInfo(); true }) }
                 .verticalScroll(rememberScrollState()).padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
