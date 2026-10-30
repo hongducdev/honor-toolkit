@@ -15,33 +15,74 @@ sealed interface LaunchResult {
 
 // Circle to Search is opened as an assist session of the voice interaction service. Google's app
 // only accepts the request for a known entry point and launcher tag, so both are passed explicitly.
+// Gemini uses the same service with a session-style bundle instead of the screenshot entry point.
 object CircleSearchLauncher {
     private const val VOICE_SERVICE = "voiceinteraction"
     private const val MANAGER_CLASS = "com.android.internal.app.IVoiceInteractionManagerService"
     private const val SHOW_SESSION = "showSessionFromSession"
     private const val ENTRY_POINT_KEY = "omni.entry_point"
     private const val ENTRY_POINT_HOME_GESTURE = 1
-    private const val SHOW_FLAGS = 7
+    private const val CIRCLE_FLAGS = 7
+    private const val GEMINI_FLAGS = 3
     private const val LAUNCHER_TAG = "hyperOS_home"
+    private const val INVOCATION_TYPE_KEY = "invocation_type"
+    private const val INVOCATION_TYPE_POWER_LONG_PRESS = 7
 
     fun launch(): LaunchResult {
         val manager = runCatching { voiceManager() }
             .getOrElse { return LaunchResult.Failed("voiceinteraction: ${it.javaClass.simpleName}") }
             ?: return LaunchResult.Failed("voiceinteraction service not found")
-
+        val managerClass = Class.forName(MANAGER_CLASS)
         val args = Bundle().apply {
             putLong("invocation_time_ms", SystemClock.elapsedRealtime())
             putInt(ENTRY_POINT_KEY, ENTRY_POINT_HOME_GESTURE)
         }
-        val managerClass = Class.forName(MANAGER_CLASS)
-        val attempts = listOf<Pair<String, () -> Any?>>(
-            "flags=$SHOW_FLAGS tag=$LAUNCHER_TAG" to {
-                HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, SHOW_FLAGS, LAUNCHER_TAG)
-            },
-            "flags=$SHOW_FLAGS" to {
-                HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, SHOW_FLAGS)
-            },
+        return show(
+            managerClass,
+            manager,
+            args,
+            listOf(
+                "flags=$CIRCLE_FLAGS tag=$LAUNCHER_TAG" to {
+                    HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, CIRCLE_FLAGS, LAUNCHER_TAG)
+                },
+                "flags=$CIRCLE_FLAGS" to {
+                    HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, CIRCLE_FLAGS)
+                },
+            ),
         )
+    }
+
+    fun launchGemini(): LaunchResult {
+        val manager = runCatching { voiceManager() }
+            .getOrElse { return LaunchResult.Failed("voiceinteraction: ${it.javaClass.simpleName}") }
+            ?: return LaunchResult.Failed("voiceinteraction service not found")
+        val managerClass = Class.forName(MANAGER_CLASS)
+        val args = Bundle().apply {
+            putLong("invocation_time_ms", SystemClock.elapsedRealtime())
+            putInt(INVOCATION_TYPE_KEY, INVOCATION_TYPE_POWER_LONG_PRESS)
+            putString("invocation_source", "POWER_LONG_PRESS")
+            putBoolean("request_assist_structure", true)
+            putBoolean("request_assist_screenshot", true)
+        }
+        return show(
+            managerClass,
+            manager,
+            args,
+            listOf(
+                "invocation_type=$INVOCATION_TYPE_POWER_LONG_PRESS flags=$GEMINI_FLAGS tag=$LAUNCHER_TAG" to {
+                    HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, GEMINI_FLAGS, LAUNCHER_TAG)
+                },
+                "invocation_type=$INVOCATION_TYPE_POWER_LONG_PRESS flags=$GEMINI_FLAGS" to {
+                    HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, GEMINI_FLAGS)
+                },
+                "invocation_type=$INVOCATION_TYPE_POWER_LONG_PRESS flags=$CIRCLE_FLAGS tag=$LAUNCHER_TAG" to {
+                    HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, CIRCLE_FLAGS, LAUNCHER_TAG)
+                },
+            ),
+        )
+    }
+
+    private fun show(managerClass: Class<*>, manager: Any, args: Bundle, attempts: List<Pair<String, () -> Any?>>): LaunchResult {
         var lastError = "rejected by system"
         for ((detail, attempt) in attempts) {
             runCatching(attempt)

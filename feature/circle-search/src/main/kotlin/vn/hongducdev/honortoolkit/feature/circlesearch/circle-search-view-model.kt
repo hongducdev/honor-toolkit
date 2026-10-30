@@ -44,6 +44,7 @@ data class CircleSearchUiState(
     val stripHeightDp: Long = 0,
     val stripOffsetDp: Long = 0,
     val stripVisible: Boolean = false,
+    val stripActions: Map<StripGesture, StripAction> = emptyMap(),
     val message: CircleSearchMessage? = null,
 )
 
@@ -71,6 +72,7 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
     fun setStripHeight(value: Long) = change { config.stripHeightDp = value }
     fun setStripOffset(value: Long) = change { config.stripOffsetDp = value }
     fun setStripVisible(value: Boolean) = change { config.stripVisible = value }
+    fun setStripAction(gesture: StripGesture, action: StripAction) = change { config.setStripAction(gesture, action) }
 
     fun test() {
         config.lastResult = ""
@@ -136,6 +138,7 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
             stripHeightDp = config.stripHeightDp,
             stripOffsetDp = config.stripOffsetDp,
             stripVisible = config.stripVisible,
+            stripActions = StripGesture.entries.associateWith(config::stripAction),
             message = message,
         )
     }

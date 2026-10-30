@@ -10,6 +10,7 @@ enum class TriggerSource(val labelRes: Int) {
     Shortcut(R.string.source_shortcut),
     Tile(R.string.source_tile),
     Strip(R.string.source_strip),
+    GeminiIcon(R.string.source_gemini_icon),
     Test(R.string.source_test),
 }
 

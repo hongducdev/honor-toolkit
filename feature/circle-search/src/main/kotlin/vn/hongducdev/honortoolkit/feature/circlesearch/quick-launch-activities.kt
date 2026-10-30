@@ -19,8 +19,12 @@ abstract class QuickLaunchActivity : Activity() {
 }
 
 /** Opens the default assistant (Gemini on a Google setup) the way the assist button does. */
-class GeminiActivity : QuickLaunchActivity() {
-    override fun target() = Intent(Intent.ACTION_VOICE_COMMAND)
+class GeminiActivity : Activity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        TriggerRunner.runGemini(this, TriggerConfig(this).delayMs, TriggerSource.GeminiIcon)
+        finish()
+    }
 }
 
 /** Opens the Google app's Search Live screen through its exported deep link. */

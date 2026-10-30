@@ -93,7 +93,7 @@ class NavBarStripService : Service() {
             fitInsetsTypes = 0
             y = (navigationBarHeightPx() + dp(config.stripOffsetDp.toInt())).coerceAtLeast(0)
         }
-        val view = StripView(this, config.stripVisible)
+        val view = StripView(this, config)
         // The system can revoke the overlay window at any time; a failed re-add must stop the
         // service instead of crashing it, so the notification does not claim a strip that is gone.
         val added = runCatching { getSystemService(WindowManager::class.java).addView(view, params) }.isSuccess
@@ -177,21 +177,42 @@ class NavBarStripService : Service() {
         strip?.visibility = View.VISIBLE
     }
 
-    private class StripView(context: Context, visible: Boolean) : View(context) {
+    private class StripView(context: Context, private val config: TriggerConfig) : View(context) {
         private val detector = GestureDetector(context, object : GestureDetector.SimpleOnGestureListener() {
             override fun onDown(e: MotionEvent): Boolean = true
 
+            // Single tap is confirmed only after the double-tap timeout, so a double tap does not
+            // also fire the tap action.
+            override fun onSingleTapConfirmed(e: MotionEvent): Boolean {
+                dispatch(StripGesture.Tap)
+                return true
+            }
+
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                dispatch(StripGesture.Double)
+                return true
+            }
+
             override fun onLongPress(e: MotionEvent) {
-                performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                TriggerRunner.run(context, 0, TriggerSource.Strip)
+                dispatch(StripGesture.Hold)
             }
         })
 
         init {
-            setBackgroundColor(if (visible) VISIBLE_DEBUG_COLOR else Color.TRANSPARENT)
+            setBackgroundColor(if (config.stripVisible) VISIBLE_DEBUG_COLOR else Color.TRANSPARENT)
         }
 
         override fun onTouchEvent(event: MotionEvent): Boolean = detector.onTouchEvent(event)
+
+        private fun dispatch(gesture: StripGesture) {
+            when (config.stripAction(gesture)) {
+                StripAction.None -> return
+                StripAction.Circle -> TriggerRunner.run(context, 0, TriggerSource.Strip)
+                StripAction.Gemini -> TriggerRunner.runGemini(context, 0, TriggerSource.Strip)
+                StripAction.Assistant -> TriggerRunner.runAssistant(context, 0, TriggerSource.Strip)
+            }
+            performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        }
     }
 
     companion object {

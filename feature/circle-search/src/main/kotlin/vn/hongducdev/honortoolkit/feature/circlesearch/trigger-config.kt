@@ -41,17 +41,26 @@ class TriggerConfig(context: Context) {
         get() = prefs.getBoolean(KEY_STRIP_VISIBLE, false)
         set(value) = prefs.edit().putBoolean(KEY_STRIP_VISIBLE, value).apply()
 
+    fun stripAction(gesture: StripGesture): StripAction {
+        val stored = prefs.getString(KEY_STRIP_ACTION + gesture.key, null)
+        return if (stored == null) StripAction.defaultFor(gesture) else StripAction.fromKey(stored)
+    }
+
+    fun setStripAction(gesture: StripGesture, action: StripAction) {
+        prefs.edit().putString(KEY_STRIP_ACTION + gesture.key, action.key).apply()
+    }
+
     companion object {
         const val MAX_DELAY_MS = 1000L
         const val MAX_STRIP_WIDTH_PERCENT = 100L
         const val MAX_STRIP_HEIGHT_DP = 60L
         const val MAX_STRIP_OFFSET_DP = 80L
         const val MIN_STRIP_OFFSET_DP = -30L
-        private const val DEFAULT_STRIP_OFFSET_DP = 0L
+        private const val DEFAULT_STRIP_OFFSET_DP = -18L
         private const val DEFAULT_DELAY_MS = 150L
         private const val DEFAULT_TILE_DELAY_MS = 350L
-        private const val DEFAULT_STRIP_WIDTH_PERCENT = 50L
-        private const val DEFAULT_STRIP_HEIGHT_DP = 32L
+        private const val DEFAULT_STRIP_WIDTH_PERCENT = 40L
+        private const val DEFAULT_STRIP_HEIGHT_DP = 22L
         private const val KEY_DELAY = "delay_ms"
         private const val KEY_TILE_DELAY = "tile_delay_ms"
         private const val KEY_VIBRATE = "vibrate"
@@ -61,5 +70,6 @@ class TriggerConfig(context: Context) {
         private const val KEY_STRIP_HEIGHT = "strip_height_dp"
         private const val KEY_STRIP_OFFSET = "strip_offset_dp"
         private const val KEY_STRIP_VISIBLE = "strip_visible"
+        private const val KEY_STRIP_ACTION = "strip_action_"
     }
 }

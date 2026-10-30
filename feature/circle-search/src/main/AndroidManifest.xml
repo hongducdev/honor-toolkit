@@ -8,6 +8,12 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
 
+    <!-- Warm-up reads Google's providers and the Gemini package is offered as a fallback target. -->
+    <queries>
+        <package android:name="com.google.android.googlequicksearchbox" />
+        <package android:name="com.google.android.apps.bard" />
+    </queries>
+
     <application>
         <!-- Not a launcher activity: the app keeps one icon. Reached through the shortcut, the tile and key assignment. -->
         <activity
