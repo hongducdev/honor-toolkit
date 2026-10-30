@@ -35,6 +35,7 @@
     <string name="home_quick_share_description">Nhận file từ Samsung, Pixel qua Wi-Fi</string>
     <string name="nav_notification_fix">Thông báo</string>
     <string name="nav_connection">ADB</string>
+    <string name="nav_update">Cập nhật</string>
     <string name="back">Quay lại</string>
     <string name="home_open_connection">Kết nối ADB</string>
     <string name="home_connection_description">Ghép cặp, kết nối lại và kiểm tra quyền shell</string>

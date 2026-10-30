@@ -116,6 +116,20 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 | `launcher-alias.kt`, `quick-launch-activities.kt` | Opt-in extra launcher icons (Circle to Search, Gemini, Search Live) for pickers that only list apps; Gemini opens the assist session and falls back to `ACTION_VOICE_COMMAND`, Search Live starts one public intent |
 | `circle-search-view-model.kt`, `circle-search-screen.kt` | Compose hub (readiness card + links) with sub-pages: trigger, launcher icons, nav-bar strip |
 
+## `:feature:update` (`feature/update/src/main/kotlin/vn/hongducdev/honortoolkit/feature/update`)
+
+| File | Concern |
+| --- | --- |
+| `app-version.kt` | Tag parsing (`v0.2.0`, prerelease) and numeric version comparison |
+| `github-release.kt` | Release/asset models, `parseLatestRelease` (prefers the release APK over debug/unsigned assets) |
+| `github-release-client.kt` | `HttpURLConnection` calls for `releases/latest` and the APK; progress, size and SHA-256 checks |
+| `update-config.kt` | Auto-check switch, last check time and the skipped version |
+| `update-controller.kt` | Installed version, check, download with package check, `FileProvider` installer and unknown-sources setting |
+| `update-view-model.kt` | Shared state: check, download, install, skip, auto-check |
+| `update-screen.kt` | Update page: version, notes, progress, install, skip |
+| `update-home-row.kt` | Home banner and tools row |
+| `src/test` | Version comparison and release JSON parsing |
+
 ## Docs and plans
 
 `docs/` holds these notes. `plans/` holds the plan and phase checklists.

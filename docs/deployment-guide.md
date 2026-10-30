@@ -30,6 +30,22 @@ keyPassword=<key password>
 
 `storeFile` is resolved from the repository root; an absolute path works.
 
+## In-app updates
+
+`:feature:update` keeps the app current through GitHub releases of `honorToolkit.githubRepo` (default `hongducdev/honor-toolkit`).
+
+- On launch the Home screen asks `releases/latest` at most once every 6 hours (`UpdateViewModel.checkIfDue`); the update page has a manual refresh and a switch for the automatic check.
+- A release qualifies when its tag (`v0.2.0`) parses as a version newer than the installed `versionName` and it carries an `.apk` asset. Assets named `debug` or `unsigned` are skipped.
+- The APK is downloaded to `cacheDir/updates`, checked against the SHA-256 digest from the GitHub API, and its package name is read with `getPackageArchiveInfo` before the system installer is launched through `FileProvider` (`<applicationId>.updates`).
+- The first install needs "Install unknown apps" (`REQUEST_INSTALL_PACKAGES`). The page opens that setting and continues when the user returns; MagicOS then shows its package-scan screen.
+- The installed version and the tag must match: the release workflow refuses a tag that differs from `honorToolkit.versionName`, otherwise the app would keep offering the same release.
+
+## Releasing from GitHub
+
+`.github/workflows/release.yml` runs on a `v*` tag (or manually) and publishes the signed APK plus a `.sha256` file. Required secrets are `SIGNING_KEYSTORE_BASE64`, `SIGNING_STORE_PASSWORD`, `SIGNING_KEY_ALIAS` and `SIGNING_KEY_PASSWORD`; `.github/workflows/ci.yml` runs the unit tests and the debug build on every push and pull request.
+
+To cut a release, bump `honorToolkit.versionCode` and `honorToolkit.versionName` in `gradle.properties`, push `main`, then push the matching tag. Do not re-use or move a tag: Android installs only when the APK's `versionCode` is higher than the installed one.
+
 ## Not yet verified
 
 The minified release build compiles (R8 on, about 6 MB unsigned) and its `core.adb` and libadb classes are present, but it has not been installed and run on a device, because no release key exists yet.

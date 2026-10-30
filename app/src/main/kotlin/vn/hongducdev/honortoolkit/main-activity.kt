@@ -39,6 +39,7 @@ import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
@@ -66,6 +67,7 @@ import vn.hongducdev.honortoolkit.feature.notificationfix.NotificationFixScreen
 import vn.hongducdev.honortoolkit.feature.permissions.PermissionsScreen
 import vn.hongducdev.honortoolkit.feature.quickshare.QuickShareOfferDialog
 import vn.hongducdev.honortoolkit.feature.quickshare.QuickShareScreen
+import vn.hongducdev.honortoolkit.feature.update.UpdateScreen
 import vn.hongducdev.honortoolkit.ui.apps.AppsScreen
 import vn.hongducdev.honortoolkit.ui.home.ConnectionScreen
 import vn.hongducdev.honortoolkit.ui.home.DeviceInfoScreen
@@ -89,6 +91,7 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
     GmsCheck(R.string.nav_gms_check, Icons.Rounded.Apps, inToolbar = false),
     QuickShare(R.string.nav_quick_share, Icons.Rounded.Share, inToolbar = false),
+    Update(R.string.nav_update, Icons.Rounded.SystemUpdate, inToolbar = false),
     ;
 
     val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions || this == GmsCheck
@@ -184,6 +187,7 @@ class MainActivity : ComponentActivity() {
                                         onOpenConnection = { subPage = Screen.Connection },
                                         onOpenDeviceInfo = { subPage = Screen.DeviceInfo },
                                         onOpenQuickShare = { subPage = Screen.QuickShare },
+                                        onOpenUpdate = { subPage = Screen.Update },
                                     )
                                     Screen.CircleSearch -> CircleSearchScreen()
                                     Screen.Apps -> AppsScreen(
@@ -206,6 +210,7 @@ class MainActivity : ComponentActivity() {
                                     Screen.Permissions -> PermissionsScreen(onBack = close)
                                     Screen.GmsCheck -> GmsCheckScreen(onBack = close)
                                     Screen.QuickShare -> QuickShareScreen(onBack = close)
+                                    Screen.Update -> UpdateScreen(onBack = close)
                                     else -> Unit
                                 }
                             }

@@ -14,6 +14,7 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | `:feature:permissions` | Runtime permission grant/revoke and AppOps for third-party apps through `AdbShell`, guard, read-back verification, journal, Compose screen |
 | `:feature:gms-check` | Read-only check of Google Play Services, Services Framework, Play Store (installed, enabled, version) and the number of Google accounts, through `AdbShell` |
 | `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, offline Vosk wake word ("OK Google"), assistant setup, Compose screen |
+| `:feature:update` | GitHub release check, APK download with SHA-256 check, system installer hand-off, Compose update page and Home banner |
 
 ## Quick Share engine (`:core:quickshare`)
 

@@ -54,6 +54,9 @@ import vn.hongducdev.honortoolkit.core.adb.AdbState
 import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
+import vn.hongducdev.honortoolkit.feature.update.UpdateAvailableCard
+import vn.hongducdev.honortoolkit.feature.update.UpdateNavRow
+import vn.hongducdev.honortoolkit.feature.update.UpdateViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,10 +66,14 @@ fun HomeScreen(
     onOpenConnection: () -> Unit,
     onOpenDeviceInfo: () -> Unit,
     onOpenQuickShare: () -> Unit,
+    onOpenUpdate: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
+    updateViewModel: UpdateViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val updateState by updateViewModel.uiState.collectAsStateWithLifecycle()
+    val pendingUpdate = updateState.visibleUpdate
     val pullState = rememberPullToRefreshState()
     var refreshing by remember { mutableStateOf(false) }
     val haptics = LocalHapticFeedback.current
@@ -104,6 +111,7 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             PullHintCard(fraction = if (refreshing) 1f else pullFraction, armed = armed || refreshing)
+            if (pendingUpdate != null) UpdateAvailableCard(pendingUpdate.versionName, onOpenUpdate)
             ConnectionStatusCard(state = state.adb, busy = state.busy, onReconnect = viewModel::reconnect)
             SettingsGroup(stringResource(R.string.home_tools_heading)) {
                 // Circle to Search works without ADB (only setting the assistant needs it), so it is always listed.
@@ -133,6 +141,7 @@ fun HomeScreen(
                     stringResource(R.string.home_connection_description),
                     onOpenConnection,
                 )
+                UpdateNavRow(updateState.currentVersion, pendingUpdate?.versionName, onOpenUpdate)
             }
         }
         }

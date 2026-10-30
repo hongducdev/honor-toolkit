@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="update_title">Cập nhật</string>
+    <string name="update_back">Quay lại</string>
+    <string name="update_refresh">Kiểm tra lại</string>
+
+    <string name="update_nav_title">Cập nhật ứng dụng</string>
+    <string name="update_nav_current">Phiên bản %1$s</string>
+    <string name="update_nav_available">Bản %1$s đã sẵn sàng</string>
+    <string name="update_banner_title">Bản %1$s đã sẵn sàng</string>
+    <string name="update_banner_description">Mở để xem có gì mới và cài đặt</string>
+
+    <string name="update_current_version">Đang dùng phiên bản %1$s</string>
+    <string name="update_checking">Đang kiểm tra bản mới…</string>
+    <string name="update_latest">Bạn đang dùng bản mới nhất.</string>
+    <string name="update_never_checked">Chưa kiểm tra bản mới.</string>
+    <string name="update_available_heading">Bản mới %1$s</string>
+    <string name="update_notes_empty">Bản phát hành không có ghi chú.</string>
+    <string name="update_asset_line">%1$s • phát hành %2$s</string>
+    <string name="update_download">Tải và cài đặt</string>
+    <string name="update_install">Cài đặt</string>
+    <string name="update_downloading">Đang tải %1$d%%</string>
+    <string name="update_download_failed">Tải bản cập nhật thất bại</string>
+    <string name="update_skip">Bỏ qua bản này</string>
+    <string name="update_cancel_download">Huỷ tải</string>
+    <string name="update_skipped">Đã bỏ qua bản %1$s</string>
+    <string name="update_unskip">Hiện lại bản này</string>
+    <string name="update_auto_check">Tự kiểm tra khi mở ứng dụng</string>
+    <string name="update_auto_check_hint">Ứng dụng đọc bản phát hành mới nhất từ GitHub rồi mở trình cài đặt của Android. Tệp tải về được kiểm tra mã SHA-256 và tên gói trước khi cài.</string>
+    <string name="update_permission_hint">Android cần quyền “Cài đặt ứng dụng không rõ nguồn gốc” cho Honor Toolkit. Mở cài đặt, bật quyền rồi quay lại bấm Cài đặt.</string>
+    <string name="update_open_release">Mở trang phát hành</string>
+    <string name="update_release_notes_heading">Có gì mới</string>
+</resources>
