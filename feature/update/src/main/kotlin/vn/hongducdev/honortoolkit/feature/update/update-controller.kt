@@ -47,7 +47,7 @@ class UpdateController(context: Context) {
         set(value) { config.skippedVersion = value }
 
     fun checkNow(): CheckResult {
-        // Recorded before the request so an offline phone retries on the next launch, not in a loop.
+        // Recorded before the request so an offline phone waits for the next interval instead of retrying on every launch.
         config.lastCheckedAt = System.currentTimeMillis()
         val release = client.latest()
         val apk = release.apk ?: throw UpdateException("Bản phát hành ${release.tag} không kèm tệp APK.")

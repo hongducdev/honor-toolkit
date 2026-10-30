@@ -77,7 +77,7 @@ class GitHubReleaseClient(private val repo: String) {
                     setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
                 }
             }
-            ?: throw IOException("URL không dùng HTTPS: $url")
+            ?: throw IOException("Địa chỉ tải không hợp lệ: $url")
 
     private fun verifyDigest(file: File, digest: String) {
         val algorithm = digest.substringBefore(':', "").lowercase()

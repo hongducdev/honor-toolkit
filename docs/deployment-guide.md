@@ -37,7 +37,7 @@ keyPassword=<key password>
 - On launch the Home screen asks `releases/latest` at most once every 6 hours (`UpdateViewModel.checkIfDue`); the update page has a manual refresh and a switch for the automatic check.
 - A release qualifies when its tag (`v0.2.0`) parses as a version newer than the installed `versionName` and it carries an `.apk` asset. Assets named `debug` or `unsigned` are skipped.
 - The APK is downloaded to `cacheDir/updates`, checked against the SHA-256 digest from the GitHub API, and its package name is read with `getPackageArchiveInfo` before the system installer is launched through `FileProvider` (`<applicationId>.updates`).
-- The first install needs "Install unknown apps" (`REQUEST_INSTALL_PACKAGES`). The page opens that setting and continues when the user returns; MagicOS then shows its package-scan screen.
+- The first install needs "Install unknown apps" (`REQUEST_INSTALL_PACKAGES`). The page opens that setting and continues when the user returns; MagicOS then shows its package-scan screen. Releases are signed with the release key, so a release APK only installs over another release-signed build; a debug install has to be uninstalled first.
 - The installed version and the tag must match: the release workflow refuses a tag that differs from `honorToolkit.versionName`, otherwise the app would keep offering the same release.
 
 ## Releasing from GitHub

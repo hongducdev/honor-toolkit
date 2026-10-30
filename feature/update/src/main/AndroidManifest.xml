@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- The update APK is installed by the system installer, so Android asks the user to allow it once. -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
