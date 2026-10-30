@@ -1,6 +1,18 @@
 # Honor Toolkit
 
+[![CI](https://github.com/hongducdev/honor-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/hongducdev/honor-toolkit/actions/workflows/ci.yml)
+
 A native Android app for Honor phones on MagicOS (built and tested against the Magic7 Pro, China ROM, Android 17). It talks to a phone's own Wireless debugging over ADB, so system-level tools work without a PC and without root. The UI is Vietnamese, Jetpack Compose with Material 3 dynamic colour.
+
+## Install
+
+Download the latest signed APK from [Releases](https://github.com/hongducdev/honor-toolkit/releases/latest) and open it, or install over ADB:
+
+```text
+adb install -r honor-toolkit-v<version>.apk
+```
+
+After the first install the app updates itself from those same releases.
 
 ## Features
 
