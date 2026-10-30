@@ -76,7 +76,7 @@ jobs:
           } > keystore.properties
 
       - name: Release APK
-        run: ./gradlew :app:assembleRelease --console=plain
+        run: chmod +x gradlew && ./gradlew :app:assembleRelease --console=plain
 
       - name: Prepare asset
         id: asset
