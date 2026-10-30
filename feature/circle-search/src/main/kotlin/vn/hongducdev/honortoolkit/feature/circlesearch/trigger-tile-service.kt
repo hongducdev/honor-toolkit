@@ -1,5 +1,6 @@
 package vn.hongducdev.honortoolkit.feature.circlesearch
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
@@ -14,6 +15,9 @@ class TriggerTileService : TileService() {
         }
     }
 
+    // The Intent overload is the only one on Android 13 and older; the PendingIntent overload is
+    // required from 14 (targetSdk 36). Lint cannot see that the deprecated call is version-guarded.
+    @SuppressLint("StartActivityAndCollapseDeprecated")
     @Suppress("DEPRECATION")
     override fun onClick() {
         val intent = Intent(this, TriggerActivity::class.java)
