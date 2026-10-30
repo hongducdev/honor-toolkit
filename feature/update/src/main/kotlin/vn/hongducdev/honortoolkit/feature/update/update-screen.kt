@@ -180,7 +180,7 @@ private fun SkippedSection(state: UpdateUiState, update: AvailableUpdate, viewMo
         SettingsRow {
             Text(stringResource(R.string.update_skipped, update.versionName), style = MaterialTheme.typography.bodyLarge)
         }
-        NavRow(Icons.Rounded.SystemUpdate, stringResource(R.string.update_unskip), update.versionName, viewModel::clearSkip)
+        NavRow(Icons.Rounded.SystemUpdate, stringResource(R.string.update_unskip), stringResource(R.string.update_nav_available, update.versionName), viewModel::clearSkip)
     }
 }
 
