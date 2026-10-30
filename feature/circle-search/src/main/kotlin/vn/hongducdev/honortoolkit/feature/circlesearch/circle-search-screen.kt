@@ -1,9 +1,17 @@
 package vn.hongducdev.honortoolkit.feature.circlesearch
 
+import android.Manifest
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,7 +48,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -50,6 +60,7 @@ import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.NavRow
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 import vn.hongducdev.honortoolkit.core.ui.SettingsNote
+import vn.hongducdev.honortoolkit.core.ui.SettingsRow
 import vn.hongducdev.honortoolkit.core.ui.SliderRow
 import vn.hongducdev.honortoolkit.core.ui.SwitchRow
 import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
@@ -64,6 +75,8 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
     var page by rememberSaveable { mutableStateOf(CsPage.Hub) }
+    val clipboard = context.getSystemService(ClipboardManager::class.java)
+    val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { viewModel.refresh() }
 
     BackHandler(enabled = page != CsPage.Hub) { page = CsPage.Hub }
 
@@ -125,6 +138,32 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
+                    SettingsGroup(stringResource(R.string.cs_log_heading)) {
+                        SettingsRow {
+                            Text(
+                                state.diagnostics.ifEmpty { stringResource(R.string.cs_log_empty) },
+                                style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            FilledTonalButton(
+                                onClick = {
+                                    clipboard?.setPrimaryClip(ClipData.newPlainText("Honor Toolkit", state.diagnostics))
+                                    Toast.makeText(context, R.string.cs_log_copied, Toast.LENGTH_SHORT).show()
+                                },
+                                enabled = state.diagnostics.isNotEmpty(),
+                            ) {
+                                Text(stringResource(R.string.cs_log_copy))
+                            }
+                            OutlinedButton(onClick = viewModel::clearLog, enabled = state.diagnostics.isNotEmpty()) {
+                                Text(stringResource(R.string.cs_log_clear))
+                            }
+                        }
+                    }
                     SettingsGroup(stringResource(R.string.cs_assign_heading)) {
                         SettingsNote(stringResource(R.string.cs_assign_body))
                         SettingsNote(stringResource(R.string.cs_old_app_note))
@@ -156,11 +195,21 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
                         state.stripEnabled && state.overlayGranted,
                     ) { enabled ->
                         viewModel.setStripEnabled(enabled)
-                        if (enabled && !state.overlayGranted) {
+                        if (!enabled) return@SwitchRow
+                        if (!state.overlayGranted) {
                             context.startActivity(
                                 Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}")),
                             )
+                        } else if (
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                            PackageManager.PERMISSION_GRANTED
+                        ) {
+                            notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                         }
+                    }
+                    if (state.stripEnabled && !state.notificationsGranted) {
+                        SettingsNote(stringResource(R.string.cs_strip_notification_denied))
                     }
                     SliderRow({ stringResource(R.string.cs_strip_width_label, it) }, state.stripWidthPercent, 5, TriggerConfig.MAX_STRIP_WIDTH_PERCENT, 5, viewModel::setStripWidth)
                     SliderRow({ stringResource(R.string.cs_strip_height_label, it) }, state.stripHeightDp, 2, TriggerConfig.MAX_STRIP_HEIGHT_DP, 2, viewModel::setStripHeight)

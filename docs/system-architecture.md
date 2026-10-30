@@ -33,7 +33,8 @@ Written from NearDrop's `PROTOCOL.md` and Swift sources (Unlicense) and the prot
 - `CircleSearchLauncher` opens an assist session of the voice interaction service through `HiddenApiBypass`; no ADB needed. The module ships a consumer proguard rule keeping the bypass library.
 - `TriggerActivity` is exported but is not a launcher activity (the app keeps one icon). It is reached through a static shortcut on `MainActivity`, the Quick Settings tile, or key assignment; it only runs the fixed action.
 - `AssistantSetup` (needs ADB) records the current ASSISTANT role holder, adds Google as holder, then sets the `assistant` and `voice_interaction_service` secure settings if the role alone did not make the setting match. `restore` re-adds the recorded holder.
-- The strip (`NavBarStripService`, foreground `specialUse`, notification id 2) is opt-in and off by default; `BootReceiver` is not exported.
+- The strip (`NavBarStripService`, foreground `specialUse`, notification id 2) is opt-in and off by default; `BootReceiver` is not exported. It hides itself for 90 ms before an assist launch so it does not appear in the screenshot Circle to Search reads, re-adds its window from a 30 s health check, and offers "Tắt dải" in its quiet notification.
+- `TriggerLog` keeps the last 20 attempts (source, detail, the assistant that received the request, OK/FAIL) in `SharedPreferences` and is shown on the trigger page with copy/clear, because MagicOS hides third-party logcat lines.
 
 ## GMS check (`:feature:gms-check`)
 

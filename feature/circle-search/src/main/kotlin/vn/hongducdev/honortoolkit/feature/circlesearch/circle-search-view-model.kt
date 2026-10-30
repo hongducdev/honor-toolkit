@@ -1,9 +1,14 @@
 package vn.hongducdev.honortoolkit.feature.circlesearch
 
+import android.Manifest
 import android.app.Application
+import android.content.pm.PackageManager
+import android.os.Build
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,8 +36,10 @@ data class CircleSearchUiState(
     val vibrate: Boolean = true,
     val launcherEntries: Set<LauncherEntry> = emptySet(),
     val lastResult: String = "",
+    val diagnostics: String = "",
     val stripEnabled: Boolean = false,
     val overlayGranted: Boolean = false,
+    val notificationsGranted: Boolean = false,
     val stripWidthPercent: Long = 0,
     val stripHeightDp: Long = 0,
     val stripOffsetDp: Long = 0,
@@ -65,10 +72,16 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
     fun setStripOffset(value: Long) = change { config.stripOffsetDp = value }
     fun setStripVisible(value: Boolean) = change { config.stripVisible = value }
 
-    fun test() = change {
+    fun test() {
         config.lastResult = ""
-        TriggerRunner.run(getApplication(), TEST_DELAY_MS)
+        TriggerRunner.run(getApplication(), TEST_DELAY_MS, TriggerSource.Test)
+        viewModelScope.launch {
+            delay(TEST_DELAY_MS + LOG_REFRESH_MS)
+            refresh()
+        }
     }
+
+    fun clearLog() = change { TriggerLog.clear(getApplication()) }
 
     fun setGoogleAsAssistant() = launchAssistant {
         if (session.state.value != AdbState.Connected) return@launchAssistant CircleSearchMessage.NeedsAdb
@@ -115,8 +128,10 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
             vibrate = config.vibrate,
             launcherEntries = LauncherAlias.enabledEntries(app),
             lastResult = config.lastResult,
+            diagnostics = TriggerLog.text(app),
             stripEnabled = config.stripEnabled,
             overlayGranted = Settings.canDrawOverlays(app),
+            notificationsGranted = notificationsGranted(app),
             stripWidthPercent = config.stripWidthPercent,
             stripHeightDp = config.stripHeightDp,
             stripOffsetDp = config.stripOffsetDp,
@@ -135,7 +150,12 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
+    private fun notificationsGranted(app: Application): Boolean =
+        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(app, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+
     private companion object {
         const val TEST_DELAY_MS = 2000L
+        const val LOG_REFRESH_MS = 1500L
     }
 }

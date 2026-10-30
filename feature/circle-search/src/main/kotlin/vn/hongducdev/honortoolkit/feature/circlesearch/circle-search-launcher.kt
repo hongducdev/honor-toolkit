@@ -1,12 +1,15 @@
 package vn.hongducdev.honortoolkit.feature.circlesearch
 
+import android.content.ComponentName
+import android.content.Context
 import android.os.Bundle
 import android.os.IBinder
 import android.os.SystemClock
+import android.provider.Settings
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 sealed interface LaunchResult {
-    data object Started : LaunchResult
+    data class Started(val detail: String) : LaunchResult
     data class Failed(val reason: String) : LaunchResult
 }
 
@@ -31,17 +34,36 @@ object CircleSearchLauncher {
             putInt(ENTRY_POINT_KEY, ENTRY_POINT_HOME_GESTURE)
         }
         val managerClass = Class.forName(MANAGER_CLASS)
-        val attempts = listOf<() -> Any?>(
-            { HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, SHOW_FLAGS, LAUNCHER_TAG) },
-            { HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, SHOW_FLAGS) },
+        val attempts = listOf<Pair<String, () -> Any?>>(
+            "flags=$SHOW_FLAGS tag=$LAUNCHER_TAG" to {
+                HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, SHOW_FLAGS, LAUNCHER_TAG)
+            },
+            "flags=$SHOW_FLAGS" to {
+                HiddenApiBypass.invoke(managerClass, manager, SHOW_SESSION, null, args, SHOW_FLAGS)
+            },
         )
         var lastError = "rejected by system"
-        for (attempt in attempts) {
+        for ((detail, attempt) in attempts) {
             runCatching(attempt)
-                .onSuccess { if (it == true) return LaunchResult.Started else lastError = "session refused" }
+                .onSuccess { if (it == true) return LaunchResult.Started(detail) else lastError = "session refused" }
                 .onFailure { lastError = it.javaClass.simpleName }
         }
         return LaunchResult.Failed(lastError)
+    }
+
+    /** Package of the assistant sessions are routed to, so a refusal says which app refused it. */
+    fun activeAssistant(context: Context): String {
+        val managerClass = runCatching { Class.forName(MANAGER_CLASS) }.getOrNull()
+        val manager = runCatching { voiceManager() }.getOrNull()
+        if (managerClass != null && manager != null) {
+            runCatching {
+                val component = HiddenApiBypass.invoke(managerClass, manager, "getActiveServiceComponentName") as? ComponentName
+                if (component != null) return component.packageName
+            }
+        }
+        val raw = Settings.Secure.getString(context.contentResolver, "voice_interaction_service")
+        val component = raw?.let { ComponentName.unflattenFromString(it) }
+        return component?.packageName ?: context.getString(R.string.cs_assistant_unknown)
     }
 
     private fun voiceManager(): Any? {

@@ -104,9 +104,10 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 
 | File | Concern |
 | --- | --- |
-| `circle-search-launcher.kt`, `trigger-runner.kt` | Hidden-API assist session launch, delayed run, vibrate, last result |
+| `circle-search-launcher.kt`, `trigger-runner.kt` | Hidden-API assist session launch, delayed run, vibrate, last result, log of each attempt with the assistant that received it |
+| `trigger-log.kt` | Last 20 attempts (source, detail, OK/FAIL) in SharedPreferences so a refused launch can be copied |
 | `trigger-activity.kt`, `trigger-tile-service.kt` | Non-launcher entry point and its Quick Settings tile |
-| `nav-bar-strip-service.kt`, `strip-toggle-tile-service.kt`, `boot-receiver.kt` | Opt-in long-press overlay strip, its tile, restore after boot |
+| `nav-bar-strip-service.kt`, `strip-toggle-tile-service.kt`, `boot-receiver.kt` | Opt-in long-press overlay strip as a foreground `specialUse` service with a quiet notification, 30 s health check, hides itself before the assist launch so it stays out of the screenshot; its tile and restore after boot |
 | `trigger-config.kt` | SharedPreferences for delays, vibration and strip geometry |
 | `assistant-setup.kt` | Set Google as assistant through `AdbShell`, remember and restore the previous holder |
 | `launcher-alias.kt`, `quick-launch-activities.kt` | Opt-in extra launcher icons (Circle to Search, Gemini, Search Live) for pickers that only list apps; Gemini and Search Live activities start one public intent |

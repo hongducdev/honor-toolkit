@@ -8,8 +8,11 @@
     <string name="result_ok">Đã kích hoạt</string>
     <string name="result_failed">Thất bại: %1$s</string>
     <string name="toast_failed">Không mở được Circle to Search</string>
-    <string name="strip_notification_title">Dải Circle Search đang bật</string>
-    <string name="strip_notification_text">Giữ vạch điều hướng để mở Circle to Search.</string>
+    <string name="cs_assistant_unknown">không rõ</string>
+    <string name="source_shortcut">lối tắt</string>
+    <string name="source_tile">ô cài đặt nhanh</string>
+    <string name="source_strip">dải điều hướng</string>
+    <string name="source_test">thử trong ứng dụng</string>
 
     <string name="cs_title">Circle to Search</string>
     <string name="cs_page_trigger">Kích hoạt và gán nút</string>
@@ -36,6 +39,11 @@
     <string name="cs_test_button">Thử sau 2 giây</string>
     <string name="cs_test_pending">Sẽ kích hoạt sau 2 giây…</string>
     <string name="cs_last_result">Kết quả gần nhất: %1$s</string>
+    <string name="cs_log_heading">Nhật ký 20 lần gần nhất</string>
+    <string name="cs_log_empty">Chưa có lần kích hoạt nào.</string>
+    <string name="cs_log_copy">Sao chép nhật ký</string>
+    <string name="cs_log_clear">Xóa nhật ký</string>
+    <string name="cs_log_copied">Đã sao chép nhật ký.</string>
     <string name="cs_assign_heading">Gán vào nút bấm</string>
     <string name="cs_assign_body">Nhấn giữ biểu tượng Honor Toolkit và chọn lối tắt Circle to Search, hoặc thêm ô Circle to Search vào Cài đặt nhanh. Có thể gán lối tắt đó cho nút AI hoặc thao tác bấm đúp. Nó mở Circle to Search ngay trên ứng dụng bạn đang dùng.</string>
     <string name="cs_launcher_heading">Biểu tượng riêng cho nút và cử chỉ</string>
@@ -45,13 +53,18 @@
     <string name="cs_launcher_live">Search Live (hội thoại giọng nói và camera của Google)</string>
     <string name="cs_old_app_note">Nếu đã cài ứng dụng Circle Search Trigger cũ, hãy gỡ nó để tránh trùng lặp.</string>
     <string name="cs_strip_heading">Giữ thanh điều hướng</string>
-    <string name="cs_strip_hint">Đặt một dải vô hình lên vạch điều hướng; giữ vào đó để mở Circle to Search. Tính năng dùng quyền "hiển thị trên ứng dụng khác", không dùng trợ năng. Một số app ngân hàng có thể từ chối chạy khi quyền này đã cấp: hãy tắt dải trước khi mở chúng.</string>
+    <string name="cs_strip_hint">Đặt một dải vô hình lên vạch điều hướng; giữ vào đó để mở Circle to Search. Tính năng dùng quyền "hiển thị trên ứng dụng khác", không dùng trợ năng. Mặc định dải nằm đúng vùng vạch điều hướng nên không che nội dung app; nếu máy bạn bị che nút, hạ "Lệch" xuống số âm. Một số app ngân hàng có thể từ chối chạy khi quyền này đã cấp: hãy tắt dải trước khi mở chúng.</string>
     <string name="cs_strip_no_permission">Dải: chưa cấp quyền "hiển thị trên ứng dụng khác".</string>
-    <string name="cs_strip_on">Dải: đang bật. Giữ ngay phía trên vạch điều hướng.</string>
+    <string name="cs_strip_on">Dải: đang bật. Giữ vào vạch điều hướng.</string>
     <string name="cs_strip_off">Dải: đang tắt.</string>
     <string name="cs_strip_switch_label">Bật dải giữ thanh điều hướng</string>
     <string name="cs_strip_width_label">Chiều rộng dải: %1$d%% màn hình</string>
     <string name="cs_strip_height_label">Chiều cao dải: %1$d dp</string>
     <string name="cs_strip_offset_label">Lệch so với mép trên thanh điều hướng: %1$d dp (số âm = hạ thấp)</string>
     <string name="cs_strip_visible_label">Hiện dải (để căn chỉnh)</string>
+    <string name="cs_strip_notification_channel">Dải thanh điều hướng</string>
+    <string name="cs_strip_notification_title">Dải Circle to Search đang bật</string>
+    <string name="cs_strip_notification_text">Giữ vào vạch điều hướng để mở Circle to Search.</string>
+    <string name="cs_strip_notification_stop">Tắt dải</string>
+    <string name="cs_strip_notification_denied">Thông báo của dải đang bị từ chối. Dải vẫn chạy nhưng không có nút tắt nhanh trong thanh thông báo; bật thông báo để giữ dải ổn định hơn.</string>
 </resources>

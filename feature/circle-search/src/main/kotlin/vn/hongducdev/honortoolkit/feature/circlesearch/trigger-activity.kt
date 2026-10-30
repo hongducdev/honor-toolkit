@@ -8,7 +8,8 @@ class TriggerActivity : Activity() {
         super.onCreate(savedInstanceState)
         val config = TriggerConfig(this)
         val fromTile = intent.getBooleanExtra(EXTRA_FROM_TILE, false)
-        TriggerRunner.run(this, if (fromTile) config.tileDelayMs else config.delayMs)
+        val source = if (fromTile) TriggerSource.Tile else TriggerSource.Shortcut
+        TriggerRunner.run(this, if (fromTile) config.tileDelayMs else config.delayMs, source)
         finish()
     }
 
