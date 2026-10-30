@@ -13,7 +13,7 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | `:feature:debloat` | Package scan, disable/enable through `AdbShell`, denylist, journal, Compose screen |
 | `:feature:permissions` | Runtime permission grant/revoke and AppOps for third-party apps through `AdbShell`, guard, read-back verification, journal, Compose screen |
 | `:feature:gms-check` | Read-only check of Google Play Services, Services Framework, Play Store (installed, enabled, version) and the number of Google accounts, through `AdbShell` |
-| `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, assistant setup, Compose screen |
+| `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, offline Vosk wake word ("OK Google"), assistant setup, Compose screen |
 
 ## Quick Share engine (`:core:quickshare`)
 
@@ -36,6 +36,8 @@ Written from NearDrop's `PROTOCOL.md` and Swift sources (Unlicense) and the prot
 - `AssistantSetup` (needs ADB) records the current ASSISTANT role holder, adds Google as holder, then sets the `assistant` and `voice_interaction_service` secure settings if the role alone did not make the setting match. `restore` re-adds the recorded holder.
 - The strip (`NavBarStripService`, foreground `specialUse`, notification id 2) is opt-in and off by default; `BootReceiver` is not exported. It hides itself for 90 ms before an assist launch so it does not appear in the screenshot Circle to Search reads, re-adds its window from a 30 s health check, and offers "Tắt dải" in its quiet notification. It maps tap, double tap and hold to `none`/`circle`/`gemini`/`assistant` (defaults: tap none, double Gemini, hold Circle); swipes are not handled so the system navigation gestures keep working.
 - `TriggerLog` keeps the last 20 attempts (source, detail, the assistant that received the request, OK/FAIL) in `SharedPreferences` and is shown on the trigger page with copy/clear, because MagicOS hides third-party logcat lines.
+- Wake word ("Đánh thức bằng giọng nói"): opt-in, off by default. `WakeWordService` is a foreground `microphone` service that runs Vosk/Kaldi fully on device. The pipeline is ported from Trợ lý VXM (`WakeAudio`, `WakeFilter`, `WakeLevel`, `SpeechGate`, `PlaybackGate`): 16 kHz mono PCM16, 1280-sample buffers, a two-phrase grammar (`okay google`, `hey google`), an 80 ms stability window on partial results, a loudness gate and a 1 s media-playback gate. The 70 MB US English mobile model ships in `assets/model-en` and is unpacked to external files on first use. On a verified wake the service releases the microphone, runs the same Gemini session as the strip (`TriggerRunner.runGemini`, source `OK Google`), then polls `AudioManager.getActiveRecordingConfigurations()` and listens again once Gemini has stopped recording. The page shows the live status, last heard phrase/time, microphone and notification permissions, a battery-optimisation shortcut and a "Thử mở Gemini" button that simulates a wake. `BootReceiver` tries to restart it after boot; on Android 14+ a microphone foreground service may be refused there, so the screen remains the reliable switch.
+- The wake module vendors Vosk/Kaldi (Apache-2.0) and the Alpha Cephei US English mobile model; the model's own README and copyright are kept in `assets/model-en/README`.
 
 ## GMS check (`:feature:gms-check`)
 

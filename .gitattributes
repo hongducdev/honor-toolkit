@@ -1,0 +1,2 @@
+# Vosk model files are opaque binary data; never apply EOL conversion on checkout.
+feature/circle-search/src/main/assets/model-en/** -text

@@ -11,6 +11,7 @@ enum class TriggerSource(val labelRes: Int) {
     Tile(R.string.source_tile),
     Strip(R.string.source_strip),
     GeminiIcon(R.string.source_gemini_icon),
+    Wake(R.string.source_wake),
     Test(R.string.source_test),
 }
 

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.text.format.DateFormat
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -27,6 +28,7 @@ import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.SwipeUp
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Widgets
 import androidx.compose.material.icons.rounded.TouchApp
 import androidx.compose.material3.AlertDialog
@@ -75,6 +77,8 @@ import vn.hongducdev.honortoolkit.core.ui.ProvideToolbar
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
 import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
+import java.util.Date
+import kotlinx.coroutines.delay
 
 // The hub is a top-level destination (no back arrow); system back from a sub-page returns to the hub.
 @Composable
@@ -83,8 +87,29 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
     var page by rememberSaveable { mutableStateOf(CsPage.Hub) }
+    var enableAfterMic by remember { mutableStateOf(false) }
     val clipboard = context.getSystemService(ClipboardManager::class.java)
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { viewModel.refresh() }
+    val micPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted && enableAfterMic) {
+            viewModel.setWakeEnabled(true)
+        } else if (!granted && enableAfterMic) {
+            Toast.makeText(context, R.string.cs_wake_no_mic_toast, Toast.LENGTH_SHORT).show()
+            viewModel.setWakeEnabled(false)
+        }
+        enableAfterMic = false
+        viewModel.refresh()
+    }
+
+    // The service writes its status to SharedPreferences; refresh while this page is open so the
+    // model load, listening state and last wake are visible without leaving the screen.
+    LaunchedEffect(page, state.wakeEnabled) {
+        if (page != CsPage.Wake || !state.wakeEnabled) return@LaunchedEffect
+        while (true) {
+            delay(WAKE_STATUS_POLL_MS)
+            viewModel.refreshWakeStatus()
+        }
+    }
 
     BackHandler(enabled = page != CsPage.Hub) { page = CsPage.Hub }
 
@@ -177,6 +202,73 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
                         SettingsNote(stringResource(R.string.cs_old_app_note))
                     }
                 }
+                CsPage.Wake -> {
+                    SettingsGroup(stringResource(R.string.cs_wake_heading)) {
+                        SettingsNote(stringResource(R.string.cs_wake_body))
+                        SettingsNote(
+                            stringResource(
+                                R.string.cs_wake_status_line,
+                                state.wakeStatus.ifEmpty { stringResource(R.string.cs_wake_status_off) },
+                            ),
+                        )
+                        SwitchRow(stringResource(R.string.cs_wake_switch_label), state.wakeEnabled) { enable ->
+                            if (!enable) {
+                                viewModel.setWakeEnabled(false)
+                                return@SwitchRow
+                            }
+                            if (!state.micGranted) {
+                                enableAfterMic = true
+                                micPermission.launch(Manifest.permission.RECORD_AUDIO)
+                                return@SwitchRow
+                            }
+                            if (
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                !state.notificationsGranted
+                            ) {
+                                notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                            viewModel.setWakeEnabled(true)
+                        }
+                        if (!state.micGranted) {
+                            SettingsNote(stringResource(R.string.cs_wake_mic_missing))
+                            Button(
+                                onClick = {
+                                    enableAfterMic = false
+                                    micPermission.launch(Manifest.permission.RECORD_AUDIO)
+                                },
+                            ) {
+                                Text(stringResource(R.string.cs_wake_grant_mic))
+                            }
+                        }
+                        if (state.wakeEnabled && !state.notificationsGranted) {
+                            SettingsNote(stringResource(R.string.cs_wake_notification_denied))
+                        }
+                        if (state.wakeLastHeard.isNotEmpty() && state.wakeLastHeardAt > 0L) {
+                            val heardAt = DateFormat.getTimeFormat(context).format(Date(state.wakeLastHeardAt))
+                            SettingsNote(stringResource(R.string.cs_wake_last_heard, state.wakeLastHeard, heardAt))
+                        }
+                        if (state.wakeBatteryOptimized) {
+                            SettingsNote(stringResource(R.string.cs_wake_battery))
+                            OutlinedButton(
+                                onClick = {
+                                    runCatching { context.startActivity(Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)) }
+                                },
+                            ) {
+                                Text(stringResource(R.string.cs_wake_battery_button))
+                            }
+                        }
+                        FilledTonalButton(
+                            onClick = viewModel::testWake,
+                            enabled = state.wakeEnabled && state.micGranted,
+                        ) {
+                            Text(stringResource(R.string.cs_wake_test))
+                        }
+                        SettingsNote(stringResource(R.string.cs_wake_test_hint))
+                    }
+                    SettingsGroup(stringResource(R.string.cs_wake_notes_heading)) {
+                        SettingsNote(stringResource(R.string.cs_wake_notes))
+                    }
+                }
                 CsPage.Launcher -> SettingsGroup(stringResource(R.string.cs_launcher_heading)) {
                     SettingsNote(stringResource(R.string.cs_launcher_body))
                     listOf(
@@ -251,6 +343,7 @@ fun CircleSearchScreen(modifier: Modifier = Modifier, viewModel: CircleSearchVie
 private enum class CsPage(val titleRes: Int, val descriptionRes: Int, val icon: ImageVector) {
     Hub(R.string.cs_title, 0, Icons.Rounded.Apps),
     Trigger(R.string.cs_page_trigger, R.string.cs_page_trigger_desc, Icons.Rounded.TouchApp),
+    Wake(R.string.cs_page_wake, R.string.cs_page_wake_desc, Icons.Rounded.Mic),
     Launcher(R.string.cs_page_launcher, R.string.cs_page_launcher_desc, Icons.Rounded.Widgets),
     Strip(R.string.cs_page_strip, R.string.cs_page_strip_desc, Icons.Rounded.SwipeUp),
 }
@@ -346,3 +439,4 @@ private fun StripActionRow(gesture: StripGesture, action: StripAction, onChange:
 }
 
 private const val STEP_MS = 50L
+private const val WAKE_STATUS_POLL_MS = 2_000L

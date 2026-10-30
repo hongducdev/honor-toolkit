@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
@@ -45,11 +46,18 @@ data class CircleSearchUiState(
     val stripOffsetDp: Long = 0,
     val stripVisible: Boolean = false,
     val stripActions: Map<StripGesture, StripAction> = emptyMap(),
+    val wakeEnabled: Boolean = false,
+    val wakeStatus: String = "",
+    val wakeLastHeard: String = "",
+    val wakeLastHeardAt: Long = 0L,
+    val micGranted: Boolean = false,
+    val wakeBatteryOptimized: Boolean = false,
     val message: CircleSearchMessage? = null,
 )
 
 class CircleSearchViewModel(application: Application) : AndroidViewModel(application) {
     private val config = TriggerConfig(application)
+    private val wake = WakeConfig(application)
     private val session = AdbSession.get(application)
     private val assistant = AssistantSetup(application, session)
     private val _state = MutableStateFlow(snapshot())
@@ -59,6 +67,14 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
     fun refresh() {
         _state.update { snapshot(it.message, it.busy) }
         NavBarStripService.sync(getApplication())
+        WakeWordService.sync(getApplication())
+    }
+
+    /** Only re-reads the wake service state; safe to call on a timer without restarting services. */
+    fun refreshWakeStatus() {
+        val app = getApplication<Application>()
+        if (wake.enabled && !WakeWordService.isRunning) WakeWordService.start(app)
+        _state.update { snapshot(it.message, it.busy) }
     }
 
     fun consumeMessage() = _state.update { it.copy(message = null) }
@@ -73,6 +89,26 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
     fun setStripOffset(value: Long) = change { config.stripOffsetDp = value }
     fun setStripVisible(value: Boolean) = change { config.stripVisible = value }
     fun setStripAction(gesture: StripGesture, action: StripAction) = change { config.setStripAction(gesture, action) }
+
+    fun setWakeEnabled(value: Boolean) = change {
+        val app = getApplication<Application>()
+        wake.enabled = value
+        if (value) {
+            wake.status = app.getString(R.string.cs_wake_status_starting)
+            WakeWordService.start(app)
+        } else {
+            wake.status = app.getString(R.string.cs_wake_status_off)
+            WakeWordService.stop(app)
+        }
+    }
+
+    fun testWake() {
+        WakeWordService.test(getApplication())
+        viewModelScope.launch {
+            delay(TEST_WAKE_REFRESH_MS)
+            refreshWakeStatus()
+        }
+    }
 
     fun test() {
         config.lastResult = ""
@@ -139,6 +175,14 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
             stripOffsetDp = config.stripOffsetDp,
             stripVisible = config.stripVisible,
             stripActions = StripGesture.entries.associateWith(config::stripAction),
+            wakeEnabled = wake.enabled,
+            wakeStatus = wake.status,
+            wakeLastHeard = wake.lastHeard,
+            wakeLastHeardAt = wake.lastHeardAt,
+            micGranted = ContextCompat.checkSelfPermission(app, Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED,
+            wakeBatteryOptimized = !app.getSystemService(PowerManager::class.java)
+                .isIgnoringBatteryOptimizations(app.packageName),
             message = message,
         )
     }
@@ -160,5 +204,6 @@ class CircleSearchViewModel(application: Application) : AndroidViewModel(applica
     private companion object {
         const val TEST_DELAY_MS = 2000L
         const val LOG_REFRESH_MS = 1500L
+        const val TEST_WAKE_REFRESH_MS = 1500L
     }
 }
