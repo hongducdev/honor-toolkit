@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Creating a rule -->
+    <string name="automation_new_title">Tạo quy tắc mới</string>
+    <string name="automation_new_trigger">Khi có sự kiện</string>
+    <string name="automation_new_trigger_desc">Chạy các hành động một lần mỗi khi sự kiện xảy ra, ví dụ cắm sạc hoặc mở một ứng dụng.</string>
+    <string name="automation_new_state">Trong khi điều kiện đúng</string>
+    <string name="automation_new_state_desc">Chạy hành động khi vào trạng thái và hành động khác khi thoát, ví dụ đang sạc hoặc trong khoảng giờ làm việc.</string>
+    <string name="automation_empty_title">Chưa có quy tắc nào</string>
+    <string name="automation_empty_action">Tạo quy tắc</string>
+
+    <!-- List -->
+    <string name="automation_disabled_count">Đã tắt (%1$d)</string>
+    <string name="automation_selected_count">Đã chọn %1$d</string>
+    <string name="automation_enable">Bật</string>
+    <string name="automation_disable">Tắt</string>
+    <string name="automation_test">Chạy thử</string>
+    <string name="automation_select">Chọn</string>
+    <string name="automation_msg_tested">Đã chạy thử “%1$s”. Xem kết quả trong nhật ký.</string>
+    <string name="automation_exit_prefix">Thoát: %1$s</string>
+
+    <!-- Editor sections -->
+    <string name="automation_editor_state">Trạng thái</string>
+    <string name="automation_editor_on_enter">Khi vào trạng thái</string>
+    <string name="automation_editor_on_exit">Khi thoát trạng thái</string>
+    <string name="automation_editor_no_exit_actions">Không bắt buộc. Thêm hành động để hoàn tác khi điều kiện hết đúng.</string>
+    <string name="automation_editor_choose_state">Chọn trạng thái</string>
+    <string name="automation_editor_change">Đổi</string>
+    <string name="automation_editor_days">Ngày trong tuần</string>
+    <string name="automation_editor_every_day">Để trống nghĩa là mọi ngày.</string>
+    <string name="automation_editor_min_percent">Pin thấp nhất (%)</string>
+    <string name="automation_editor_max_percent">Pin cao nhất (%)</string>
+    <string name="automation_editor_start_hour">Giờ bắt đầu</string>
+    <string name="automation_editor_start_minute">Phút bắt đầu</string>
+    <string name="automation_editor_end_hour">Giờ kết thúc</string>
+    <string name="automation_editor_end_minute">Phút kết thúc</string>
+    <string name="automation_editor_calendar_keyword">Từ khoá trong tên sự kiện (tuỳ chọn)</string>
+    <string name="automation_editor_use_current_wifi">Dùng Wi-Fi hiện tại</string>
+    <string name="automation_editor_current_wifi_failed">Không đọc được tên Wi-Fi. Hãy kết nối Wi-Fi, bật Vị trí của máy và cấp quyền Vị trí cho Honor Toolkit.</string>
+    <string name="automation_editor_volume_percent">Âm lượng (%)</string>
+    <string name="automation_editor_class">Tên lớp Activity</string>
+    <string name="automation_editor_minutes">Số phút</string>
+    <string name="automation_editor_adb_only">Hành động này cần ADB đang kết nối.</string>
+
+    <!-- Days -->
+    <string name="automation_day_1">T2</string>
+    <string name="automation_day_2">T3</string>
+    <string name="automation_day_3">T4</string>
+    <string name="automation_day_4">T5</string>
+    <string name="automation_day_5">T6</string>
+    <string name="automation_day_6">T7</string>
+    <string name="automation_day_7">CN</string>
+
+    <!-- Triggers and states -->
+    <string name="automation_trigger_power_saving">Tiết kiệm pin</string>
+    <string name="automation_trigger_android_auto">Android Auto</string>
+    <string name="automation_trigger_on">Bật</string>
+    <string name="automation_trigger_off">Tắt</string>
+    <string name="automation_state_charging">Đang sạc</string>
+    <string name="automation_state_battery">Mức pin trong khoảng</string>
+    <string name="automation_state_screen_on">Màn hình sáng</string>
+    <string name="automation_state_power_saving">Tiết kiệm pin đang bật</string>
+    <string name="automation_state_wifi">Đang kết nối Wi-Fi</string>
+    <string name="automation_state_time_period">Khoảng giờ</string>
+    <string name="automation_state_calendar">Có sự kiện lịch</string>
+
+    <!-- Toggle values -->
+    <string name="automation_toggle_on">Bật</string>
+    <string name="automation_toggle_off">Tắt</string>
+    <string name="automation_toggle_flip">Chuyển đổi</string>
+
+    <!-- Actions -->
+    <string name="automation_action_vibrate">Rung</string>
+    <string name="automation_action_dnd_switch">Không làm phiền</string>
+    <string name="automation_action_mute_media">Tắt tiếng nhạc</string>
+    <string name="automation_action_cycle_ringer">Xoay vòng chế độ âm thanh</string>
+    <string name="automation_action_toggle_vibrate">Chuyển chuông / rung</string>
+    <string name="automation_action_low_power">Tiết kiệm pin</string>
+    <string name="automation_action_keep_awake">Giữ màn hình sáng</string>
+    <string name="automation_action_auto_brightness">Độ sáng tự động</string>
+    <string name="automation_action_net_wifi">Wi-Fi</string>
+    <string name="automation_action_net_data">Dữ liệu di động</string>
+    <string name="automation_action_camera">Mở camera</string>
+    <string name="automation_action_video">Mở quay video</string>
+    <string name="automation_action_qr">Mở quét mã QR</string>
+    <string name="automation_action_open_activity">Mở màn hình ứng dụng</string>
+    <string name="automation_action_settings_page">Mở trang cài đặt</string>
+    <string name="automation_action_keyboard">Chọn bàn phím</string>
+    <string name="automation_action_voice_assistant">Trợ lý giọng nói</string>
+    <string name="automation_action_like_song">Thích bài đang phát</string>
+    <string name="automation_action_now_playing">Mở ứng dụng đang phát nhạc</string>
+    <string name="automation_action_split_screen">Chia đôi màn hình</string>
+    <string name="automation_action_freeze_app">Đóng băng ứng dụng</string>
+    <string name="automation_action_freeze_on">Đóng băng</string>
+    <string name="automation_action_freeze_off">Bỏ đóng băng</string>
+
+    <!-- Haptic and settings pages -->
+    <string name="automation_haptic_tick">Nhẹ</string>
+    <string name="automation_haptic_click">Nhấn</string>
+    <string name="automation_haptic_double">Nhấn đôi</string>
+    <string name="automation_haptic_heavy">Mạnh</string>
+    <string name="automation_page_wifi">Wi-Fi</string>
+    <string name="automation_page_bluetooth">Bluetooth</string>
+    <string name="automation_page_display">Màn hình</string>
+    <string name="automation_page_sound">Âm thanh</string>
+    <string name="automation_page_battery">Tiết kiệm pin</string>
+    <string name="automation_page_location">Vị trí</string>
+    <string name="automation_page_accessibility">Trợ năng</string>
+    <string name="automation_page_date">Ngày giờ</string>
+    <string name="automation_page_storage">Bộ nhớ</string>
+    <string name="automation_page_apps">Ứng dụng</string>
+</resources>

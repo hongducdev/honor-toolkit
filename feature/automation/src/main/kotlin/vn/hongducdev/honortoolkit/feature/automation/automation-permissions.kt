@@ -20,6 +20,7 @@ enum class AutomationRequirement {
     BluetoothConnect,
     ExactAlarm,
     DndAccess,
+    Calendar,
 }
 
 object AutomationPermissions {
@@ -31,10 +32,26 @@ object AutomationPermissions {
             is Trigger.LocationRegion -> add(AutomationRequirement.Location)
             is Trigger.Wifi -> if (!trigger.ssid.isNullOrBlank()) add(AutomationRequirement.Location)
             is Trigger.TimeOfDay -> add(AutomationRequirement.ExactAlarm)
+            is Trigger.InState -> when (trigger.state) {
+                is State.CalendarEvent -> add(AutomationRequirement.Calendar)
+                is State.WifiNetwork -> if (!trigger.state.ssid.isNullOrBlank()) add(AutomationRequirement.Location)
+                is State.TimePeriod -> add(AutomationRequirement.ExactAlarm)
+                else -> Unit
+            }
             else -> Unit
         }
-        rule.actions.forEach { action ->
+        (rule.actions + rule.exitActions).forEach { action ->
             when (action) {
+                is Action.OpenActivity, is Action.OpenSettingsPage, Action.KeyboardPicker, Action.VoiceAssistant,
+                is Action.OpenCamera,
+                -> add(AutomationRequirement.Overlay)
+                Action.OpenNowPlaying -> {
+                    add(AutomationRequirement.Overlay)
+                    add(AutomationRequirement.NotificationAccess)
+                }
+                is Action.DoNotDisturbSwitch, Action.CycleRinger, Action.ToggleVibrate -> add(AutomationRequirement.DndAccess)
+                Action.LikeCurrentSong -> add(AutomationRequirement.NotificationAccess)
+                Action.SplitScreen -> add(AutomationRequirement.Accessibility)
                 is Action.LaunchApp -> add(AutomationRequirement.Overlay)
                 is Action.ToolkitStrip -> if (action.enabled) add(AutomationRequirement.Overlay)
                 is Action.Notify -> add(AutomationRequirement.PostNotifications)
@@ -69,6 +86,8 @@ object AutomationPermissions {
             context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
         AutomationRequirement.DndAccess ->
             context.getSystemService(NotificationManager::class.java).isNotificationPolicyAccessGranted
+        AutomationRequirement.Calendar ->
+            context.checkSelfPermission(Manifest.permission.READ_CALENDAR) == PackageManager.PERMISSION_GRANTED
     }
 
     /** Runtime permissions are requested from Compose; everything else opens the matching settings page. */
@@ -78,6 +97,7 @@ object AutomationPermissions {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else null
         AutomationRequirement.BluetoothConnect ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) Manifest.permission.BLUETOOTH_CONNECT else null
+        AutomationRequirement.Calendar -> Manifest.permission.READ_CALENDAR
         AutomationRequirement.DndAccess -> null
         else -> null
     }
@@ -95,6 +115,7 @@ object AutomationPermissions {
         AutomationRequirement.DndAccess -> Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
         AutomationRequirement.PostNotifications,
         AutomationRequirement.BluetoothConnect,
+        AutomationRequirement.Calendar,
         -> null
     }
 

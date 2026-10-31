@@ -16,7 +16,13 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.wifi.WifiManager
+import android.app.UiModeManager
+import android.database.ContentObserver
 import android.os.BatteryManager
+import android.os.Handler
+import android.os.Looper
+import android.os.PowerManager
+import android.provider.CalendarContract
 import android.os.Build
 import android.os.IBinder
 import android.provider.Settings
@@ -36,6 +42,8 @@ class AutomationForegroundService : Service() {
     private var lastPlugged: Boolean? = null
     private var lastWifi: Boolean? = null
     private var lastDnd: Boolean? = null
+    private var lastPowerSave: Boolean? = null
+    private var lastCarMode: Boolean? = null
     private var wifiNetwork: Network? = null
 
     private val batteryReceiver = object : BroadcastReceiver() {
@@ -51,10 +59,33 @@ class AutomationForegroundService : Service() {
     private val screenReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                Intent.ACTION_SCREEN_ON -> dispatch(TriggerEvent.ScreenChanged(true))
-                Intent.ACTION_SCREEN_OFF -> dispatch(TriggerEvent.ScreenChanged(false))
+                Intent.ACTION_SCREEN_ON -> {
+                    dispatch(TriggerEvent.ScreenChanged(true))
+                    evaluateStates()
+                }
+                Intent.ACTION_SCREEN_OFF -> {
+                    dispatch(TriggerEvent.ScreenChanged(false))
+                    evaluateStates()
+                }
                 Intent.ACTION_USER_PRESENT -> dispatch(TriggerEvent.DeviceUnlocked)
             }
+        }
+    }
+
+    private val modeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> updatePowerSave()
+                UiModeManager.ACTION_ENTER_CAR_MODE -> updateCarMode(true)
+                UiModeManager.ACTION_EXIT_CAR_MODE -> updateCarMode(false)
+            }
+        }
+    }
+
+    private val calendarObserver = object : ContentObserver(Handler(Looper.getMainLooper())) {
+        override fun onChange(selfChange: Boolean) {
+            AutomationAlarms.sync(this@AutomationForegroundService)
+            evaluateStates()
         }
     }
 
@@ -97,12 +128,15 @@ class AutomationForegroundService : Service() {
             if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return
             wifiNetwork = network
             updateWifi(true)
+            // The SSID can appear a moment after the connection, so states re-read on every change.
+            evaluateStates()
         }
 
         override fun onLost(network: Network) {
             if (network != wifiNetwork) return
             wifiNetwork = null
             updateWifi(false)
+            evaluateStates()
         }
     }
 
@@ -159,6 +193,18 @@ class AutomationForegroundService : Service() {
         })
         register(dndReceiver, IntentFilter(NotificationManager.ACTION_INTERRUPTION_FILTER_CHANGED))
         lastDnd = currentDnd()
+        register(modeReceiver, IntentFilter().apply {
+            addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+            addAction(UiModeManager.ACTION_ENTER_CAR_MODE)
+            addAction(UiModeManager.ACTION_EXIT_CAR_MODE)
+        })
+        lastPowerSave = getSystemService(PowerManager::class.java).isPowerSaveMode
+        lastCarMode = currentCarMode()
+        if (AutomationSnapshot.hasCalendarAccess(this)) {
+            runCatching {
+                contentResolver.registerContentObserver(CalendarContract.Events.CONTENT_URI, true, calendarObserver)
+            }
+        }
         register(bluetoothReceiver, IntentFilter().apply {
             addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
@@ -172,15 +218,17 @@ class AutomationForegroundService : Service() {
             getSystemService(ConnectivityManager::class.java).registerDefaultNetworkCallback(networkCallback)
         }
         lastWifi = currentWifiConnected()
+        evaluateStates()
     }
 
     private fun unregisterReceivers() {
         if (!registered) return
         registered = false
-        listOf(batteryReceiver, screenReceiver, dndReceiver, bluetoothReceiver, clockReceiver).forEach { receiver ->
+        listOf(batteryReceiver, screenReceiver, dndReceiver, bluetoothReceiver, clockReceiver, modeReceiver).forEach { receiver ->
             runCatching { unregisterReceiver(receiver) }
         }
         runCatching { getSystemService(ConnectivityManager::class.java).unregisterNetworkCallback(networkCallback) }
+        runCatching { contentResolver.unregisterContentObserver(calendarObserver) }
     }
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
@@ -204,6 +252,7 @@ class AutomationForegroundService : Service() {
         lastPercent = percent
         if (previous != null && previous != percent) {
             dispatch(TriggerEvent.BatteryChanged(previous, percent))
+            evaluateStates()
         }
     }
 
@@ -212,7 +261,27 @@ class AutomationForegroundService : Service() {
         lastPlugged = plugged
         if (previous != null && previous == plugged) return
         dispatch(TriggerEvent.ChargerChanged(plugged))
+        evaluateStates()
     }
+
+    private fun updatePowerSave() {
+        val on = getSystemService(PowerManager::class.java).isPowerSaveMode
+        if (lastPowerSave == on) return
+        lastPowerSave = on
+        dispatch(TriggerEvent.PowerSaveChanged(on))
+        evaluateStates()
+    }
+
+    private fun currentCarMode(): Boolean =
+        getSystemService(UiModeManager::class.java).currentModeType == android.content.res.Configuration.UI_MODE_TYPE_CAR
+
+    private fun updateCarMode(connected: Boolean) {
+        if (lastCarMode == connected) return
+        lastCarMode = connected
+        dispatch(TriggerEvent.CarModeChanged(connected))
+    }
+
+    private fun evaluateStates() = AutomationRuntime.evaluateStates(this)
 
     private fun updateWifi(connected: Boolean) {
         if (lastWifi == connected) return
@@ -240,14 +309,7 @@ class AutomationForegroundService : Service() {
         capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
     }.getOrDefault(false)
 
-    /** Null until location is granted: Android hides the SSID from apps without it. */
-    private fun wifiSsid(): String? {
-        if (!AutomationLocation.hasPermission(this)) return null
-        val info = runCatching { getSystemService(WifiManager::class.java).connectionInfo }.getOrNull() ?: return null
-        val ssid = runCatching { info.ssid }.getOrNull() ?: return null
-        if (ssid.isBlank() || ssid == WifiManager.UNKNOWN_SSID) return null
-        return ssid.removeSurrounding("\"")
-    }
+    private fun wifiSsid(): String? = AutomationSnapshot.wifiSsid(this)
 
     private fun dispatch(event: TriggerEvent) = AutomationRuntime.dispatch(this, event)
 

@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
     <!-- ACL broadcasts need BLUETOOTH on 30 and BLUETOOTH_CONNECT from 31. -->
     <uses-permission
         android:name="android.permission.BLUETOOTH"

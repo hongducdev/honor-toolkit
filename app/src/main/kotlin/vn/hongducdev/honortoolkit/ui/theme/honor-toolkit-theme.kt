@@ -28,11 +28,18 @@ private val ToolkitShapes = Shapes(
     extraLarge = RoundedCornerShape(32.dp),
 )
 
-// One variable font file serves every weight, so the app stays at a single ~270 KB asset.
+// One variable font file serves every weight; ROND 100 gives the rounded terminals.
 @OptIn(ExperimentalTextApi::class)
 private val RoundedFamily = FontFamily(
     listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold).map { weight ->
-        Font(R.font.nunito, weight, variationSettings = FontVariation.Settings(FontVariation.weight(weight.weight)))
+        Font(
+            R.font.google_sans_flex,
+            weight,
+            variationSettings = FontVariation.Settings(
+                FontVariation.Setting("ROND", 100f),
+                FontVariation.weight(weight.weight),
+            ),
+        )
     },
 )
 

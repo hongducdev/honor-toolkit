@@ -38,6 +38,7 @@ internal class AndroidActionExecutor(
     private val adbState: () -> AdbState = { AdbSession.get(context).state.value },
 ) : ActionExecutor {
     private val notificationIds = AtomicInteger(1_000)
+    private val system = AndroidSystemActions(context, shell, adbState)
 
     override suspend fun run(action: Action): ActionResult = when (action) {
         is Action.WriteSetting -> writeSetting(action)
@@ -57,6 +58,7 @@ internal class AndroidActionExecutor(
         is Action.Volume -> volume(action)
         Action.Screenshot -> globalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT, "chụp màn hình", needsUnlocked = true)
         Action.ScreenOff -> globalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN, "tắt màn hình", needsUnlocked = false)
+        else -> system.run(action)
     }
 
     private fun writeSetting(action: Action.WriteSetting): ActionResult {

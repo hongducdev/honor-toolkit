@@ -18,6 +18,7 @@ sealed interface AutomationMessage {
     data object UndoEmpty : AutomationMessage
     data class UndoFailed(val failed: Int) : AutomationMessage
     data object MissingPermission : AutomationMessage
+    data class Tested(val name: String) : AutomationMessage
 }
 
 data class AutomationUiState(
@@ -44,13 +45,14 @@ class AutomationViewModel(application: Application) : AndroidViewModel(applicati
 
     fun refresh() = reload()
 
-    fun startNew() = mutableState.update {
+    /** [state] starts a rule on a condition (entry and exit actions) instead of an event. */
+    fun startNew(state: Boolean = false) = mutableState.update {
         it.copy(
             editor = AutomationRule(
                 id = UUID.randomUUID().toString(),
                 name = "",
                 enabled = true,
-                trigger = Trigger.Charger(plugged = true),
+                trigger = if (state) Trigger.InState(State.Charging) else Trigger.Charger(plugged = true),
                 actions = emptyList(),
             ),
         )
@@ -87,6 +89,31 @@ class AutomationViewModel(application: Application) : AndroidViewModel(applicati
         syncRuntime()
         mutableState.update { it.copy(editor = null, message = AutomationMessage.Deleted) }
         reload()
+    }
+
+    fun setEnabledMany(ids: Set<String>, enabled: Boolean) {
+        val blocked = mutableState.value.missingByRule
+        val allowed = ids.filter { !enabled || blocked[it].orEmpty().isEmpty() }
+        allowed.forEach { store.setEnabled(it, enabled) }
+        syncRuntime()
+        if (allowed.size < ids.size) mutableState.update { it.copy(message = AutomationMessage.MissingPermission) }
+        reload()
+    }
+
+    fun deleteMany(ids: Set<String>) {
+        ids.forEach(store::remove)
+        syncRuntime()
+        mutableState.update { it.copy(message = AutomationMessage.Deleted) }
+        reload()
+    }
+
+    fun test(rule: AutomationRule) {
+        if (mutableState.value.missingByRule[rule.id].orEmpty().isNotEmpty()) {
+            mutableState.update { it.copy(message = AutomationMessage.MissingPermission) }
+            return
+        }
+        AutomationRuntime.test(getApplication(), rule)
+        mutableState.update { it.copy(message = AutomationMessage.Tested(rule.name)) }
     }
 
     fun clearLog() {

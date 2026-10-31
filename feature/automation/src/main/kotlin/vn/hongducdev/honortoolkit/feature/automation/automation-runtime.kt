@@ -70,6 +70,54 @@ object AutomationRuntime {
         }
     }
 
+    /** Runs [rule]'s actions once, for the "Chạy thử" menu item. Results land in the journal. */
+    fun test(context: Context, rule: AutomationRule) {
+        val app = context.applicationContext
+        scope.launch {
+            try {
+                engine(app).runNow(rule)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                AutomationStorage.store(app).appendLog(
+                    AutomationLogEntry(System.currentTimeMillis(), rule.name, "Chạy thử", ActionResult.Failed(e.message ?: e::class.java.simpleName)),
+                )
+            }
+        }
+    }
+
+    /**
+     * Re-reads the phone and lets every state rule enter or leave its state. Cheap when no state
+     * rule is enabled, so receivers may call it on every battery or screen change.
+     */
+    fun evaluateStates(context: Context, onDone: (() -> Unit)? = null) {
+        val app = context.applicationContext
+        val stateRules = AutomationStorage.store(app).rules().filter { it.enabled && it.isValid && it.isState }
+        if (stateRules.isEmpty()) {
+            onDone?.invoke()
+            return
+        }
+        val withCalendar = stateRules.any { (it.trigger as Trigger.InState).state is State.CalendarEvent }
+        scope.launch {
+            try {
+                engine(app).evaluate(AutomationSnapshot.read(app, withCalendar))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                AutomationStorage.store(app).appendLog(
+                    AutomationLogEntry(
+                        at = System.currentTimeMillis(),
+                        ruleName = "Hệ thống",
+                        action = "Đánh giá trạng thái",
+                        result = ActionResult.Failed(e.message ?: e::class.java.simpleName),
+                    ),
+                )
+            } finally {
+                onDone?.invoke()
+            }
+        }
+    }
+
     fun hasEnabledRule(context: Context, predicate: (Trigger) -> Boolean): Boolean =
         AutomationStorage.store(context).rules().any { it.enabled && it.isValid && predicate(it.trigger) }
 }

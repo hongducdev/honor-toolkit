@@ -3,6 +3,13 @@ package vn.hongducdev.honortoolkit.feature.automation
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,28 +20,35 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
-import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.automirrored.rounded.Undo
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Delete
+import androidx.compose.material.icons.rounded.KeyboardArrowDown
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -49,6 +63,7 @@ import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
 import vn.hongducdev.honortoolkit.core.ui.SettingsRow
 import vn.hongducdev.honortoolkit.core.ui.ToolbarAction
 import vn.hongducdev.honortoolkit.core.ui.ToolbarSpec
+import vn.hongducdev.honortoolkit.core.ui.groupedRowShape
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,10 +73,17 @@ fun AutomationScreen(
     viewModel: AutomationViewModel = viewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
-    var pendingDelete by remember { mutableStateOf<AutomationRule?>(null) }
+    var pendingDelete by remember { mutableStateOf<List<AutomationRule>>(emptyList()) }
+    var choosingKind by remember { mutableStateOf(false) }
+    var selectionMode by remember { mutableStateOf(false) }
+    var selectedIds by remember { mutableStateOf(emptySet<String>()) }
     val editing = state.editor
+
+    fun exitSelection() {
+        selectionMode = false
+        selectedIds = emptySet()
+    }
 
     val message = state.message?.let { messageText(it) }
     LaunchedEffect(message) {
@@ -70,10 +92,16 @@ fun AutomationScreen(
             viewModel.consumeMessage()
         }
     }
+    LaunchedEffect(state.rules) {
+        selectedIds = selectedIds intersect state.rules.map { it.id }.toSet()
+        if (state.rules.isEmpty()) exitSelection()
+    }
     // Permissions can be changed in Settings; reload the rule runnability when the page returns.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.refresh() }
 
-    BackHandler(enabled = editing != null) { viewModel.closeEditor() }
+    BackHandler(enabled = editing != null || selectionMode) {
+        if (editing != null) viewModel.closeEditor() else exitSelection()
+    }
 
     ProvideToolbar(
         ToolbarSpec.Page(
@@ -93,7 +121,7 @@ fun AutomationScreen(
                 emptyList()
             },
             fab = if (editing == null) {
-                ToolbarAction(Icons.Rounded.Add, stringResource(R.string.automation_add), viewModel::startNew)
+                ToolbarAction(Icons.Rounded.Add, stringResource(R.string.automation_add)) { choosingKind = true }
             } else {
                 null
             },
@@ -106,17 +134,24 @@ fun AutomationScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (editing != null) {
-                AutomationEditor(
-                    rule = editing,
-                    onSave = viewModel::save,
-                    onCancel = viewModel::closeEditor,
-                )
+                AutomationEditor(rule = editing, onSave = viewModel::save, onCancel = viewModel::closeEditor)
             } else {
                 AutomationRuleList(
                     state = state,
-                    onToggle = viewModel::toggle,
+                    selectionMode = selectionMode,
+                    selectedIds = selectedIds,
+                    onSelectedChange = { id, checked ->
+                        selectionMode = true
+                        selectedIds = if (checked) selectedIds + id else selectedIds - id
+                    },
+                    onExitSelection = ::exitSelection,
+                    onToggle = { rule -> viewModel.toggle(rule, !rule.enabled) },
                     onEdit = viewModel::edit,
-                    onDelete = { pendingDelete = it },
+                    onTest = viewModel::test,
+                    onDelete = { pendingDelete = listOf(it) },
+                    onSetEnabledMany = viewModel::setEnabledMany,
+                    onDeleteMany = { ids -> pendingDelete = state.rules.filter { it.id in ids } },
+                    onNew = { choosingKind = true },
                     onClearLog = viewModel::clearLog,
                     onPermissionsChanged = viewModel::refresh,
                 )
@@ -124,20 +159,39 @@ fun AutomationScreen(
         }
     }
 
-    val deleting = pendingDelete
-    if (deleting != null) {
+    if (choosingKind) {
+        NewRuleSheet(
+            onPick = { stateRule ->
+                choosingKind = false
+                viewModel.startNew(state = stateRule)
+            },
+            onDismiss = { choosingKind = false },
+        )
+    }
+
+    if (pendingDelete.isNotEmpty()) {
+        val doomed = pendingDelete
         AlertDialog(
-            onDismissRequest = { pendingDelete = null },
+            onDismissRequest = { pendingDelete = emptyList() },
             title = { Text(stringResource(R.string.automation_delete_title)) },
-            text = { Text(stringResource(R.string.automation_delete_body, deleting.name)) },
+            text = {
+                Text(
+                    if (doomed.size == 1) {
+                        stringResource(R.string.automation_delete_body, doomed.single().name)
+                    } else {
+                        stringResource(R.string.automation_selected_count, doomed.size)
+                    },
+                )
+            },
             confirmButton = {
                 Button(onClick = {
-                    pendingDelete = null
-                    viewModel.delete(deleting)
+                    pendingDelete = emptyList()
+                    if (doomed.size == 1) viewModel.delete(doomed.single()) else viewModel.deleteMany(doomed.map { it.id }.toSet())
+                    exitSelection()
                 }) { Text(stringResource(R.string.automation_delete)) }
             },
             dismissButton = {
-                OutlinedButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.automation_cancel)) }
+                OutlinedButton(onClick = { pendingDelete = emptyList() }) { Text(stringResource(R.string.automation_cancel)) }
             },
         )
     }
@@ -146,15 +200,49 @@ fun AutomationScreen(
 @Composable
 private fun AutomationRuleList(
     state: AutomationUiState,
-    onToggle: (AutomationRule, Boolean) -> Unit,
+    selectionMode: Boolean,
+    selectedIds: Set<String>,
+    onSelectedChange: (String, Boolean) -> Unit,
+    onExitSelection: () -> Unit,
+    onToggle: (AutomationRule) -> Unit,
     onEdit: (AutomationRule) -> Unit,
+    onTest: (AutomationRule) -> Unit,
     onDelete: (AutomationRule) -> Unit,
+    onSetEnabledMany: (Set<String>, Boolean) -> Unit,
+    onDeleteMany: (Set<String>) -> Unit,
+    onNew: () -> Unit,
     onClearLog: () -> Unit,
     onPermissionsChanged: () -> Unit,
 ) {
     val context = LocalContext.current
     val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
         onPermissionsChanged()
+    }
+    val (liveRules, pausedRules) = state.rules.partition { state.isLive(it) }
+    var pausedOpen by rememberSaveable { mutableStateOf(false) }
+    val chevron by animateFloatAsState(if (pausedOpen) 180f else 0f, label = "paused_chevron")
+
+    @Composable
+    fun RuleGroup(rules: List<AutomationRule>) {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            rules.forEachIndexed { index, rule ->
+                RuleCard(
+                    rule = rule,
+                    live = state.isLive(rule),
+                    blocked = rule.enabled && state.missingByRule[rule.id].orEmpty().isNotEmpty(),
+                    shape = groupedRowShape(index, rules.lastIndex, outer = 28.dp),
+                    selectionMode = selectionMode,
+                    selected = rule.id in selectedIds,
+                    callbacks = RuleCardCallbacks(
+                        onClick = { onEdit(rule) },
+                        onToggle = { onToggle(rule) },
+                        onTest = { onTest(rule) },
+                        onDelete = { onDelete(rule) },
+                        onSelectedChange = { onSelectedChange(rule.id, it) },
+                    ),
+                )
+            }
+        }
     }
 
     LazyColumn(
@@ -190,22 +278,66 @@ private fun AutomationRuleList(
                 }
             }
         }
-        item(key = "rules") {
-            SettingsGroup(title = stringResource(R.string.automation_rules)) {
-                if (state.rules.isEmpty()) {
-                    SettingsRow {
-                        Text(stringResource(R.string.automation_no_rules), style = MaterialTheme.typography.bodyMedium)
-                    }
-                } else {
-                    state.rules.forEach { rule ->
-                        RuleRow(
-                            rule = rule,
-                            live = state.isLive(rule),
-                            blocked = state.missingByRule[rule.id].orEmpty().isNotEmpty(),
-                            onToggle = { onToggle(rule, it) },
-                            onEdit = { onEdit(rule) },
-                            onDelete = { onDelete(rule) },
+        item(key = "selection") {
+            AnimatedVisibility(
+                visible = selectionMode,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut(),
+            ) {
+                SelectionBar(
+                    count = selectedIds.size,
+                    onCancel = onExitSelection,
+                    onEnable = { onSetEnabledMany(selectedIds, true) },
+                    onDisable = { onSetEnabledMany(selectedIds, false) },
+                    onDelete = { onDeleteMany(selectedIds) },
+                )
+            }
+        }
+        if (state.rules.isEmpty()) {
+            item(key = "empty") {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Text(stringResource(R.string.automation_empty_title), style = MaterialTheme.typography.titleMedium)
+                    Button(onClick = onNew) { Text(stringResource(R.string.automation_empty_action)) }
+                }
+            }
+        }
+        if (liveRules.isNotEmpty()) {
+            item(key = "live") { RuleGroup(liveRules) }
+        }
+        if (pausedRules.isNotEmpty()) {
+            item(key = "paused") {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(MaterialTheme.shapes.extraLarge)
+                            .clickable { pausedOpen = !pausedOpen }
+                            .padding(start = 16.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            stringResource(R.string.automation_disabled_count, pausedRules.size),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f),
                         )
+                        Icon(
+                            Icons.Rounded.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.graphicsLayer { rotationZ = chevron },
+                        )
+                    }
+                    AnimatedVisibility(
+                        visible = pausedOpen,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut(),
+                    ) {
+                        Column(modifier = Modifier.padding(top = 8.dp)) { RuleGroup(pausedRules) }
                     }
                 }
             }
@@ -233,42 +365,26 @@ private fun AutomationRuleList(
 }
 
 @Composable
-private fun RuleRow(
-    rule: AutomationRule,
-    live: Boolean,
-    blocked: Boolean,
-    onToggle: (Boolean) -> Unit,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
-) {
-    SettingsRow {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(rule.name, style = MaterialTheme.typography.titleMedium)
-                Text(
-                    rule.trigger.summary(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    rule.actions.joinToString(" · ") { it.summary() },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+private fun SelectionBar(count: Int, onCancel: () -> Unit, onEnable: () -> Unit, onDisable: () -> Unit, onDelete: () -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            stringResource(R.string.automation_selected_count, count),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp),
+        )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.automation_cancel))
             }
-            Switch(checked = live, onCheckedChange = onToggle)
-        }
-        if (blocked) {
-            Text(
-                stringResource(R.string.automation_rule_disabled_permission),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-            )
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextButton(onClick = onEdit) { Text(stringResource(R.string.automation_edit)) }
-            TextButton(onClick = onDelete) {
-                Text(stringResource(R.string.automation_delete), color = MaterialTheme.colorScheme.error)
+            FilledTonalButton(onClick = onDisable, enabled = count > 0, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.automation_disable))
+            }
+            FilledTonalButton(onClick = onEnable, enabled = count > 0, modifier = Modifier.weight(1f)) {
+                Text(stringResource(R.string.automation_enable))
+            }
+            FilledTonalButton(onClick = onDelete, enabled = count > 0, modifier = Modifier.weight(1f)) {
+                Icon(Icons.Rounded.Delete, contentDescription = stringResource(R.string.automation_delete))
             }
         }
     }
@@ -310,6 +426,7 @@ private fun requirementLabel(requirement: AutomationRequirement): Int = when (re
     AutomationRequirement.BluetoothConnect -> R.string.automation_perm_bluetooth
     AutomationRequirement.ExactAlarm -> R.string.automation_perm_exact_alarm
     AutomationRequirement.DndAccess -> R.string.automation_perm_dnd
+    AutomationRequirement.Calendar -> R.string.automation_perm_calendar
 }
 
 private fun requirementDescription(requirement: AutomationRequirement): Int = when (requirement) {
@@ -321,6 +438,7 @@ private fun requirementDescription(requirement: AutomationRequirement): Int = wh
     AutomationRequirement.BluetoothConnect -> R.string.automation_perm_bluetooth_desc
     AutomationRequirement.ExactAlarm -> R.string.automation_perm_exact_alarm_desc
     AutomationRequirement.DndAccess -> R.string.automation_perm_dnd_desc
+    AutomationRequirement.Calendar -> R.string.automation_perm_calendar_desc
 }
 
 @Composable
@@ -332,4 +450,5 @@ private fun messageText(message: AutomationMessage): String = when (message) {
     AutomationMessage.UndoEmpty -> stringResource(R.string.automation_msg_undo_empty)
     is AutomationMessage.UndoFailed -> stringResource(R.string.automation_msg_undo_failed, message.failed)
     AutomationMessage.MissingPermission -> stringResource(R.string.automation_msg_missing_permission)
+    is AutomationMessage.Tested -> stringResource(R.string.automation_msg_tested, message.name)
 }

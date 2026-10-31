@@ -90,12 +90,15 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 
 | File | Concern |
 | --- | --- |
-| `automation-model.kt` | `AutomationRule`, sealed `Trigger`/`Action`/`TriggerEvent`, matching, validation and Vietnamese summaries |
+| `automation-model.kt` | `AutomationRule` (trigger, entry `actions`, state `exitActions`), validation, result and journal types |
+| `automation-trigger.kt`, `automation-action.kt`, `automation-state.kt` | Sealed `Trigger`/`TriggerEvent`, `Action` and `State` with matching, `isActive(DeviceSnapshot)` and Vietnamese summaries |
+| `automation-snapshot.kt` | Reads charging, battery, screen, power-saving, clock and current calendar titles for state evaluation |
 | `automation-json.kt` | Versioned `org.json` encoding; a broken rule or action is dropped without losing the list |
 | `automation-store.kt` | Device-protected `SharedPreferences`: rules, 60-line journal, undo snapshots (`SettingSnapshot`) |
-| `automation-engine.kt` | Sequential dispatch, running-rule and 2 s loop guards, `canRun` permission gate, per-step log |
+| `automation-engine.kt` | Sequential dispatch, running-rule and 2 s loop guards, `canRun` permission gate, per-step log; `evaluate(snapshot)` for state entry/exit and `runNow` for test runs |
 | `automation-settings.kt` | `Settings.*` read/write with read-back, plus the allowlist/denylist policy |
-| `automation-actions.kt` | Android executor: settings, ringer, launch app, notification, wait, ADB shell, Tune feature, nav-bar strip, Circle to Search; locked/unlocked skips |
+| `automation-actions.kt` | Android executor: settings, ringer, launch app, notification, wait, ADB shell, Tune feature, nav-bar strip, Circle to Search, flashlight, media, volume; locked/unlocked skips |
+| `automation-android-actions.kt` | Haptics, Do Not Disturb, media mute, ringer cycling, battery saver, keep-awake wake lock, auto brightness, Wi-Fi/mobile data and app freezing over ADB, camera/QR, activity/settings pages, keyboard picker, assistant, now-playing like/open, split screen |
 | `automation-runtime.kt` | Process-wide engine; dispatches from services and receivers, supports `goAsync` completion |
 | `automation-foreground-service.kt` | `specialUse` service, battery/power/screen/Bluetooth/clock receivers, Wi-Fi callback, quiet notification, `sync()` start/stop |
 | `automation-alarms.kt`, `automation-location.kt`, `automation-schedule-store.kt` | Time alarms and proximity alerts per rule, rescheduling/cancelling, receiving and dispatch |
@@ -104,7 +107,8 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 | `automation-notification-listener.kt` | Notification trigger; text only in memory for keyword matching |
 | `automation-permissions.kt` | Requirement set per trigger/action, grant checks, settings intents |
 | `automation-view-model.kt` | Rule list/editor state, toggle/save/delete, undo, runtime sync |
-| `automation-screen.kt`, `automation-editor-screen.kt` | Compose list (permission cards, rules, journal) and rule editor (trigger/action pickers) |
+| `automation-screen.kt`, `automation-rule-card.kt` | Essentials-style list: trigger chip → action chip cards, multi-select, collapsible disabled group, permission cards, journal |
+| `automation-editor-screen.kt`, `automation-editor-sheets.kt`, `automation-trigger-fields.kt`, `automation-action-fields.kt`, `automation-editor-inputs.kt`, `automation-catalog.kt` | Editor with entry/exit action lists, bottom-sheet pickers and the icon/label catalogue of trigger, state and action kinds |
 | `src/test` | JSON round-trip, engine ordering/queue/loop/failure/permission, settings policy, trigger matching and rule validation |
 
 ## `:feature:debloat` (`feature/debloat/src/main/kotlin/vn/hongducdev/honortoolkit/feature/debloat`)

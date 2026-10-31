@@ -10,7 +10,7 @@ import android.os.Build
 import java.util.Calendar
 
 /**
- * One-shot alarms for [Trigger.TimeOfDay]. The service reschedules after every run, so a missed
+ * One-shot alarms for [Trigger.TimeOfDay] and for the boundaries of time-period and calendar states. The service reschedules after every run, so a missed
  * alarm does not leave the rule dead. Exact alarms are used when the ROM allows them
  * (`USE_EXACT_ALARM`); otherwise the alarm is inexact and the editor still shows the rule, but the
  * page warns that the time can drift.
@@ -18,6 +18,7 @@ import java.util.Calendar
 object AutomationAlarms {
     private const val ACTION_FIRE = "vn.hongducdev.honortoolkit.feature.automation.TIME_TRIGGER"
     internal const val EXTRA_RULE = "rule_id"
+    private const val CALENDAR_RECHECK_MS = 60L * 60 * 1000
 
     // canScheduleExactAlarms() is checked before setExactAndAllowWhileIdle; lint cannot see it.
     @SuppressLint("MissingPermission")
@@ -36,8 +37,7 @@ object AutomationAlarms {
         AutomationStorage.store(app).rules()
             .filter { it.enabled && it.isValid }
             .forEach { rule ->
-                val trigger = rule.trigger as? Trigger.TimeOfDay ?: return@forEach
-                val at = nextOccurrence(trigger.hour, trigger.minute)
+                val at = nextFire(app, rule.trigger) ?: return@forEach
                 val intent = pendingIntent(app, rule.id)
                 val scheduled = runCatching {
                     if (exact) {
@@ -51,8 +51,36 @@ object AutomationAlarms {
         schedule.save(AutomationScheduleStore.Kind.Alarms, next)
     }
 
-    /** Next time today with that hour/minute, or tomorrow when it already passed. */
-    fun nextOccurrence(hour: Int, minute: Int, now: Long = System.currentTimeMillis()): Long {
+    /**
+     * When a trigger's alarm should ring next, or null when it needs none. A time-period or calendar
+     * state wakes at its boundaries only to re-read the phone, so an early or spare wake-up is harmless.
+     */
+    private fun nextFire(context: Context, trigger: Trigger): Long? = when (trigger) {
+        is Trigger.TimeOfDay -> nextOccurrence(trigger.hour, trigger.minute, days = trigger.days)
+        is Trigger.InState -> when (val state = trigger.state) {
+            is State.TimePeriod -> minOf(
+                nextOccurrence(state.startMinute / 60, state.startMinute % 60),
+                nextOccurrence(state.endMinute / 60, state.endMinute % 60),
+            )
+            is State.CalendarEvent -> {
+                val spare = System.currentTimeMillis() + CALENDAR_RECHECK_MS
+                minOf(AutomationSnapshot.nextCalendarBoundary(context) ?: spare, spare)
+            }
+            else -> null
+        }
+        else -> null
+    }
+
+    /**
+     * The next time at [hour]:[minute] after [now] on one of [days] (ISO numbers, empty = every day).
+     * The exact minute counts as already passed.
+     */
+    fun nextOccurrence(
+        hour: Int,
+        minute: Int,
+        now: Long = System.currentTimeMillis(),
+        days: Set<Int> = emptySet(),
+    ): Long {
         val calendar = Calendar.getInstance().apply {
             timeInMillis = now
             set(Calendar.HOUR_OF_DAY, hour.coerceIn(0, 23))
@@ -60,7 +88,10 @@ object AutomationAlarms {
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
         }
-        if (calendar.timeInMillis <= now) calendar.add(Calendar.DAY_OF_YEAR, 1)
+        repeat(8) {
+            if (calendar.timeInMillis > now && days.includes(AutomationSnapshot.isoDay(calendar))) return calendar.timeInMillis
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
         return calendar.timeInMillis
     }
 
@@ -87,13 +118,21 @@ class AutomationAlarmReceiver : BroadcastReceiver() {
         AutomationAlarms.sync(context)
         val rule = AutomationStorage.store(context).rule(ruleId) ?: return
         if (!rule.enabled) return
-        val trigger = rule.trigger as? Trigger.TimeOfDay ?: return
         // goAsync keeps the broadcast alive while the actions run; onReceive may return first otherwise.
-        val pending = goAsync()
-        AutomationRuntime.dispatch(
-            context,
-            TriggerEvent.TimeReached(trigger.hour, trigger.minute, ruleId),
-            onDone = pending::finish,
-        )
+        when (val trigger = rule.trigger) {
+            is Trigger.TimeOfDay -> {
+                val pending = goAsync()
+                AutomationRuntime.dispatch(
+                    context,
+                    TriggerEvent.TimeReached(trigger.hour, trigger.minute, ruleId),
+                    onDone = pending::finish,
+                )
+            }
+            is Trigger.InState -> {
+                val pending = goAsync()
+                AutomationRuntime.evaluateStates(context, onDone = pending::finish)
+            }
+            else -> Unit
+        }
     }
 }

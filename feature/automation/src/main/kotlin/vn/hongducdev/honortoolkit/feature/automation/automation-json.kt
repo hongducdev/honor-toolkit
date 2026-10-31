@@ -5,10 +5,10 @@ import org.json.JSONObject
 
 /**
  * Rule storage format. Bump [VERSION] when a field changes meaning; [decodeRules] keeps reading
- * version 1 and drops anything it cannot understand instead of losing the whole list.
+ * versions 1 and 2 and drops anything it cannot understand instead of losing the whole list.
  */
 object AutomationJson {
-    const val VERSION = 1
+    const val VERSION = 2
 
     private const val KEY_VERSION = "version"
     private const val KEY_RULES = "rules"
@@ -17,6 +17,7 @@ object AutomationJson {
     private const val KEY_ENABLED = "enabled"
     private const val KEY_TRIGGER = "trigger"
     private const val KEY_ACTIONS = "actions"
+    private const val KEY_EXIT_ACTIONS = "exitActions"
     private const val KEY_TYPE = "type"
 
     fun encodeRules(rules: List<AutomationRule>): String {
@@ -43,25 +44,30 @@ object AutomationJson {
         .put(KEY_ENABLED, rule.enabled)
         .put(KEY_TRIGGER, encodeTrigger(rule.trigger))
         .put(KEY_ACTIONS, JSONArray().also { array -> rule.actions.forEach { array.put(encodeAction(it)) } })
+        .put(KEY_EXIT_ACTIONS, JSONArray().also { array -> rule.exitActions.forEach { array.put(encodeAction(it)) } })
 
     fun decodeRule(json: JSONObject): AutomationRule {
         val id = json.getString(KEY_ID)
         require(id.isNotBlank()) { "blank rule id" }
-        val actions = json.optJSONArray(KEY_ACTIONS)
-            ?.let { array ->
-                (0 until array.length()).mapNotNull { index ->
-                    runCatching { decodeAction(array.getJSONObject(index)) }.getOrNull()
-                }
-            }
-            .orEmpty()
+        val actions = decodeActions(json.optJSONArray(KEY_ACTIONS))
+        val exitActions = decodeActions(json.optJSONArray(KEY_EXIT_ACTIONS))
         return AutomationRule(
             id = id,
             name = json.optString(KEY_NAME),
             enabled = json.optBoolean(KEY_ENABLED, false),
             trigger = decodeTrigger(json.getJSONObject(KEY_TRIGGER)),
             actions = actions,
+            exitActions = exitActions,
         )
     }
+
+    private fun decodeActions(array: JSONArray?): List<Action> = array
+        ?.let {
+            (0 until it.length()).mapNotNull { index ->
+                runCatching { decodeAction(it.getJSONObject(index)) }.getOrNull()
+            }
+        }
+        .orEmpty()
 
     fun encodeTrigger(trigger: Trigger): JSONObject = when (trigger) {
         is Trigger.Charger -> JSONObject().put(KEY_TYPE, "charger").put("plugged", trigger.plugged)
@@ -86,6 +92,7 @@ object AutomationJson {
             .put(KEY_TYPE, "time")
             .put("hour", trigger.hour)
             .put("minute", trigger.minute)
+            .put("days", trigger.days.toJsonArray())
         is Trigger.AppOpened -> JSONObject().put(KEY_TYPE, "appOpened").put("package", trigger.packageName)
         is Trigger.AppClosed -> JSONObject().put(KEY_TYPE, "appClosed").put("package", trigger.packageName)
         is Trigger.Notification -> JSONObject()
@@ -98,6 +105,34 @@ object AutomationJson {
             .put("longitude", trigger.longitude)
             .put("radius", trigger.radiusMeters.toDouble())
             .put("entering", trigger.entering)
+        is Trigger.PowerSaving -> JSONObject().put(KEY_TYPE, "powerSaving").put("on", trigger.on)
+        is Trigger.AndroidAuto -> JSONObject().put(KEY_TYPE, "androidAuto").put("connected", trigger.connected)
+        is Trigger.InState -> JSONObject().put(KEY_TYPE, "state").put("state", encodeState(trigger.state))
+    }
+
+    fun encodeState(state: State): JSONObject = when (state) {
+        State.Charging -> JSONObject().put(KEY_TYPE, "charging")
+        is State.BatteryRange -> JSONObject().put(KEY_TYPE, "batteryRange").put("min", state.min).put("max", state.max)
+        State.ScreenOn -> JSONObject().put(KEY_TYPE, "screenOn")
+        State.PowerSaving -> JSONObject().put(KEY_TYPE, "powerSaving")
+        is State.WifiNetwork -> JSONObject().put(KEY_TYPE, "wifi").put("ssid", state.ssid ?: JSONObject.NULL)
+        is State.TimePeriod -> JSONObject()
+            .put(KEY_TYPE, "timePeriod")
+            .put("start", state.startMinute)
+            .put("end", state.endMinute)
+            .put("days", state.days.toJsonArray())
+        is State.CalendarEvent -> JSONObject().put(KEY_TYPE, "calendar").put("keyword", state.keyword ?: JSONObject.NULL)
+    }
+
+    fun decodeState(json: JSONObject): State = when (json.getString(KEY_TYPE)) {
+        "charging" -> State.Charging
+        "batteryRange" -> State.BatteryRange(json.optInt("min", 0), json.optInt("max", 100))
+        "screenOn" -> State.ScreenOn
+        "powerSaving" -> State.PowerSaving
+        "wifi" -> State.WifiNetwork(json.nullableString("ssid"))
+        "timePeriod" -> State.TimePeriod(json.optInt("start"), json.optInt("end"), json.optJSONArray("days").toDays())
+        "calendar" -> State.CalendarEvent(json.nullableString("keyword"))
+        else -> error("unknown state ${json.optString(KEY_TYPE)}")
     }
 
     fun decodeTrigger(json: JSONObject): Trigger = when (json.getString(KEY_TYPE)) {
@@ -113,7 +148,7 @@ object AutomationJson {
             name = json.optString("name"),
             connected = json.optBoolean("connected", true),
         )
-        "time" -> Trigger.TimeOfDay(json.optInt("hour"), json.optInt("minute"))
+        "time" -> Trigger.TimeOfDay(json.optInt("hour"), json.optInt("minute"), json.optJSONArray("days").toDays())
         "appOpened" -> Trigger.AppOpened(json.optString("package"))
         "appClosed" -> Trigger.AppClosed(json.optString("package"))
         "notification" -> Trigger.Notification(json.optString("package"), json.nullableString("keyword"))
@@ -123,6 +158,9 @@ object AutomationJson {
             radiusMeters = json.optDouble("radius", 100.0).toFloat(),
             entering = json.optBoolean("entering", true),
         )
+        "powerSaving" -> Trigger.PowerSaving(json.optBoolean("on", true))
+        "androidAuto" -> Trigger.AndroidAuto(json.optBoolean("connected", true))
+        "state" -> Trigger.InState(decodeState(json.getJSONObject("state")))
         else -> error("unknown trigger ${json.optString(KEY_TYPE)}")
     }
 
@@ -155,6 +193,36 @@ object AutomationJson {
             .put("percent", action.percent)
         Action.Screenshot -> JSONObject().put(KEY_TYPE, "screenshot")
         Action.ScreenOff -> JSONObject().put(KEY_TYPE, "screenOffAction")
+        is Action.Vibrate -> JSONObject().put(KEY_TYPE, "vibrate").put("kind", action.kind.name)
+        is Action.DoNotDisturbSwitch -> JSONObject().put(KEY_TYPE, "dndSwitch").put("mode", action.mode.name)
+        is Action.MuteMedia -> JSONObject().put(KEY_TYPE, "muteMedia").put("mode", action.mode.name)
+        Action.CycleRinger -> JSONObject().put(KEY_TYPE, "cycleRinger")
+        Action.ToggleVibrate -> JSONObject().put(KEY_TYPE, "toggleVibrate")
+        is Action.LowPower -> JSONObject().put(KEY_TYPE, "lowPower").put("mode", action.mode.name)
+        is Action.KeepAwake -> JSONObject()
+            .put(KEY_TYPE, "keepAwake")
+            .put("mode", action.mode.name)
+            .put("minutes", action.minutes)
+        is Action.AutoBrightness -> JSONObject().put(KEY_TYPE, "autoBrightness").put("mode", action.mode.name)
+        is Action.NetworkSwitch -> JSONObject()
+            .put(KEY_TYPE, "network")
+            .put("kind", action.kind.name)
+            .put("mode", action.mode.name)
+        is Action.OpenCamera -> JSONObject().put(KEY_TYPE, "camera").put("kind", action.kind.name)
+        is Action.OpenActivity -> JSONObject()
+            .put(KEY_TYPE, "openActivity")
+            .put("package", action.packageName)
+            .put("class", action.className)
+        is Action.OpenSettingsPage -> JSONObject().put(KEY_TYPE, "settingsPage").put("page", action.page.name)
+        Action.KeyboardPicker -> JSONObject().put(KEY_TYPE, "keyboardPicker")
+        Action.VoiceAssistant -> JSONObject().put(KEY_TYPE, "voiceAssistant")
+        Action.LikeCurrentSong -> JSONObject().put(KEY_TYPE, "likeSong")
+        Action.OpenNowPlaying -> JSONObject().put(KEY_TYPE, "nowPlaying")
+        Action.SplitScreen -> JSONObject().put(KEY_TYPE, "splitScreen")
+        is Action.FreezeApp -> JSONObject()
+            .put(KEY_TYPE, "freeze")
+            .put("package", action.packageName)
+            .put("frozen", action.frozen)
     }
 
     fun decodeAction(json: JSONObject): Action = when (json.getString(KEY_TYPE)) {
@@ -184,8 +252,34 @@ object AutomationJson {
         )
         "screenshot" -> Action.Screenshot
         "screenOffAction" -> Action.ScreenOff
+        "vibrate" -> Action.Vibrate(json.enumOf("kind", HapticKind.Click))
+        "dndSwitch" -> Action.DoNotDisturbSwitch(json.enumOf("mode", Toggle.Flip))
+        "muteMedia" -> Action.MuteMedia(json.enumOf("mode", Toggle.Flip))
+        "cycleRinger" -> Action.CycleRinger
+        "toggleVibrate" -> Action.ToggleVibrate
+        "lowPower" -> Action.LowPower(json.enumOf("mode", Toggle.Flip))
+        "keepAwake" -> Action.KeepAwake(json.enumOf("mode", Toggle.On), json.optInt("minutes", 30))
+        "autoBrightness" -> Action.AutoBrightness(json.enumOf("mode", Toggle.Flip))
+        "network" -> Action.NetworkSwitch(json.enumOf("kind", NetworkKind.Wifi), json.enumOf("mode", Toggle.Flip))
+        "camera" -> Action.OpenCamera(json.enumOf("kind", CameraKind.Photo))
+        "openActivity" -> Action.OpenActivity(json.optString("package"), json.optString("class"))
+        "settingsPage" -> Action.OpenSettingsPage(json.enumOf("page", SettingsPage.Wifi))
+        "keyboardPicker" -> Action.KeyboardPicker
+        "voiceAssistant" -> Action.VoiceAssistant
+        "likeSong" -> Action.LikeCurrentSong
+        "nowPlaying" -> Action.OpenNowPlaying
+        "splitScreen" -> Action.SplitScreen
+        "freeze" -> Action.FreezeApp(json.optString("package"), json.optBoolean("frozen", true))
         else -> error("unknown action ${json.optString(KEY_TYPE)}")
     }
+
+    private inline fun <reified E : Enum<E>> JSONObject.enumOf(key: String, default: E): E =
+        enumValues<E>().firstOrNull { it.name == optString(key) } ?: default
+
+    private fun Set<Int>.toJsonArray(): JSONArray = JSONArray().also { array -> sorted().forEach(array::put) }
+
+    private fun JSONArray?.toDays(): Set<Int> =
+        if (this == null) emptySet() else (0 until length()).map { optInt(it) }.toSet()
 
     private fun JSONObject.nullableString(key: String): String? =
         if (!has(key) || isNull(key)) null else optString(key).takeIf { it.isNotBlank() }

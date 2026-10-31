@@ -5,7 +5,7 @@
     <string name="automation_add">Thêm quy tắc</string>
     <string name="automation_refresh">Tải lại</string>
     <string name="automation_undo">Hoàn tác lần ghi gần nhất</string>
-    <string name="automation_intro">Một quy tắc gồm một điều kiện và các hành động chạy lần lượt. Quy tắc chạy khi máy đang khoá, kể cả sau khi khởi động lại nhưng chưa mở khoá lần nào: quy tắc và nhật ký nằm ở vùng nhớ không mã hoá theo mật khẩu, nên đừng ghi thông tin bí mật vào tên hoặc lệnh. Action cần ADB sẽ bị bỏ qua khi ADB chưa kết nối. Nếu quy tắc không chạy khi tắt màn hình, hãy tắt tối ưu pin cho Honor Toolkit trong Cài đặt.</string>
+    <string name="automation_intro">Quy tắc theo sự kiện chạy một lần, quy tắc theo trạng thái có hành động khi vào và khi thoát. Quy tắc chạy được cả khi máy khoá, nên đừng ghi thông tin bí mật vào tên hoặc lệnh. Hành động cần ADB bị bỏ qua khi ADB chưa kết nối. Nếu quy tắc không chạy lúc tắt màn hình, hãy tắt tối ưu pin cho Honor Toolkit.</string>
     <string name="automation_rules">Quy tắc</string>
     <string name="automation_no_rules">Chưa có quy tắc nào. Bấm “Thêm quy tắc” để bắt đầu.</string>
     <string name="automation_edit">Sửa</string>
@@ -136,6 +136,8 @@
     <string name="automation_perm_exact_alarm_desc">Cần để quy tắc theo giờ chạy đúng phút; nếu không, MagicOS có thể trễ vài phút.</string>
     <string name="automation_perm_dnd">Chế độ không làm phiền</string>
     <string name="automation_perm_dnd_desc">Cần để đặt chế độ âm thanh “Im lặng” thay vì chỉ rung.</string>
+    <string name="automation_perm_calendar">Lịch</string>
+    <string name="automation_perm_calendar_desc">Cần để biết khi nào có sự kiện lịch đang diễn ra. Chỉ đọc giờ và tiêu đề để so khớp, không lưu lại.</string>
     <string name="automation_perm_open_settings">Mở cài đặt</string>
     <string name="automation_perm_grant">Cấp quyền</string>
 

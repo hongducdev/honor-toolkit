@@ -1,6 +1,9 @@
 package vn.hongducdev.honortoolkit.feature.automation
 
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /** Runs one action. Implementations return [ActionResult] instead of throwing for expected failures. */
 fun interface ActionExecutor {
@@ -27,11 +30,13 @@ class AutomationEngine(
     private val stateLock = Any()
     private val running = mutableSetOf<String>()
     private val lastStarted = mutableMapOf<String, Long>()
+    private val stateActive = mutableMapOf<String, Boolean>()
+    private val stateLocks = ConcurrentHashMap<String, Mutex>()
 
     suspend fun dispatch(event: TriggerEvent): List<AutomationOutcome> {
         val outcomes = mutableListOf<AutomationOutcome>()
         for (rule in rules()) {
-            if (!rule.enabled || !rule.isValid) continue
+            if (!rule.enabled || !rule.isValid || rule.isState) continue
             if (!matches(rule, event)) continue
             if (!canRun(rule)) {
                 log(
@@ -68,10 +73,53 @@ class AutomationEngine(
         return outcomes
     }
 
+    /**
+     * Compares each state rule with [snapshot]. The entry actions run when the state becomes true,
+     * and also the first time it is seen true (a reboot while charging still applies the rule); the
+     * exit actions run only when a state that was seen true turns false. Entry and exit of one rule
+     * are queued behind each other, so an exit never overlaps an entry that is still waiting.
+     */
+    suspend fun evaluate(snapshot: DeviceSnapshot): List<AutomationOutcome> {
+        val outcomes = mutableListOf<AutomationOutcome>()
+        for (rule in rules()) {
+            val state = (rule.trigger as? Trigger.InState)?.state ?: continue
+            if (!rule.enabled || !rule.isValid) {
+                synchronized(stateLock) { stateActive.remove(rule.id) }
+                continue
+            }
+            val active = state.isActive(snapshot)
+            val before = synchronized(stateLock) { stateActive.put(rule.id, active) }
+            val actions = when {
+                active && before != true -> rule.actions
+                !active && before == true -> rule.exitActions
+                else -> continue
+            }
+            if (actions.isEmpty()) continue
+            if (!canRun(rule)) {
+                log(AutomationLogEntry(now(), rule.name, "Kích hoạt", ActionResult.Skipped("chưa cấp đủ quyền cho quy tắc")))
+                continue
+            }
+            val steps = stateLocks.getOrPut(rule.id) { Mutex() }.withLock {
+                actions.map { action -> AutomationStep(action, execute(action)) }
+            }
+            steps.forEach { step -> log(AutomationLogEntry(now(), rule.name, step.action.summary(), step.result)) }
+            outcomes += AutomationOutcome(rule.id, rule.name, steps)
+        }
+        return outcomes
+    }
+
+    /** Runs a rule's entry actions right now, ignoring its trigger, the loop window and the enabled flag. */
+    suspend fun runNow(rule: AutomationRule): AutomationOutcome {
+        val steps = rule.actions.map { action -> AutomationStep(action, execute(action)) }
+        steps.forEach { step -> log(AutomationLogEntry(now(), rule.name, step.action.summary(), step.result)) }
+        return AutomationOutcome(rule.id, rule.name, steps)
+    }
+
     /** Forgets the loop window and running state; used by the tests and when all rules are disabled. */
     fun reset() = synchronized(stateLock) {
         running.clear()
         lastStarted.clear()
+        stateActive.clear()
     }
 
     private fun matches(rule: AutomationRule, event: TriggerEvent): Boolean {
