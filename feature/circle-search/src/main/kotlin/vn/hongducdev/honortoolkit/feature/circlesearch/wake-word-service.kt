@@ -46,6 +46,7 @@ class WakeWordService : Service(), RecognitionListener {
     private var audioClosing = false
     private var restartAfterClose = false
     private var lastRecognition = 0L
+    private var lastWakeAt = 0L
     private var recognitionFailures = 0
     private var testPending = false
     private var wakeLock: PowerManager.WakeLock? = null
@@ -244,14 +245,18 @@ class WakeWordService : Service(), RecognitionListener {
             !assistantOpen &&
             speech != null &&
             config.enabled &&
-            playback?.blocks() != true
+            playback?.blocks() != true &&
+            (lastWakeAt == 0L || SystemClock.elapsedRealtime() - lastWakeAt >= WAKE_COOLDOWN_MS)
 
-    private fun acceptsWakeLevel(): Boolean =
-        speech?.loudEnough(config.sensitivity()) == true
+    private fun acceptsWakeLevel(): Boolean {
+        val audio = speech ?: return false
+        return audio.voicedEnough() && audio.loudEnough(config.sensitivity())
+    }
 
     private fun onWakePhrase(text: String) {
         if (!canAcceptWake()) return
         triggered = true
+        lastWakeAt = SystemClock.elapsedRealtime()
         config.lastHeard = text.ifBlank { WakePhrase.DISPLAY }
         config.lastHeardAt = System.currentTimeMillis()
         setStatus(getString(R.string.cs_wake_status_heard, WakePhrase.DISPLAY))
@@ -406,6 +411,7 @@ class WakeWordService : Service(), RecognitionListener {
         private const val MAX_ASSISTANT_MS = 30_000L
         private const val MIC_IDLE_MS = 1_500L
         private const val WAKE_LOCK_MS = 5_000L
+        private const val WAKE_COOLDOWN_MS = 5_000L
         private const val MAX_FAILURES = 4
 
         @Volatile

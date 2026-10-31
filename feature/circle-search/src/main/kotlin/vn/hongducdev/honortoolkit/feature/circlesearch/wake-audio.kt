@@ -32,6 +32,11 @@ internal class WakeAudio(
 
     @Volatile
     private var running = false
+
+    /** Voiced (not just trailing) audio in the current utterance, used to reject coughs and clicks. */
+    @Volatile
+    private var voicedSamples = 0L
+
     private var worker: Thread? = null
 
     init {
@@ -77,6 +82,7 @@ internal class WakeAudio(
                     if (!blocked) {
                         recognizer.reset()
                         gate = SpeechGate()
+                        voicedSamples = 0L
                         filter?.invalidateAudio()
                     }
                     blocked = true
@@ -91,15 +97,17 @@ internal class WakeAudio(
                 if (blocked) {
                     recognizer.reset()
                     gate = SpeechGate()
+                    voicedSamples = 0L
                     filter?.invalidateAudio()
                     blocked = false
                 }
 
                 val now = SystemClock.elapsedRealtime()
                 level.add(buffer, length, now)
-                filter?.push(buffer, length)
 
                 val input = if (gating) gate.prepare(buffer, length) else buffer
+                voicedSamples = gate.voicedSamples
+                if (gate.started) filter?.invalidateAudio()
                 if (input == null) {
                     if (now - lastHeartbeat >= 1000) {
                         lastHeartbeat = now
@@ -109,6 +117,8 @@ internal class WakeAudio(
                 }
 
                 val count = if (input === buffer) length else input.size
+                // Only decoded speech ages a wake candidate; silence must not make one "stable".
+                filter?.push(input, count)
                 val complete = recognizer.acceptWaveForm(input, count)
                 val result = if (complete) recognizer.getResult() else recognizer.getPartialResult()
                 if (gating && gate.ended) recognizer.reset()
@@ -151,11 +161,15 @@ internal class WakeAudio(
 
     fun loudEnough(sensitivity: Int): Boolean = level.allows(sensitivity, SystemClock.elapsedRealtime())
 
+    fun voicedEnough(): Boolean = voicedSamples >= MIN_VOICED_SAMPLES
+
     fun displayLevels(): IntArray = level.display(SystemClock.elapsedRealtime())
 
     private companion object {
         const val SAMPLE_RATE = 16000f
         const val BUFFER_SAMPLES = 1280
+        /** 300 ms of voiced audio in this utterance; a click or a cough is shorter. */
+        const val MIN_VOICED_SAMPLES = 4800L
         const val EMPTY_PARTIAL = """{"partial":""}"""
     }
 }
@@ -183,6 +197,14 @@ internal class PlaybackGate(context: Context) {
  */
 internal class SpeechGate {
     var ended = false
+        private set
+
+    /** True on the first voiced frame of a new utterance. */
+    var started = false
+        private set
+
+    /** Voiced (non-tail) samples in the current utterance. */
+    var voicedSamples = 0L
         private set
 
     private val history = ShortArray(12800)
@@ -217,6 +239,9 @@ internal class SpeechGate {
         tail = if (voice) 16000 else max(0, tail - length)
         ended = wasActive && tail == 0
         val active = wasActive || voice
+        started = active && !wasActive
+        if (started) voicedSamples = 0L
+        if (voice) voicedSamples += length
 
         var output: ShortArray? = if (active) audio else null
         if (active && !wasActive) {

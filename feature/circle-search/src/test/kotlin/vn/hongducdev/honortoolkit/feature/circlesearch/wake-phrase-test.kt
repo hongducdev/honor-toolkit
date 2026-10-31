@@ -15,12 +15,13 @@ class WakePhraseTest {
     }
 
     @Test
-    fun acceptsCommonForms() {
+    fun acceptsOnlyOkGoogle() {
         assertTrue(WakePhrase.matches("OK Google"))
         assertTrue(WakePhrase.matches("ok google"))
         assertTrue(WakePhrase.matches("OKAY GOOGLE"))
-        assertTrue(WakePhrase.matches("Hey Google"))
-        assertTrue(WakePhrase.matches("h\u00e9y google"))
+        // VXM also ignores this form; keeping it out halves the false-trigger surface.
+        assertFalse(WakePhrase.matches("Hey Google"))
+        assertFalse(WakePhrase.matches("h\u00e9y google"))
     }
 
     @Test
@@ -30,10 +31,14 @@ class WakePhraseTest {
         assertFalse(WakePhrase.matches("okay"))
         assertFalse(WakePhrase.matches("okay google now"))
         assertFalse(WakePhrase.matches("please open google"))
+        assertFalse(WakePhrase.matches("[unk]"))
     }
 
     @Test
-    fun grammarOnlyAllowsWakeWordsAndUnknown() {
-        assertEquals("""["okay google","hey google","[unk]"]""", WakePhrase.grammarJson)
+    fun grammarKeepsWakeWordAndDistractors() {
+        assertTrue(WakePhrase.grammarJson.startsWith("""["okay google","hey google","""))
+        assertTrue(WakePhrase.grammarJson.contains(""""thank you""""))
+        assertTrue(WakePhrase.grammarJson.endsWith(""""[unk]"]"""))
+        assertTrue(WakePhrase.grammarJson.contains(""""okay""""))
     }
 }

@@ -3,11 +3,13 @@ package vn.hongducdev.honortoolkit.feature.circlesearch
 import org.json.JSONObject
 
 /**
- * Wake-word filter ported from Trợ lý VXM's `WakeFilter`.
+ * Wake-word filter ported from Trợ lý VXM's `WakeFilter`, with one extra guard for this app.
  *
- * A partial result must stay stable for ~80 ms (1280 samples at 16 kHz) before it fires, so a
- * recognizer that briefly guesses "okay google" while decoding other speech does not open Gemini.
- * A final result fires immediately because the decoder already closed the utterance.
+ * A partial result must stay stable for ~80 ms (1280 decoded samples at 16 kHz) before it fires.
+ * A final result no longer fires on its own: it must be corroborated by an earlier matching
+ * partial in the same audio epoch. Vosk's tiny word-list grammar will happily decode a cough, a
+ * door or a TV into the wake phrase once it closes an utterance, so a bare final is the main
+ * source of "Gemini opened by itself".
  */
 internal class WakeFilter(
     private val canAccept: () -> Boolean,
@@ -28,6 +30,7 @@ internal class WakeFilter(
     private var candidateAt = -1L
     private var candidateEpoch = -1
 
+    /** Only audio that was actually decoded counts; silence and playback gaps must not age a candidate. */
     fun push(audio: ShortArray, length: Int) {
         synchronized(lock) { samples += length }
     }
@@ -57,11 +60,18 @@ internal class WakeFilter(
             now = samples
             token = epoch
         }
-        if (candidateAt < 0 || candidateEpoch != token) {
-            candidateAt = now
-            candidateEpoch = token
+        val known = candidateAt >= 0 && candidateEpoch == token
+        if (partial) {
+            if (!known) {
+                candidateAt = now
+                candidateEpoch = token
+            }
+        } else if (!known) {
+            // A final without a matching partial is the decoder guessing at end of utterance.
+            return
         }
-        val stable = !partial || now - candidateAt >= STABLE_SAMPLES
+
+        val stable = now - candidateAt >= STABLE_SAMPLES
         if (stable && !closed && token == epoch && canAccept()) {
             fired = true
             onWake(text)
