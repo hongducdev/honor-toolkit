@@ -82,6 +82,9 @@ private const val MaxTabs = 4
 
 // Measured on a 365dp phone: side margins, the bar's own padding and the gap before the FAB add up to this much.
 private const val ScreenChromeDp = 42
+
+// More actions than this collapse into one overflow menu so the bar stays compact on every page.
+private const val MaxInlineActions = 1
 private const val BackButtonDp = 48
 private const val ActionButtonDp = 48
 private const val FabDp = 56
@@ -172,8 +175,7 @@ fun <T : Any> ToolkitFloatingToolbar(
 @Composable
 private fun PageContent(spec: ToolbarSpec.Page, haptics: HapticFeedback, screenWidthDp: Int) {
     val colors = MaterialTheme.colorScheme
-    val maxInlineActions = if (spec.fab != null) 1 else 2
-    val overflow = spec.actions.size > maxInlineActions
+    val overflow = spec.actions.size > MaxInlineActions
     val buttonCount = if (overflow) 1 else spec.actions.size
     val titleMax = (screenWidthDp - ScreenChromeDp - BackButtonDp - ActionButtonDp * buttonCount - if (spec.fab != null) FabDp else 0)
         .coerceAtLeast(MinTitleDp).dp
