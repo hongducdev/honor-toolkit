@@ -110,7 +110,6 @@ fun NotificationFixScreen(onBack: () -> Unit, modifier: Modifier = Modifier, vie
 
 @Composable
 private fun AppList(state: NotificationFixUiState, viewModel: NotificationFixViewModel) {
-    Text(stringResource(R.string.notification_fix_intro), style = MaterialTheme.typography.bodyMedium)
     ToolkitSearchField(state.query, viewModel::setQuery, stringResource(R.string.notification_fix_search))
     val visible = state.visibleApps
     if (visible.isEmpty() && !state.loading) Text(stringResource(R.string.notification_fix_empty), style = MaterialTheme.typography.bodyMedium)
@@ -135,7 +134,6 @@ private fun AppList(state: NotificationFixUiState, viewModel: NotificationFixVie
 private fun AppDetail(state: NotificationFixUiState, onApply: () -> Unit, onOpenLaunchManagement: () -> Unit, onOpenBattery: () -> Unit) {
     val steps = state.steps ?: return
     LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(bottom = LocalToolbarClearance.current)) {
-        item { Text(stringResource(R.string.notification_fix_detail_intro), style = MaterialTheme.typography.bodyMedium) }
         items(steps, key = { it.step }) { StepRow(it) }
         item {
             FilledTonalButton(onClick = onApply, enabled = state.canApply, modifier = Modifier.padding(vertical = 12.dp)) {

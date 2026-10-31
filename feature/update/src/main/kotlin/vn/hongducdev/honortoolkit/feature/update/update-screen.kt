@@ -89,11 +89,6 @@ fun UpdateScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: U
             SettingsGroup(title = null) {
                 SwitchRow(stringResource(R.string.update_auto_check), state.autoCheck, onChange = viewModel::setAutoCheck)
             }
-            Text(
-                stringResource(R.string.update_auto_check_hint),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
         }
     }
 }

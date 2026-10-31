@@ -3,11 +3,9 @@
     <string name="notification_fix_title">Fix thông báo</string>
     <string name="notification_fix_back">Quay lại</string>
     <string name="notification_fix_refresh">Tải lại</string>
-    <string name="notification_fix_intro">Chọn ứng dụng bị trễ hoặc mất thông báo (Zalo, Facebook, Messenger, ngân hàng…). Honor Toolkit sẽ tự đặt các thiết lập cần thiết qua ADB, bạn không phải làm từng bước.</string>
     <string name="notification_fix_search">Tìm ứng dụng</string>
     <string name="notification_fix_empty">Không có ứng dụng nào.</string>
 
-    <string name="notification_fix_detail_intro">Trạng thái hiện tại của ứng dụng này. Nhấn Áp dụng để bật những mục đang tắt.</string>
     <string name="notification_fix_apply">Áp dụng tự động</string>
     <string name="notification_fix_all_done">Đã bật đủ</string>
 
@@ -19,7 +17,7 @@
     <string name="notification_fix_step_background_desc">Cho phép chạy và nhận tin dưới nền</string>
     <string name="notification_fix_step_alarm">Báo thức chính xác</string>
     <string name="notification_fix_step_standby">Nhóm chờ ứng dụng</string>
-    <string name="notification_fix_step_standby_desc">Giữ ứng dụng ở nhóm hoạt động để hệ thống không hạn chế tin nhắn nền</string>
+    <string name="notification_fix_step_standby_desc">Giữ ứng dụng ở nhóm hoạt động</string>
     <string name="notification_fix_step_alarm_desc">Cần cho OTP và nhắc nhở đúng giờ (Android 12 trở lên)</string>
 
     <string name="notification_fix_status_on">Đã bật</string>
@@ -28,7 +26,7 @@
     <string name="notification_fix_status_failed">Không áp dụng được</string>
 
     <string name="notification_fix_manual_title">Còn lại phải làm trong Cài đặt</string>
-    <string name="notification_fix_manual_desc">MagicOS không cho đặt “Khởi chạy ứng dụng” và “Duy trì kết nối khi ngủ” qua ADB. Mở thẳng màn hình đó để bật cho ứng dụng này.</string>
+    <string name="notification_fix_manual_desc">MagicOS không cho đặt qua ADB. Mở thẳng màn hình đó để bật cho ứng dụng này.</string>
     <string name="notification_fix_open_launch">Mở Khởi chạy ứng dụng</string>
     <string name="notification_fix_open_battery">Mở Pin</string>
 

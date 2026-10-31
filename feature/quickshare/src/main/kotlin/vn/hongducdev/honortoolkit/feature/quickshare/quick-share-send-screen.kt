@@ -80,7 +80,6 @@ private fun DevicePicker(state: SendUiState, onPick: (NearbyDevice) -> Unit) {
     Text(stringResource(R.string.quick_share_send_files, state.fileCount), style = MaterialTheme.typography.bodyLarge)
     if (state.devices.isEmpty()) {
         Text(stringResource(R.string.quick_share_send_searching), style = MaterialTheme.typography.titleMedium)
-        Text(stringResource(R.string.quick_share_send_hint), style = MaterialTheme.typography.bodyMedium)
     } else {
         SettingsGroup(stringResource(R.string.quick_share_send_nearby)) {
             val unnamed = stringResource(R.string.quick_share_send_unnamed)

@@ -91,7 +91,6 @@ fun QuickShareScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 .padding(bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(stringResource(R.string.quick_share_intro), style = MaterialTheme.typography.bodyMedium)
             SettingsGroup(null) {
                 NavRow(Icons.Rounded.Share, stringResource(R.string.quick_share_pick_files), stringResource(R.string.quick_share_pick_files_description)) {
                     filePicker.launch(arrayOf("*/*"))
@@ -108,7 +107,6 @@ fun QuickShareScreen(onBack: () -> Unit, modifier: Modifier = Modifier) {
                 }
                 lastResultText(status.last)?.let { SettingsNote(it) }
             }
-            Text(stringResource(R.string.quick_share_notification_hint), style = MaterialTheme.typography.bodySmall)
             SettingsGroup(null) {
                 NavRow(Icons.Rounded.Notifications, stringResource(R.string.quick_share_banner_title), stringResource(R.string.quick_share_banner_description)) {
                     context.startActivity(

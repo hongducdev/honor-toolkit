@@ -250,13 +250,6 @@ private fun AutomationRuleList(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = LocalToolbarClearance.current),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item(key = "intro") {
-            Text(
-                stringResource(R.string.automation_intro),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
         if (state.missing.isNotEmpty()) {
             item(key = "permissions") {
                 SettingsGroup(title = stringResource(R.string.automation_perm_heading)) {
@@ -349,11 +342,6 @@ private fun AutomationRuleList(
                         state.log.ifBlank { stringResource(R.string.automation_log_empty) },
                         style = MaterialTheme.typography.bodySmall,
                         fontFamily = FontFamily.Monospace,
-                    )
-                    Text(
-                        stringResource(R.string.automation_log_privacy),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     TextButton(onClick = onClearLog, enabled = state.log.isNotBlank()) {
                         Text(stringResource(R.string.automation_log_clear))

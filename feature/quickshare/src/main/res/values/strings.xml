@@ -2,7 +2,6 @@
 <resources>
     <string name="quick_share_title">Quick Share</string>
     <string name="quick_share_back">Quay lại</string>
-    <string name="quick_share_intro">Nhận file từ điện thoại Android khác qua Wi-Fi cùng mạng. Máy hiện trong Quick Share của Samsung và Pixel khi bạn bật nhận.</string>
     <string name="quick_share_receive">Cho phép nhận file</string>
     <string name="quick_share_status_off">Đang tắt</string>
     <string name="quick_share_status_listening">Đang chờ — máy hiện với tên “%1$s”</string>
@@ -12,7 +11,6 @@
     <string name="quick_share_last_rejected">Lần trước: đã từ chối</string>
     <string name="quick_share_last_cancelled">Lần trước: người gửi đã hủy</string>
     <string name="quick_share_last_failed">Lần trước: lỗi — xem nhật ký chẩn đoán</string>
-    <string name="quick_share_notification_hint">Nếu không thấy thông báo hỏi nhận file, hãy cho phép thông báo cho ứng dụng này.</string>
     <string name="quick_share_banner_title">Biểu ngữ và thông báo dạng nang</string>
     <string name="quick_share_banner_description">Mở cài đặt kênh “Yêu cầu nhận file”, bật biểu ngữ để thấy yêu cầu ngay khi có người gửi</string>
 
@@ -21,7 +19,6 @@
     <string name="quick_share_send_title">Gửi qua Quick Share</string>
     <string name="quick_share_send_files">Đang gửi %1$d file</string>
     <string name="quick_share_send_searching">Đang tìm thiết bị gần đây…</string>
-    <string name="quick_share_send_hint">Máy nhận phải cùng Wi-Fi, mở Quick Share và đặt hiển thị cho “Mọi người”.</string>
     <string name="quick_share_send_nearby">Thiết bị gần đây</string>
     <string name="quick_share_send_unnamed">Thiết bị Quick Share</string>
     <string name="quick_share_send_connecting">Đang kết nối…</string>

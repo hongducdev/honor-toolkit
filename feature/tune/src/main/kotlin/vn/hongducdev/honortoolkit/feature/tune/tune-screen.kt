@@ -88,13 +88,6 @@ fun TuneScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: Tun
             contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = LocalToolbarClearance.current),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item(key = "intro") {
-                Text(
-                    stringResource(R.string.tune_intro),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
             item(key = "recommended") {
                 FilledTonalButton(
                     onClick = viewModel::requestRecommended,
@@ -266,7 +259,7 @@ private fun choiceTitle(id: TuneId): Int = when (id) {
 private fun choiceDescription(id: TuneId): Int = when (id) {
     TuneId.RefreshRate -> R.string.tune_refresh_rate_desc
     TuneId.AnimationScale -> R.string.tune_animation_desc
-    else -> R.string.tune_intro
+    else -> R.string.tune_title
 }
 
 private fun toggleDescription(id: TuneId): Int = when (id) {
@@ -288,5 +281,5 @@ private fun toggleDescription(id: TuneId): Int = when (id) {
     TuneId.Volte5g -> R.string.tune_volte_desc
     TuneId.SuplGps -> R.string.tune_supl_desc
     TuneId.PrivateDnsAdBlock -> R.string.tune_dns_desc
-    else -> R.string.tune_intro
+    else -> R.string.tune_title
 }

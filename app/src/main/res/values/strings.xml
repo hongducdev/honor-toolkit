@@ -10,11 +10,11 @@
     <string name="status_reconnect">Kết nối lại</string>
 
     <string name="pairing_heading">Ghép cặp với chính máy này</string>
-    <string name="pairing_step_1">Bật Tùy chọn nhà phát triển và Gỡ lỗi qua WLAN (cần Wi-Fi).</string>
+    <string name="pairing_step_1">Bật Tùy chọn nhà phát triển và Gỡ lỗi qua WLAN.</string>
     <string name="pairing_step_2">Bấm Bắt đầu ghép cặp bên dưới.</string>
-    <string name="pairing_step_3">Vào Gỡ lỗi qua WLAN → Ghép cặp thiết bị bằng mã ghép cặp, giữ hộp thoại mở.</string>
-    <string name="pairing_step_4">Kéo thanh thông báo xuống, bấm Nhập mã và gõ mã 6 số.</string>
-    <string name="pairing_reboot_note">Sau mỗi lần khởi động lại máy, Android xóa ghép cặp nên cần làm lại các bước này.</string>
+    <string name="pairing_step_3">Vào Gỡ lỗi qua WLAN → Ghép cặp bằng mã, giữ hộp thoại mở.</string>
+    <string name="pairing_step_4">Kéo thanh thông báo, bấm Nhập mã và gõ mã 6 số.</string>
+    <string name="pairing_reboot_note">Khởi động lại máy sẽ xóa ghép cặp, cần làm lại.</string>
     <string name="pairing_open_developer_options">Mở Tùy chọn nhà phát triển</string>
     <string name="pairing_start">Bắt đầu ghép cặp</string>
     <string name="pairing_code_found">Đã thấy hộp thoại ghép cặp. Nhập mã tại đây nếu không dùng được thông báo.</string>
@@ -30,7 +30,7 @@
     <string name="nav_permissions">Quyền</string>
     <string name="nav_gms_check">Dịch vụ Google</string>
     <string name="home_open_gms_check">Dịch vụ Google</string>
-    <string name="home_gms_check_description">Kiểm tra Play Services, Cửa hàng Play và tài khoản Google đã hoạt động chưa</string>
+    <string name="home_gms_check_description">Kiểm tra Play Services và tài khoản Google</string>
     <string name="nav_quick_share">Quick Share</string>
     <string name="home_open_quick_share">Quick Share</string>
     <string name="home_quick_share_description">Nhận file từ Samsung, Pixel qua Wi-Fi</string>
@@ -38,24 +38,24 @@
     <string name="nav_tune">Tinh chỉnh</string>
     <string name="nav_automation">Tự động hoá</string>
     <string name="home_open_automation">Tự động hoá</string>
-    <string name="home_automation_description">Quy tắc một điều kiện, nhiều hành động: sạc, pin, Wi-Fi, Bluetooth, giờ, ứng dụng, thông báo, vị trí</string>
+    <string name="home_automation_description">Quy tắc tự chạy theo điều kiện</string>
     <string name="home_open_tune">Tinh chỉnh MagicOS</string>
-    <string name="home_tune_description">Tần số quét, thông báo hệ thống, dọn giao diện Trung, GPS và VoLTE</string>
+    <string name="home_tune_description">Tần số quét, thông báo, dọn giao diện Trung</string>
     <string name="nav_connection">ADB</string>
     <string name="nav_update">Cập nhật</string>
     <string name="back">Quay lại</string>
     <string name="home_open_connection">Kết nối ADB</string>
-    <string name="home_connection_description">Ghép cặp, kết nối lại và kiểm tra quyền shell</string>
+    <string name="home_connection_description">Ghép cặp và kiểm tra quyền shell</string>
     <string name="apps_title">Ứng dụng</string>
     <string name="status_needs_adb_hint">Cần ADB để dùng các công cụ trong tab Ứng dụng.</string>
-    <string name="home_device_info_description">Model, phiên bản hệ thống và thông số máy</string>
+    <string name="home_device_info_description">Model, phiên bản hệ thống, thông số máy</string>
     <string name="home_open_debloat">Gỡ ứng dụng hệ thống</string>
     <string name="home_open_permissions">Quyền ứng dụng</string>
-    <string name="home_permissions_description">Cấp hoặc thu hồi quyền và AppOps, mỗi thay đổi đều được đọc lại</string>
+    <string name="home_permissions_description">Cấp hoặc thu hồi quyền và AppOps</string>
     <string name="home_debloat_description">Tắt ứng dụng thừa, bật lại bất cứ lúc nào</string>
 
     <string name="home_open_notification_fix">Fix thông báo</string>
-    <string name="home_notification_fix_description">Chọn ứng dụng, tự đặt quyền thông báo và chạy nền qua ADB</string>
+    <string name="home_notification_fix_description">Tự đặt quyền thông báo và chạy nền qua ADB</string>
 
     <string name="shortcut_circle_search">Circle to Search</string>
     <string name="shortcut_gemini">Gemini</string>

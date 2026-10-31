@@ -35,7 +35,7 @@
     <string name="debloat_protected_core">Được bảo vệ: lõi hệ thống</string>
     <string name="debloat_protected_in_use">Được bảo vệ: đang là launcher, bàn phím hoặc app mặc định</string>
     <string name="debloat_confirm_title">Tắt %1$s?</string>
-    <string name="debloat_confirm_body">Ứng dụng chỉ bị tắt cho người dùng hiện tại, không bị gỡ. Bật lại bất cứ lúc nào ở tab Đã tắt. Gói chưa đánh giá có thể ảnh hưởng thông báo hoặc chức năng của máy.</string>
+    <string name="debloat_confirm_body">Ứng dụng chỉ bị tắt, không bị gỡ. Bật lại bất cứ lúc nào ở tab Đã tắt.</string>
     <string name="debloat_confirm_ok">Tắt</string>
     <string name="debloat_confirm_cancel">Hủy</string>
     <string name="debloat_msg_disabled">Đã tắt %1$s</string>

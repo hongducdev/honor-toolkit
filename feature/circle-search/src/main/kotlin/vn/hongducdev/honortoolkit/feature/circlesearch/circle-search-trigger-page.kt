@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import vn.hongducdev.honortoolkit.core.ui.SettingsGroup
-import vn.hongducdev.honortoolkit.core.ui.SettingsNote
 import vn.hongducdev.honortoolkit.core.ui.SettingsRow
 import vn.hongducdev.honortoolkit.core.ui.SliderRow
 import vn.hongducdev.honortoolkit.core.ui.SwitchRow
@@ -64,7 +63,5 @@ internal fun TriggerPage(state: CircleSearchUiState, viewModel: CircleSearchView
         }
     }
     SettingsGroup(stringResource(R.string.cs_assign_heading)) {
-        SettingsNote(stringResource(R.string.cs_assign_body))
-        SettingsNote(stringResource(R.string.cs_old_app_note))
     }
 }

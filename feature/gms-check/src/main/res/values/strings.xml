@@ -12,8 +12,8 @@
     <string name="gms_check_status_missing">Chưa cài</string>
     <string name="gms_check_status_disabled">Đang tắt (phiên bản %1$s)</string>
     <string name="gms_check_status_enabled">Đang bật (phiên bản %1$s)</string>
-    <string name="gms_check_advice_missing">Máy chưa có thành phần này. Thông báo đẩy của nhiều ứng dụng sẽ không hoạt động nếu thiếu Play Services.</string>
-    <string name="gms_check_advice_disabled">Bật lại trong Cài đặt &gt; Ứng dụng, hoặc ở màn Gỡ ứng dụng hệ thống nếu chính app này đã tắt nó.</string>
+    <string name="gms_check_advice_missing">Máy chưa có thành phần này; thông báo đẩy của nhiều ứng dụng sẽ không hoạt động.</string>
+    <string name="gms_check_advice_disabled">Bật lại trong Cài đặt &gt; Ứng dụng, hoặc ở màn Gỡ ứng dụng hệ thống.</string>
     <string name="gms_check_account">Tài khoản Google</string>
     <string name="gms_check_account_unknown">Không đọc được</string>
     <string name="gms_check_account_none">Chưa đăng nhập tài khoản Google nào</string>

@@ -22,13 +22,13 @@
 
     <string name="cs_title">Circle to Search</string>
     <string name="cs_page_trigger">Kích hoạt và gán nút</string>
-    <string name="cs_page_trigger_desc">Độ trễ, rung, thử kích hoạt, cách gán vào nút AI</string>
+    <string name="cs_page_trigger_desc">Độ trễ, rung, thử kích hoạt, gán nút AI</string>
     <string name="cs_page_launcher">Biểu tượng riêng</string>
-    <string name="cs_page_launcher_desc">Biểu tượng mở thẳng Circle to Search, Gemini, Search Live</string>
+    <string name="cs_page_launcher_desc">Mở thẳng Circle to Search, Gemini, Search Live</string>
     <string name="cs_page_strip">Giữ thanh điều hướng</string>
-    <string name="cs_page_strip_desc">Dải vô hình trên vạch điều hướng để mở bằng cách giữ</string>
+    <string name="cs_page_strip_desc">Giữ vạch điều hướng để mở</string>
     <string name="cs_page_wake">Đánh thức bằng giọng nói</string>
-    <string name="cs_page_wake_desc">Nói “OK Google” để mở Gemini, nhận giọng ngoại tuyến bằng Vosk</string>
+    <string name="cs_page_wake_desc">Nói “OK Google” để mở Gemini</string>
     <string name="cs_back">Quay lại</string>
     <string name="cs_status_no_google">Chưa cài ứng dụng Google. Circle to Search cần ứng dụng này.</string>
     <string name="cs_status_not_assistant">Google chưa là trợ lý số mặc định nên yêu cầu sẽ bị từ chối.</string>
@@ -53,15 +53,11 @@
     <string name="cs_log_clear">Xóa nhật ký</string>
     <string name="cs_log_copied">Đã sao chép nhật ký.</string>
     <string name="cs_assign_heading">Gán vào nút bấm</string>
-    <string name="cs_assign_body">Nhấn giữ biểu tượng Honor Toolkit và chọn lối tắt Circle to Search, hoặc thêm ô Circle to Search vào Cài đặt nhanh. Có thể gán lối tắt đó cho nút AI hoặc thao tác bấm đúp. Nó mở Circle to Search ngay trên ứng dụng bạn đang dùng.</string>
-    <string name="cs_launcher_heading">Biểu tượng riêng cho nút và cử chỉ</string>
-    <string name="cs_launcher_body">Nếu cài đặt của Honor chỉ cho chọn ứng dụng (ví dụ bấm đúp nút nguồn), bật biểu tượng tương ứng rồi chọn nó trong danh sách. Mỗi biểu tượng mở thẳng một tính năng thay vì mở app. Tắt đi để bỏ biểu tượng.</string>
+    <string name="cs_launcher_heading">Biểu tượng riêng</string>
     <string name="cs_launcher_circle_search">Circle to Search</string>
     <string name="cs_launcher_gemini">Gemini (trợ lý)</string>
     <string name="cs_launcher_live">Search Live (hội thoại giọng nói và camera của Google)</string>
-    <string name="cs_old_app_note">Nếu đã cài ứng dụng Circle Search Trigger cũ, hãy gỡ nó để tránh trùng lặp.</string>
     <string name="cs_strip_heading">Giữ thanh điều hướng</string>
-    <string name="cs_strip_hint">Đặt một dải vô hình lên vạch điều hướng; giữ vào đó để mở Circle to Search. Tính năng dùng quyền "hiển thị trên ứng dụng khác", không dùng trợ năng. Mặc định dải nằm đúng vùng vạch điều hướng nên không che nội dung app; nếu máy bạn bị che nút, hạ "Lệch" xuống số âm. Một số app ngân hàng có thể từ chối chạy khi quyền này đã cấp: hãy tắt dải trước khi mở chúng.</string>
     <string name="cs_strip_no_permission">Dải: chưa cấp quyền "hiển thị trên ứng dụng khác".</string>
     <string name="cs_strip_on">Dải: đang bật. Giữ vào vạch điều hướng.</string>
     <string name="cs_strip_off">Dải: đang tắt.</string>
@@ -74,9 +70,8 @@
     <string name="cs_strip_notification_title">Dải Circle to Search đang bật</string>
     <string name="cs_strip_notification_text">Giữ vào vạch điều hướng để mở Circle to Search.</string>
     <string name="cs_strip_notification_stop">Tắt dải</string>
-    <string name="cs_strip_notification_denied">Thông báo của dải đang bị từ chối. Dải vẫn chạy nhưng không có nút tắt nhanh trong thanh thông báo; bật thông báo để giữ dải ổn định hơn.</string>
+    <string name="cs_strip_notification_denied">Thông báo của dải đang bị từ chối, bật để có nút tắt nhanh.</string>
     <string name="cs_strip_gestures_heading">Cử chỉ trên dải</string>
-    <string name="cs_strip_gestures_note">Chạm, chạm hai lần hoặc giữ trên dải để chạy hành động tương ứng. Dải không nhận thao tác vuốt để không chặn cử chỉ điều hướng của hệ thống.</string>
     <string name="cs_strip_gesture_dialog">Hành động khi %1$s</string>
     <string name="gesture_tap">chạm</string>
     <string name="gesture_double">chạm hai lần</string>
@@ -88,12 +83,11 @@
     <string name="cs_close">Đóng</string>
 
     <string name="cs_wake_heading">Nghe “OK Google”</string>
-    <string name="cs_wake_body">Bật micro thường trực để câu “OK Google” mở Gemini. Bộ nhận giọng Vosk chạy hoàn toàn trên máy, không gửi âm thanh lên mạng. Khi nghe đúng câu, dịch vụ nhả micro rồi mở Gemini; sau khi Gemini nhả micro, dịch vụ tự nghe lại.</string>
     <string name="cs_wake_switch_label">Bật nghe “OK Google”</string>
     <string name="cs_wake_status_off">Đã tắt</string>
     <string name="cs_wake_status_starting">Đang khởi động…</string>
     <string name="cs_wake_status_no_mic">Chưa có quyền micro</string>
-    <string name="cs_wake_status_loading">Đang nạp bộ nhận giọng nói… lần đầu có thể mất khoảng 30 giây</string>
+    <string name="cs_wake_status_loading">Đang nạp bộ nhận giọng nói…</string>
     <string name="cs_wake_status_model_error">Lỗi nạp model: %1$s</string>
     <string name="cs_wake_status_listening">Đang nghe “%1$s”</string>
     <string name="cs_wake_status_mic_error">Lỗi micro: %1$s</string>
@@ -106,14 +100,11 @@
     <string name="cs_wake_mic_missing">Cần quyền micro để nghe “OK Google”. Cấp quyền rồi bật lại.</string>
     <string name="cs_wake_grant_mic">Cấp quyền micro</string>
     <string name="cs_wake_no_mic_toast">Chưa có quyền micro nên chưa bật được.</string>
-    <string name="cs_wake_notification_denied">Thông báo đang bị từ chối. Dịch vụ vẫn chạy nhưng khó tắt nhanh và dễ bị hệ thống dừng hơn.</string>
-    <string name="cs_wake_battery">Android đang tối ưu pin cho ứng dụng. Tắt tối ưu pin để dịch vụ nghe không bị dừng khi màn hình tắt.</string>
+    <string name="cs_wake_notification_denied">Thông báo đang bị từ chối, dịch vụ dễ bị hệ thống dừng hơn.</string>
+    <string name="cs_wake_battery">Tắt tối ưu pin để dịch vụ nghe không bị dừng khi tắt màn hình.</string>
     <string name="cs_wake_battery_button">Mở tối ưu pin</string>
     <string name="cs_wake_last_heard">Lần cuối: “%1$s” lúc %2$s</string>
     <string name="cs_wake_test">Thử mở Gemini</string>
-    <string name="cs_wake_test_hint">Nút này giả lập một lần nghe được “OK Google” để kiểm tra đường mở Gemini mà không cần nói.</string>
-    <string name="cs_wake_notes_heading">Lưu ý</string>
-    <string name="cs_wake_notes">Model nhận giọng là tiếng Anh nên hãy nói “OK Google” theo giọng Anh. Trên MagicOS, hãy cho phép ứng dụng tự khởi chạy để dịch vụ bật lại sau khi khởi động máy. Gemini chỉ mở được khi Google đang là trợ lý mặc định; nếu bị từ chối, màn hình sẽ mở ứng dụng Gemini thay thế. Micro thường trực tốn pin, hãy tắt khi không dùng.</string>
     <string name="cs_wake_channel">Nghe “OK Google”</string>
     <string name="cs_wake_notification_title">Đang nghe “%1$s”</string>
     <string name="cs_wake_notification_text">Nói “OK Google” để mở Gemini.</string>

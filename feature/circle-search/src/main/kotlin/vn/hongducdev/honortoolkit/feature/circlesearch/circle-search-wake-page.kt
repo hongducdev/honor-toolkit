@@ -56,7 +56,6 @@ internal fun WakePage(state: CircleSearchUiState, viewModel: CircleSearchViewMod
     }
 
     SettingsGroup(stringResource(R.string.cs_wake_heading)) {
-        SettingsNote(stringResource(R.string.cs_wake_body))
         SettingsNote(
             stringResource(
                 R.string.cs_wake_status_line,
@@ -121,9 +120,5 @@ internal fun WakePage(state: CircleSearchUiState, viewModel: CircleSearchViewMod
                 Text(stringResource(R.string.cs_wake_test))
             }
         }
-        SettingsNote(stringResource(R.string.cs_wake_test_hint))
-    }
-    SettingsGroup(stringResource(R.string.cs_wake_notes_heading)) {
-        SettingsNote(stringResource(R.string.cs_wake_notes))
     }
 }

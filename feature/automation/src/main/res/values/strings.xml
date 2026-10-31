@@ -5,7 +5,6 @@
     <string name="automation_add">Thêm quy tắc</string>
     <string name="automation_refresh">Tải lại</string>
     <string name="automation_undo">Hoàn tác lần ghi gần nhất</string>
-    <string name="automation_intro">Quy tắc theo sự kiện chạy một lần, quy tắc theo trạng thái có hành động khi vào và khi thoát. Quy tắc chạy được cả khi máy khoá, nên đừng ghi thông tin bí mật vào tên hoặc lệnh. Hành động cần ADB bị bỏ qua khi ADB chưa kết nối. Nếu quy tắc không chạy lúc tắt màn hình, hãy tắt tối ưu pin cho Honor Toolkit.</string>
     <string name="automation_rules">Quy tắc</string>
     <string name="automation_no_rules">Chưa có quy tắc nào. Bấm “Thêm quy tắc” để bắt đầu.</string>
     <string name="automation_edit">Sửa</string>
@@ -20,7 +19,6 @@
     <string name="automation_log">Nhật ký</string>
     <string name="automation_log_empty">Chưa có lần chạy nào.</string>
     <string name="automation_log_clear">Xoá nhật ký</string>
-    <string name="automation_log_privacy">Nhật ký chỉ ghi tên quy tắc, hành động và kết quả. Nội dung thông báo không bao giờ được lưu.</string>
 
     <string name="automation_editor_new">Quy tắc mới</string>
     <string name="automation_editor_name">Tên quy tắc</string>
@@ -30,10 +28,10 @@
     <string name="automation_editor_no_actions">Chưa có hành động. Quy tắc phải có ít nhất một hành động.</string>
     <string name="automation_editor_choose_trigger">Chọn điều kiện</string>
     <string name="automation_editor_choose_action">Chọn hành động</string>
-    <string name="automation_editor_confirm_advanced">Khoá “%1$s” không nằm trong danh mục Tune. Ghi sai khoá có thể làm hỏng cài đặt hệ thống. Khoá nguy hiểm (ADB, trợ năng, bàn phím mặc định…) vẫn bị chặn.</string>
+    <string name="automation_editor_confirm_advanced">Khoá “%1$s” không nằm trong danh mục Tune; ghi sai có thể làm hỏng cài đặt hệ thống. Khoá nguy hiểm vẫn bị chặn.</string>
     <string name="automation_editor_advanced_on">Nâng cao</string>
-    <string name="automation_editor_advanced_desc">Cho phép khoá ngoài danh mục Tune, sau khi xác nhận.</string>
-    <string name="automation_editor_shell_note">Lệnh chỉ chạy khi ADB đang kết nối. Lệnh chạy đúng như bạn gõ: không có biến SSID hay nội dung thông báo được thay vào.</string>
+    <string name="automation_editor_advanced_desc">Cho phép khoá ngoài danh mục Tune.</string>
+    <string name="automation_editor_shell_note">Chỉ chạy khi ADB đang kết nối, đúng như bạn gõ.</string>
     <string name="automation_editor_battery_dropping">Khi pin xuống dưới</string>
     <string name="automation_editor_battery_rising">Khi pin lên trên</string>
     <string name="automation_editor_percent">Mức pin (%)</string>
@@ -68,7 +66,7 @@
     <string name="automation_editor_remove_action">Xoá hành động</string>
     <string name="automation_editor_pick">Chọn</string>
     <string name="automation_editor_add_short">Thêm</string>
-    <string name="automation_editor_key_warning">Khoá này không có trong danh mục Tune. Chỉ dùng khi bạn biết chắc tác dụng.</string>
+    <string name="automation_editor_key_warning">Khoá này không có trong danh mục Tune.</string>
 
     <string name="automation_trigger_charger">Cắm hoặc rút sạc</string>
     <string name="automation_trigger_battery">Mức pin</string>
@@ -121,23 +119,23 @@
 
     <string name="automation_perm_heading">Cần cấp quyền</string>
     <string name="automation_perm_accessibility">Theo dõi ứng dụng</string>
-    <string name="automation_perm_accessibility_desc">Dùng dịch vụ trợ năng để biết khi một ứng dụng được mở hoặc đóng. Dịch vụ không đọc nội dung màn hình.</string>
+    <string name="automation_perm_accessibility_desc">Biết khi một ứng dụng mở hoặc đóng, không đọc nội dung màn hình.</string>
     <string name="automation_perm_notifications">Truy cập thông báo</string>
-    <string name="automation_perm_notifications_desc">Cần để quy tắc nhận được thông báo mới. Nội dung chỉ dùng để so từ khoá, không lưu lại.</string>
+    <string name="automation_perm_notifications_desc">Nhận thông báo mới để so từ khoá, không lưu lại.</string>
     <string name="automation_perm_location">Vị trí</string>
-    <string name="automation_perm_location_desc">Cần cho quy tắc theo vùng và để đọc tên Wi-Fi (SSID).</string>
+    <string name="automation_perm_location_desc">Cho quy tắc theo vùng và đọc tên Wi-Fi.</string>
     <string name="automation_perm_overlay">Hiển thị trên ứng dụng khác</string>
-    <string name="automation_perm_overlay_desc">Cần để mở ứng dụng từ nền khi quy tắc chạy lúc bạn đang dùng app khác.</string>
+    <string name="automation_perm_overlay_desc">Mở ứng dụng từ nền khi quy tắc chạy.</string>
     <string name="automation_perm_post_notifications">Gửi thông báo</string>
     <string name="automation_perm_post_notifications_desc">Cần cho hành động “Gửi thông báo”.</string>
     <string name="automation_perm_bluetooth">Bluetooth</string>
-    <string name="automation_perm_bluetooth_desc">Cần để nhận sự kiện kết nối và đọc tên thiết bị đã ghép.</string>
+    <string name="automation_perm_bluetooth_desc">Nhận sự kiện kết nối và đọc tên thiết bị đã ghép.</string>
     <string name="automation_perm_exact_alarm">Báo thức chính xác</string>
-    <string name="automation_perm_exact_alarm_desc">Cần để quy tắc theo giờ chạy đúng phút; nếu không, MagicOS có thể trễ vài phút.</string>
+    <string name="automation_perm_exact_alarm_desc">Để quy tắc theo giờ chạy đúng phút.</string>
     <string name="automation_perm_dnd">Chế độ không làm phiền</string>
-    <string name="automation_perm_dnd_desc">Cần để đặt chế độ âm thanh “Im lặng” thay vì chỉ rung.</string>
+    <string name="automation_perm_dnd_desc">Để đặt chế độ âm thanh “Im lặng”.</string>
     <string name="automation_perm_calendar">Lịch</string>
-    <string name="automation_perm_calendar_desc">Cần để biết khi nào có sự kiện lịch đang diễn ra. Chỉ đọc giờ và tiêu đề để so khớp, không lưu lại.</string>
+    <string name="automation_perm_calendar_desc">Biết khi có sự kiện lịch, chỉ đọc giờ và tiêu đề.</string>
     <string name="automation_perm_open_settings">Mở cài đặt</string>
     <string name="automation_perm_grant">Cấp quyền</string>
 
@@ -155,6 +153,6 @@
     <string name="automation_service_stop">Tạm dừng</string>
     <string name="automation_action_channel">Thông báo từ quy tắc</string>
     <string name="automation_accessibility_label">Honor Toolkit – Theo dõi ứng dụng</string>
-    <string name="automation_accessibility_description">Cho quy tắc tự động biết khi một ứng dụng được mở hoặc đóng. Dịch vụ không đọc nội dung màn hình.</string>
+    <string name="automation_accessibility_description">Biết khi một ứng dụng mở hoặc đóng, không đọc nội dung màn hình.</string>
     <string name="automation_notification_listener_label">Honor Toolkit – Theo dõi thông báo</string>
 </resources>

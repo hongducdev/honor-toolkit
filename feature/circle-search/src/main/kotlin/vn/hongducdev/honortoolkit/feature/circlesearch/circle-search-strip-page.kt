@@ -46,7 +46,6 @@ internal fun StripPage(state: CircleSearchUiState, viewModel: CircleSearchViewMo
     val context = LocalContext.current
     val notificationPermission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { viewModel.refresh() }
     SettingsGroup(stringResource(R.string.cs_strip_heading)) {
-        SettingsNote(stringResource(R.string.cs_strip_hint))
         SettingsNote(
             stringResource(
                 when {
@@ -90,7 +89,6 @@ internal fun StripPage(state: CircleSearchUiState, viewModel: CircleSearchViewMo
         SwitchRow(stringResource(R.string.cs_strip_visible_label), state.stripVisible, onChange = viewModel::setStripVisible)
     }
     SettingsGroup(stringResource(R.string.cs_strip_gestures_heading)) {
-        SettingsNote(stringResource(R.string.cs_strip_gestures_note))
         StripGesture.entries.forEach { gesture ->
             StripActionRow(
                 gesture = gesture,
