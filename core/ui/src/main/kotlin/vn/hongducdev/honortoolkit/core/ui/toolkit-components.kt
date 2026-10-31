@@ -12,6 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -100,19 +108,33 @@ fun SettingsNote(text: String) {
 }
 
 @Composable
-fun SwitchRow(label: String, checked: Boolean, onChange: (Boolean) -> Unit) {
+fun SwitchRow(
+    label: String,
+    checked: Boolean,
+    description: String? = null,
+    enabled: Boolean = true,
+    onChange: (Boolean) -> Unit,
+) {
     val haptics = LocalHapticFeedback.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .toggleable(value = checked, role = Role.Switch) { haptics.performHapticFeedback(HapticFeedbackType.ContextClick); onChange(it) }
+            .toggleable(enabled = enabled, value = checked, role = Role.Switch) {
+                haptics.performHapticFeedback(HapticFeedbackType.ContextClick)
+                onChange(it)
+            }
             .padding(horizontal = 20.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(label, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
-        Switch(checked = checked, onCheckedChange = null)
+        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(label, style = MaterialTheme.typography.bodyLarge)
+            if (description != null) {
+                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        Switch(checked = checked, onCheckedChange = null, enabled = enabled)
     }
 }
 
@@ -149,11 +171,28 @@ fun groupedRowShape(index: Int, lastIndex: Int, outer: Dp = 24.dp, inner: Dp = 4
 /** Rounded search box shared by the app-list pages. */
 @Composable
 fun ToolkitSearchField(value: String, onValueChange: (String) -> Unit, label: String, modifier: Modifier = Modifier) {
+    val focusManager = LocalFocusManager.current
+    val keyboard = LocalSoftwareKeyboardController.current
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
+        placeholder = { Text(label) },
+        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+        trailingIcon = if (value.isNotEmpty()) {
+            {
+                IconButton(onClick = { onValueChange("") }) {
+                    Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.search_clear))
+                }
+            }
+        } else {
+            null
+        },
         singleLine = true,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = {
+            keyboard?.hide()
+            focusManager.clearFocus()
+        }),
         shape = CircleShape,
         modifier = modifier.fillMaxWidth(),
     )
@@ -162,14 +201,21 @@ fun ToolkitSearchField(value: String, onValueChange: (String) -> Unit, label: St
 /** Cookie-shaped badge showing the first letter of [label], used as a stand-in app icon. */
 @Composable
 fun LetterAvatar(label: String, modifier: Modifier = Modifier, size: Dp = 44.dp) {
+    val scheme = MaterialTheme.colorScheme
+    val tints = listOf(
+        scheme.secondaryContainer to scheme.onSecondaryContainer,
+        scheme.primaryContainer to scheme.onPrimaryContainer,
+        scheme.tertiaryContainer to scheme.onTertiaryContainer,
+    )
+    val (container, content) = tints[Math.floorMod(label.hashCode(), tints.size)]
     Box(
-        modifier = modifier.size(size).background(MaterialTheme.colorScheme.secondaryContainer, CookieShape),
+        modifier = modifier.size(size).background(container, CookieShape),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             label.firstOrNull()?.uppercase().orEmpty(),
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            color = content,
         )
     }
 }

@@ -5,8 +5,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import vn.hongducdev.honortoolkit.core.ui.LocalToolbarClearance
 import vn.hongducdev.honortoolkit.core.ui.LetterAvatar
 import vn.hongducdev.honortoolkit.core.ui.groupedRowShape
@@ -16,9 +16,10 @@ import androidx.compose.ui.graphics.Shape
 import vn.hongducdev.honortoolkit.core.ui.ToolkitSearchField
 import vn.hongducdev.honortoolkit.core.ui.ToolkitLoadingIndicator
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -53,7 +54,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,7 +67,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: DebloatViewModel = viewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
@@ -98,20 +98,20 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
             backDescription = stringResource(R.string.debloat_back),
             onBack = onBack,
             actions = listOf(
+                ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.debloat_refresh), viewModel::refresh),
                 ToolbarAction(Icons.Rounded.Restore, stringResource(R.string.debloat_restore_all), viewModel::requestRestoreAll),
                 ToolbarAction(Icons.Rounded.FileDownload, stringResource(R.string.debloat_export)) { exportLauncher.launch("honor-toolkit-debloat.txt") },
             ),
-            fab = ToolbarAction(Icons.Rounded.Refresh, stringResource(R.string.debloat_refresh), viewModel::refresh),
         ),
     )
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        snackbarHost = { SnackbarHost(snackbar) },
+        snackbarHost = { SnackbarHost(snackbar, modifier = Modifier.padding(bottom = LocalToolbarClearance.current)) },
     ) { padding ->
         Column(modifier = Modifier.padding(padding).padding(start = 16.dp, end = 16.dp, top = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ToolkitSearchField(state.query, viewModel::setQuery, stringResource(R.string.debloat_search))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(
                     selected = state.filter == DebloatFilter.Enabled,
                     onClick = { viewModel.setFilter(DebloatFilter.Enabled) },
@@ -122,28 +122,25 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
                     onClick = { viewModel.setFilter(DebloatFilter.Disabled) },
                     label = { Text(stringResource(R.string.debloat_filter_disabled)) },
                 )
+                FilterChip(
+                    selected = state.filter == DebloatFilter.Suggested,
+                    onClick = { viewModel.setFilter(DebloatFilter.Suggested) },
+                    label = { Text(stringResource(R.string.debloat_filter_suggested)) },
+                )
             }
             if (state.loading) ToolkitLoadingIndicator()
             val visible = state.visible
             if (visible.isEmpty() && !state.loading) {
                 Text(stringResource(R.string.debloat_empty), style = MaterialTheme.typography.bodyMedium)
             }
-            Box(modifier = Modifier.fillMaxSize()) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = LocalToolbarClearance.current),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    itemsIndexed(visible, key = { _, entry -> entry.packageName }) { index, entry ->
-                        PackageRow(entry, groupedRowShape(index, visible.lastIndex), onDisable = { viewModel.requestDisable(entry) }, onEnable = { viewModel.enable(entry) })
-                    }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = LocalToolbarClearance.current),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                itemsIndexed(visible, key = { _, entry -> entry.packageName }) { index, entry ->
+                    PackageRow(entry, groupedRowShape(index, visible.lastIndex), onDisable = { viewModel.requestDisable(entry) }, onEnable = { viewModel.enable(entry) })
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(20.dp)
-                        .background(Brush.verticalGradient(listOf(MaterialTheme.colorScheme.surface, Color.Transparent))),
-                )
             }
         }
     }
@@ -162,7 +159,12 @@ fun DebloatScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: 
         AlertDialog(
             onDismissRequest = viewModel::cancelRestoreAll,
             title = { Text(stringResource(R.string.debloat_restore_title, entries.size)) },
-            text = { Text(stringResource(R.string.debloat_restore_body, entries.joinToString("\n") { "• ${it.label}" })) },
+            text = {
+                Text(
+                    stringResource(R.string.debloat_restore_body, entries.joinToString("\n") { "• ${it.label}" }),
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                )
+            },
             confirmButton = { Button(onClick = viewModel::confirmRestoreAll) { Text(stringResource(R.string.debloat_restore_ok)) } },
             dismissButton = { OutlinedButton(onClick = viewModel::cancelRestoreAll) { Text(stringResource(R.string.debloat_confirm_cancel)) } },
         )
@@ -187,12 +189,21 @@ private fun PackageRow(entry: PackageEntry, shape: Shape, onDisable: () -> Unit,
         supportingContent = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(entry.packageName, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    statusText(entry),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = badgeContent,
-                    modifier = Modifier.background(badgeContainer, CircleShape).padding(horizontal = 8.dp, vertical = 2.dp),
-                )
+                if (entry.protection != null || entry.verified) {
+                    Text(
+                        statusText(entry),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = badgeContent,
+                        modifier = Modifier.background(badgeContainer, RoundedCornerShape(12.dp)).padding(horizontal = 8.dp, vertical = 2.dp),
+                    )
+                }
+                entry.suggestion?.let { suggestion ->
+                    Text(
+                        suggestionText(suggestion),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = scheme.onSurfaceVariant,
+                    )
+                }
             }
         },
         trailingContent = {
@@ -210,6 +221,14 @@ private fun statusText(entry: PackageEntry): String = when {
     entry.protection == ProtectionReason.InUse -> stringResource(R.string.debloat_protected_in_use)
     entry.verified -> stringResource(R.string.debloat_verified)
     else -> stringResource(R.string.debloat_not_assessed)
+}
+
+@Composable
+private fun suggestionText(suggestion: PackageSuggestion): String {
+    val level = stringResource(
+        if (suggestion.level == SuggestionLevel.Safe) R.string.debloat_suggestion_safe else R.string.debloat_suggestion_usually,
+    )
+    return "$level: ${stringResource(suggestion.reason)}"
 }
 
 @Composable

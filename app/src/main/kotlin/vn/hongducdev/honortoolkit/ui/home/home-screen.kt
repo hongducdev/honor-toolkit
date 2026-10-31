@@ -32,6 +32,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
@@ -121,14 +122,19 @@ fun HomeScreen(
                     stringResource(R.string.home_circle_search_description),
                     onOpenCircleSearch,
                 )
-                if (state.adb == AdbState.Connected) {
-                    NavRow(
-                        Icons.Rounded.Apps,
-                        stringResource(R.string.home_open_apps),
-                        stringResource(R.string.home_apps_description),
-                        onOpenApps,
-                    )
-                }
+                val adbConnected = state.adb == AdbState.Connected
+                NavRow(
+                    Icons.Rounded.Apps,
+                    stringResource(R.string.home_open_apps),
+                    stringResource(if (adbConnected) R.string.home_apps_description else R.string.home_apps_needs_adb),
+                    if (adbConnected) onOpenApps else onOpenConnection,
+                )
+                NavRow(
+                    Icons.Rounded.Info,
+                    stringResource(R.string.device_info_title),
+                    stringResource(R.string.home_device_info_description),
+                    onOpenDeviceInfo,
+                )
                 NavRow(
                     Icons.Rounded.Share,
                     stringResource(R.string.home_open_quick_share),

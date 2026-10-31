@@ -23,6 +23,7 @@
 
     <string name="home_tools_heading">Công cụ</string>
     <string name="nav_home">Trang chủ</string>
+    <string name="toolbar_more">Thêm tùy chọn</string>
     <string name="nav_circle_search">Circle</string>
     <string name="nav_apps">Ứng dụng</string>
     <string name="nav_debloat">Gỡ app</string>
@@ -34,12 +35,17 @@
     <string name="home_open_quick_share">Quick Share</string>
     <string name="home_quick_share_description">Nhận file từ Samsung, Pixel qua Wi-Fi</string>
     <string name="nav_notification_fix">Thông báo</string>
+    <string name="nav_tune">Tinh chỉnh</string>
+    <string name="home_open_tune">Tinh chỉnh MagicOS</string>
+    <string name="home_tune_description">Tần số quét, thông báo hệ thống, dọn giao diện Trung, GPS và VoLTE</string>
     <string name="nav_connection">ADB</string>
     <string name="nav_update">Cập nhật</string>
     <string name="back">Quay lại</string>
     <string name="home_open_connection">Kết nối ADB</string>
     <string name="home_connection_description">Ghép cặp, kết nối lại và kiểm tra quyền shell</string>
     <string name="apps_title">Ứng dụng</string>
+    <string name="home_apps_needs_adb">Cần kết nối ADB trước. Chạm để ghép cặp hoặc kết nối lại</string>
+    <string name="home_device_info_description">Model, phiên bản hệ thống và thông số máy</string>
     <string name="home_open_apps">Ứng dụng</string>
     <string name="home_apps_description">Fix thông báo, gỡ ứng dụng hệ thống và quản lý quyền</string>
     <string name="home_open_debloat">Gỡ ứng dụng hệ thống</string>

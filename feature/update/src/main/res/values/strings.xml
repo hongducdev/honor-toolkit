@@ -29,5 +29,6 @@
     <string name="update_auto_check_hint">Ứng dụng đọc bản phát hành mới nhất từ GitHub rồi mở trình cài đặt của Android. Tệp tải về được kiểm tra mã SHA-256 và tên gói trước khi cài.</string>
     <string name="update_permission_hint">Android cần quyền “Cài đặt ứng dụng không rõ nguồn gốc” cho Honor Toolkit. Mở cài đặt, bật quyền rồi quay lại bấm Cài đặt.</string>
     <string name="update_open_release">Mở trang phát hành</string>
+    <string name="update_open_release_desc">Xem đầy đủ trong trình duyệt</string>
     <string name="update_release_notes_heading">Có gì mới</string>
 </resources>

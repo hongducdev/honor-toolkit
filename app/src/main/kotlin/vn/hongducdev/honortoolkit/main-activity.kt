@@ -25,6 +25,9 @@ import vn.hongducdev.honortoolkit.ui.navigation.SubPageSettleSpec
 import vn.hongducdev.honortoolkit.ui.navigation.subPageUnderlay
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
@@ -40,6 +43,7 @@ import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.SystemUpdate
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.CompositionLocalProvider
@@ -60,13 +64,16 @@ import vn.hongducdev.honortoolkit.core.ui.LocalToolbarHost
 import vn.hongducdev.honortoolkit.core.ui.ToolbarHost
 import vn.hongducdev.honortoolkit.core.ui.rememberMotionEnabled
 import vn.hongducdev.honortoolkit.ui.navigation.bottomFade
+import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchPageScreen
 import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchScreen
+import vn.hongducdev.honortoolkit.feature.circlesearch.CsPage
 import vn.hongducdev.honortoolkit.feature.debloat.DebloatScreen
 import vn.hongducdev.honortoolkit.feature.gmscheck.GmsCheckScreen
 import vn.hongducdev.honortoolkit.feature.notificationfix.NotificationFixScreen
 import vn.hongducdev.honortoolkit.feature.permissions.PermissionsScreen
 import vn.hongducdev.honortoolkit.feature.quickshare.QuickShareOfferDialog
 import vn.hongducdev.honortoolkit.feature.quickshare.QuickShareScreen
+import vn.hongducdev.honortoolkit.feature.tune.TuneScreen
 import vn.hongducdev.honortoolkit.feature.update.UpdateScreen
 import vn.hongducdev.honortoolkit.ui.apps.AppsScreen
 import vn.hongducdev.honortoolkit.ui.home.ConnectionScreen
@@ -90,14 +97,26 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     Debloat(R.string.nav_debloat, Icons.Rounded.Apps, inToolbar = false),
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
     GmsCheck(R.string.nav_gms_check, Icons.Rounded.Apps, inToolbar = false),
+    Tune(R.string.nav_tune, Icons.Rounded.Tune, inToolbar = false),
     QuickShare(R.string.nav_quick_share, Icons.Rounded.Share, inToolbar = false),
     Update(R.string.nav_update, Icons.Rounded.SystemUpdate, inToolbar = false),
+    CircleTrigger(R.string.nav_circle_search, Icons.Rounded.Search, inToolbar = false),
+    CircleWake(R.string.nav_circle_search, Icons.Rounded.Search, inToolbar = false),
+    CircleLauncher(R.string.nav_circle_search, Icons.Rounded.Search, inToolbar = false),
+    CircleStrip(R.string.nav_circle_search, Icons.Rounded.Search, inToolbar = false),
     ;
 
-    val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions || this == GmsCheck
+    val needsAdb: Boolean get() = this == Apps || this == NotificationFix || this == Debloat || this == Permissions || this == GmsCheck || this == Tune
 }
 
 private fun Screen?.opensFromTop(): Boolean = this == Screen.DeviceInfo || this == Screen.DeviceUsage
+
+private fun CsPage.asScreen(): Screen = when (this) {
+    CsPage.Trigger -> Screen.CircleTrigger
+    CsPage.Wake -> Screen.CircleWake
+    CsPage.Launcher -> Screen.CircleLauncher
+    CsPage.Strip -> Screen.CircleStrip
+}
 
 private val ToolbarHeight = 64.dp
 private val ToolbarBottomMargin = 12.dp
@@ -122,7 +141,7 @@ class MainActivity : ComponentActivity() {
                 val motionEnabled = rememberMotionEnabled()
 
                 // Apps and its sub-pages need ADB; leave them if the connection drops while one is open.
-                LaunchedEffect(connected) { if (!connected) subPage = null }
+                LaunchedEffect(connected) { if (!connected && subPage?.needsAdb == true) subPage = null }
                 LaunchedEffect(tabs.size) { if (pagerState.currentPage >= tabs.size) pagerState.scrollToPage(0) }
 
                 val dragged by pagerState.interactionSource.collectIsDraggedAsState()
@@ -167,13 +186,15 @@ class MainActivity : ComponentActivity() {
                 val toolbarHost = remember { ToolbarHost() }
                 val destinations = remember(tabs) { tabs.map { ToolbarDestination(it, it.labelRes, it.icon) } }
                 // Screens scroll behind the toolbar; each leaves this much room at its end (Scaffold already pads the navigation bar).
-                val toolbarClearance = ToolbarHeight + ToolbarBottomMargin + ToolbarContentGap
-                val fadeHeight = toolbarClearance + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + ToolbarFadeExtra
+                // While the keyboard is up the toolbar sits beneath it, so the content needs neither its clearance nor its fade.
+                val imeVisible = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+                val toolbarClearance = if (imeVisible) ToolbarContentGap else ToolbarHeight + ToolbarBottomMargin + ToolbarContentGap
+                val fadeHeight = if (imeVisible) 0.dp else toolbarClearance + WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + ToolbarFadeExtra
                 val fadeOverlay = MaterialTheme.colorScheme.background.copy(alpha = ToolbarFadeAlpha)
                 QuickShareOfferDialog()
                 Box {
                     CompositionLocalProvider(LocalToolbarClearance provides toolbarClearance, LocalToolbarHost provides toolbarHost) {
-                        Box(modifier = Modifier.bottomFade(height = fadeHeight, overlay = fadeOverlay)) {
+                        Box(modifier = Modifier.imePadding().bottomFade(height = fadeHeight, overlay = fadeOverlay)) {
                             HorizontalPager(
                                 state = pagerState,
                                 modifier = Modifier.fillMaxSize().subPageUnderlay(fromTop = shownPage.opensFromTop()) { reveal.value },
@@ -189,12 +210,13 @@ class MainActivity : ComponentActivity() {
                                         onOpenQuickShare = { subPage = Screen.QuickShare },
                                         onOpenUpdate = { subPage = Screen.Update },
                                     )
-                                    Screen.CircleSearch -> CircleSearchScreen()
+                                    Screen.CircleSearch -> CircleSearchScreen(onOpenPage = { subPage = it.asScreen() })
                                     Screen.Apps -> AppsScreen(
                                         onOpenNotificationFix = { subPage = Screen.NotificationFix },
                                         onOpenDebloat = { subPage = Screen.Debloat },
                                         onOpenPermissions = { subPage = Screen.Permissions },
                                         onOpenGmsCheck = { subPage = Screen.GmsCheck },
+                                        onOpenTune = { subPage = Screen.Tune },
                                     )
                                     else -> Unit
                                 }
@@ -209,8 +231,13 @@ class MainActivity : ComponentActivity() {
                                     Screen.Debloat -> DebloatScreen(onBack = close)
                                     Screen.Permissions -> PermissionsScreen(onBack = close)
                                     Screen.GmsCheck -> GmsCheckScreen(onBack = close)
+                                    Screen.Tune -> TuneScreen(onBack = close)
                                     Screen.QuickShare -> QuickShareScreen(onBack = close)
                                     Screen.Update -> UpdateScreen(onBack = close)
+                                    Screen.CircleTrigger -> CircleSearchPageScreen(CsPage.Trigger, onBack = close)
+                                    Screen.CircleWake -> CircleSearchPageScreen(CsPage.Wake, onBack = close)
+                                    Screen.CircleLauncher -> CircleSearchPageScreen(CsPage.Launcher, onBack = close)
+                                    Screen.CircleStrip -> CircleSearchPageScreen(CsPage.Strip, onBack = close)
                                     else -> Unit
                                 }
                             }

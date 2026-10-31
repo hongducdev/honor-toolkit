@@ -77,7 +77,6 @@ fun UpdateScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: U
             if (state.checking) {
                 SettingsGroup(null) {
                     SettingsRow { ToolkitLoadingIndicator() }
-                    SettingsRow { Text(stringResource(R.string.update_checking), style = MaterialTheme.typography.bodyMedium) }
                 }
             }
 
@@ -88,7 +87,7 @@ fun UpdateScreen(onBack: () -> Unit, modifier: Modifier = Modifier, viewModel: U
             }
 
             SettingsGroup(title = null) {
-                SwitchRow(stringResource(R.string.update_auto_check), state.autoCheck, viewModel::setAutoCheck)
+                SwitchRow(stringResource(R.string.update_auto_check), state.autoCheck, onChange = viewModel::setAutoCheck)
             }
             Text(
                 stringResource(R.string.update_auto_check_hint),
@@ -135,13 +134,13 @@ private fun NewVersionSection(state: UpdateUiState, update: AvailableUpdate, vie
         SettingsRow {
             Text(stringResource(R.string.update_release_notes_heading), style = MaterialTheme.typography.titleSmall)
             Text(
-                update.notes.ifBlank { stringResource(R.string.update_notes_empty) }.take(MaxNotesChars),
+                releaseNotesToPlainText(update.notes).ifBlank { stringResource(R.string.update_notes_empty) }.take(MaxNotesChars),
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(assetLine(update, context), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         if (update.pageUrl.isNotBlank()) {
-            NavRow(Icons.AutoMirrored.Rounded.OpenInNew, stringResource(R.string.update_open_release), update.pageUrl, viewModel::openReleasePage)
+            NavRow(Icons.AutoMirrored.Rounded.OpenInNew, stringResource(R.string.update_open_release), stringResource(R.string.update_open_release_desc), viewModel::openReleasePage)
         }
     }
 

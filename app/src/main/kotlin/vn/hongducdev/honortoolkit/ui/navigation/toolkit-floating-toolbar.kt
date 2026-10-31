@@ -8,6 +8,14 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import vn.hongducdev.honortoolkit.R
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -72,6 +80,13 @@ private const val CompactDestinationCount = 3
 // A fifth tab plus a floating action makes the bar wider than a phone and the layout jumps.
 private const val MaxTabs = 4
 
+// Measured on a 365dp phone: side margins, the bar's own padding and the gap before the FAB add up to this much.
+private const val ScreenChromeDp = 42
+private const val BackButtonDp = 48
+private const val ActionButtonDp = 48
+private const val FabDp = 56
+private const val MinTitleDp = 64
+
 // The overload with a floating action lays the bar out taller than the one without, which lifts it off the bottom edge.
 private val BarHeight = 64.dp
 
@@ -110,7 +125,7 @@ fun <T : Any> ToolkitFloatingToolbar(
         ) { isPage ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isPage && spec is ToolbarSpec.Page) {
-                    PageContent(spec, haptics)
+                    PageContent(spec, haptics, screenWidthDp)
                 } else {
                     destinations.forEach { destination ->
                         key(destination.id) {
@@ -155,8 +170,13 @@ fun <T : Any> ToolkitFloatingToolbar(
 }
 
 @Composable
-private fun PageContent(spec: ToolbarSpec.Page, haptics: HapticFeedback) {
+private fun PageContent(spec: ToolbarSpec.Page, haptics: HapticFeedback, screenWidthDp: Int) {
     val colors = MaterialTheme.colorScheme
+    val maxInlineActions = if (spec.fab != null) 1 else 2
+    val overflow = spec.actions.size > maxInlineActions
+    val buttonCount = if (overflow) 1 else spec.actions.size
+    val titleMax = (screenWidthDp - ScreenChromeDp - BackButtonDp - ActionButtonDp * buttonCount - if (spec.fab != null) FabDp else 0)
+        .coerceAtLeast(MinTitleDp).dp
     FilledIconButton(
         onClick = {
             haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
@@ -171,11 +191,38 @@ private fun PageContent(spec: ToolbarSpec.Page, haptics: HapticFeedback) {
         text = spec.title,
         style = MaterialTheme.typography.titleMedium,
         maxLines = 1,
-        modifier = Modifier.widthIn(min = 96.dp, max = 200.dp).padding(horizontal = 12.dp).basicMarquee(),
+        modifier = Modifier.widthIn(min = 96.dp.coerceAtMost(titleMax), max = titleMax).padding(horizontal = 12.dp).basicMarquee(iterations = 1),
     )
-    spec.actions.forEach { action ->
-        IconButton(onClick = { haptics.performHapticFeedback(HapticFeedbackType.SegmentTick); action.onClick() }) {
-            Icon(action.icon, contentDescription = action.description)
+    if (overflow) {
+        OverflowMenu(spec.actions, haptics)
+    } else {
+        spec.actions.forEach { action ->
+            IconButton(onClick = { haptics.performHapticFeedback(HapticFeedbackType.SegmentTick); action.onClick() }) {
+                Icon(action.icon, contentDescription = action.description)
+            }
+        }
+    }
+}
+
+@Composable
+private fun OverflowMenu(actions: List<ToolbarAction>, haptics: HapticFeedback) {
+    var open by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { haptics.performHapticFeedback(HapticFeedbackType.SegmentTick); open = true }) {
+            Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.toolbar_more))
+        }
+        DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            actions.forEach { action ->
+                DropdownMenuItem(
+                    text = { Text(action.description) },
+                    leadingIcon = { Icon(action.icon, contentDescription = null) },
+                    onClick = {
+                        open = false
+                        haptics.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                        action.onClick()
+                    },
+                )
+            }
         }
     }
 }
