@@ -8,3 +8,6 @@ keystore.properties
 .idea/
 *.iml
 .scratch/
+
+# Local planning notes
+plans/
