@@ -86,6 +86,27 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 | `tune-view-model.kt` | Loading state, current values, messages, restore confirmation |
 | `tune-screen.kt` | Compose sub-page opened from the Apps tab (switch rows, chips, GPS action, restore dialog) |
 
+## `:feature:automation` (`feature/automation/src/main/kotlin/vn/hongducdev/honortoolkit/feature/automation`)
+
+| File | Concern |
+| --- | --- |
+| `automation-model.kt` | `AutomationRule`, sealed `Trigger`/`Action`/`TriggerEvent`, matching, validation and Vietnamese summaries |
+| `automation-json.kt` | Versioned `org.json` encoding; a broken rule or action is dropped without losing the list |
+| `automation-store.kt` | Device-protected `SharedPreferences`: rules, 60-line journal, undo snapshots (`SettingSnapshot`) |
+| `automation-engine.kt` | Sequential dispatch, running-rule and 2 s loop guards, `canRun` permission gate, per-step log |
+| `automation-settings.kt` | `Settings.*` read/write with read-back, plus the allowlist/denylist policy |
+| `automation-actions.kt` | Android executor: settings, ringer, launch app, notification, wait, ADB shell, Tune feature, nav-bar strip, Circle to Search; locked/unlocked skips |
+| `automation-runtime.kt` | Process-wide engine; dispatches from services and receivers, supports `goAsync` completion |
+| `automation-foreground-service.kt` | `specialUse` service, battery/power/screen/Bluetooth/clock receivers, Wi-Fi callback, quiet notification, `sync()` start/stop |
+| `automation-alarms.kt`, `automation-location.kt`, `automation-schedule-store.kt` | Time alarms and proximity alerts per rule, rescheduling/cancelling, receiving and dispatch |
+| `automation-boot-receiver.kt` | `LOCKED_BOOT_COMPLETED`, `BOOT_COMPLETED`, `MY_PACKAGE_REPLACED` restart |
+| `automation-accessibility-service.kt` | App open/close via window-state changes, filtered by package in code |
+| `automation-notification-listener.kt` | Notification trigger; text only in memory for keyword matching |
+| `automation-permissions.kt` | Requirement set per trigger/action, grant checks, settings intents |
+| `automation-view-model.kt` | Rule list/editor state, toggle/save/delete, undo, runtime sync |
+| `automation-screen.kt`, `automation-editor-screen.kt` | Compose list (permission cards, rules, journal) and rule editor (trigger/action pickers) |
+| `src/test` | JSON round-trip, engine ordering/queue/loop/failure/permission, settings policy, trigger matching and rule validation |
+
 ## `:feature:debloat` (`feature/debloat/src/main/kotlin/vn/hongducdev/honortoolkit/feature/debloat`)
 
 | File | Concern |

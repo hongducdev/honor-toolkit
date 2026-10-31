@@ -23,6 +23,7 @@ After the first install the app updates itself from those same releases.
 | Permissions | Grants and revokes runtime permissions and AppOps for third-party apps, reads every change back |
 | Notification fix | Applies notification and standby-bucket fixes through ADB, reports each step |
 | MagicOS tune | Refresh rate, animation scale, system-wide notification switches, China-UI cleanup, GPS/SUPL and VoLTE/5G, each write read back |
+| Automation | One-condition rules with an ordered action list: charger, battery, screen, Wi-Fi, Bluetooth, clock, app, notification and proximity triggers; settings, ringer, app, notification, wait, ADB shell, Toolkit feature and Circle to Search actions; journal and undo, runs while locked and after reboot |
 | GMS check | Read-only check of Play Services, Services Framework, Play Store and Google accounts |
 | Circle to Search | Assist-session trigger, Quick Settings tile, nav-bar strip, offline "OK Google" wake word |
 | Quick Share | Receives from Samsung and Pixel over Wi-Fi, and sends from the share sheet |

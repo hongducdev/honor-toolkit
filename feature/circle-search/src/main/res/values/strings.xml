@@ -18,6 +18,7 @@
     <string name="source_gemini_icon">biểu tượng Gemini</string>
     <string name="source_wake">OK Google</string>
     <string name="source_test">thử trong ứng dụng</string>
+    <string name="source_automation">quy tắc tự động</string>
 
     <string name="cs_title">Circle to Search</string>
     <string name="cs_page_trigger">Kích hoạt và gán nút</string>

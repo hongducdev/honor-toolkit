@@ -36,6 +36,9 @@
     <string name="home_quick_share_description">Nhận file từ Samsung, Pixel qua Wi-Fi</string>
     <string name="nav_notification_fix">Thông báo</string>
     <string name="nav_tune">Tinh chỉnh</string>
+    <string name="nav_automation">Tự động hoá</string>
+    <string name="home_open_automation">Tự động hoá</string>
+    <string name="home_automation_description">Quy tắc một điều kiện, nhiều hành động: sạc, pin, Wi-Fi, Bluetooth, giờ, ứng dụng, thông báo, vị trí</string>
     <string name="home_open_tune">Tinh chỉnh MagicOS</string>
     <string name="home_tune_description">Tần số quét, thông báo hệ thống, dọn giao diện Trung, GPS và VoLTE</string>
     <string name="nav_connection">ADB</string>

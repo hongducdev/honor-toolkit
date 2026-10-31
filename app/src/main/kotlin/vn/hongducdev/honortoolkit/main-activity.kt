@@ -37,6 +37,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
+import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Notifications
@@ -67,6 +68,7 @@ import vn.hongducdev.honortoolkit.ui.navigation.bottomFade
 import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchPageScreen
 import vn.hongducdev.honortoolkit.feature.circlesearch.CircleSearchScreen
 import vn.hongducdev.honortoolkit.feature.circlesearch.CsPage
+import vn.hongducdev.honortoolkit.feature.automation.AutomationScreen
 import vn.hongducdev.honortoolkit.feature.debloat.DebloatScreen
 import vn.hongducdev.honortoolkit.feature.gmscheck.GmsCheckScreen
 import vn.hongducdev.honortoolkit.feature.notificationfix.NotificationFixScreen
@@ -98,6 +100,7 @@ private enum class Screen(val labelRes: Int, val icon: ImageVector, val inToolba
     Permissions(R.string.nav_permissions, Icons.Rounded.Apps, inToolbar = false),
     GmsCheck(R.string.nav_gms_check, Icons.Rounded.Apps, inToolbar = false),
     Tune(R.string.nav_tune, Icons.Rounded.Tune, inToolbar = false),
+    Automation(R.string.nav_automation, Icons.Rounded.Bolt, inToolbar = false),
     QuickShare(R.string.nav_quick_share, Icons.Rounded.Share, inToolbar = false),
     Update(R.string.nav_update, Icons.Rounded.SystemUpdate, inToolbar = false),
     CircleTrigger(R.string.nav_circle_search, Icons.Rounded.Search, inToolbar = false),
@@ -207,6 +210,7 @@ class MainActivity : ComponentActivity() {
                                         onOpenDeviceInfo = { subPage = Screen.DeviceInfo },
                                         onOpenQuickShare = { subPage = Screen.QuickShare },
                                         onOpenUpdate = { subPage = Screen.Update },
+                                        onOpenAutomation = { subPage = Screen.Automation },
                                     )
                                     Screen.CircleSearch -> CircleSearchScreen(onOpenPage = { subPage = it.asScreen() })
                                     Screen.Apps -> AppsScreen(
@@ -230,6 +234,7 @@ class MainActivity : ComponentActivity() {
                                     Screen.Permissions -> PermissionsScreen(onBack = close)
                                     Screen.GmsCheck -> GmsCheckScreen(onBack = close)
                                     Screen.Tune -> TuneScreen(onBack = close)
+                                    Screen.Automation -> AutomationScreen(onBack = close)
                                     Screen.QuickShare -> QuickShareScreen(onBack = close)
                                     Screen.Update -> UpdateScreen(onBack = close)
                                     Screen.CircleTrigger -> CircleSearchPageScreen(CsPage.Trigger, onBack = close)

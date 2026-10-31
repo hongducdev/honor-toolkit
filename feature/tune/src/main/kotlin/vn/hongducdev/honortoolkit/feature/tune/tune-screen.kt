@@ -269,28 +269,6 @@ private fun choiceDescription(id: TuneId): Int = when (id) {
     else -> R.string.tune_intro
 }
 
-private fun toggleTitle(id: TuneId): Int = when (id) {
-    TuneId.TouchBoost -> R.string.tune_touch_boost
-    TuneId.GentleNotifications -> R.string.tune_gentle
-    TuneId.NotificationCooldown -> R.string.tune_cooldown
-    TuneId.HeadsUp -> R.string.tune_heads_up
-    TuneId.BannerContent -> R.string.tune_banner_content
-    TuneId.LockScreenDetail -> R.string.tune_lock_screen
-    TuneId.JobBatching -> R.string.tune_batching
-    TuneId.HiBoard -> R.string.tune_hiboard
-    TuneId.HonorSearch -> R.string.tune_honor_search
-    TuneId.MagazineDownload -> R.string.tune_magazine
-    TuneId.YoyoNavWake -> R.string.tune_yoyo
-    TuneId.MarketAutoUpdate -> R.string.tune_market
-    TuneId.AdPersonalization -> R.string.tune_ads
-    TuneId.CaptivePortal -> R.string.tune_captive
-    TuneId.CallerIdMatch -> R.string.tune_caller
-    TuneId.Volte5g -> R.string.tune_volte
-    TuneId.SuplGps -> R.string.tune_supl
-    TuneId.PrivateDnsAdBlock -> R.string.tune_dns
-    else -> R.string.tune_title
-}
-
 private fun toggleDescription(id: TuneId): Int = when (id) {
     TuneId.TouchBoost -> R.string.tune_touch_boost_desc
     TuneId.GentleNotifications -> R.string.tune_gentle_desc

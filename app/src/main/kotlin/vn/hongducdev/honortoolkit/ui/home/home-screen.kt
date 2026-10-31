@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.Share
@@ -64,6 +65,7 @@ fun HomeScreen(
     onOpenDeviceInfo: () -> Unit,
     onOpenQuickShare: () -> Unit,
     onOpenUpdate: () -> Unit,
+    onOpenAutomation: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
     updateViewModel: UpdateViewModel = viewModel(),
@@ -122,6 +124,12 @@ fun HomeScreen(
                     stringResource(R.string.home_open_quick_share),
                     stringResource(R.string.home_quick_share_description),
                     onOpenQuickShare,
+                )
+                NavRow(
+                    Icons.Rounded.Bolt,
+                    stringResource(R.string.home_open_automation),
+                    stringResource(R.string.home_automation_description),
+                    onOpenAutomation,
                 )
                 NavRow(
                     Icons.Rounded.Link,

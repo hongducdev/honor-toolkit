@@ -13,6 +13,7 @@ enum class TriggerSource(val labelRes: Int) {
     GeminiIcon(R.string.source_gemini_icon),
     Wake(R.string.source_wake),
     Test(R.string.source_test),
+    Automation(R.string.source_automation),
 }
 
 /**
