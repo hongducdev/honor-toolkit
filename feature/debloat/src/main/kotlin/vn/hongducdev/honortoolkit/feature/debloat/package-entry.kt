@@ -6,4 +6,5 @@ data class PackageEntry(
     val enabled: Boolean,
     val protection: ProtectionReason?,
     val verified: Boolean,
+    val suggestion: PackageSuggestion? = null,
 )

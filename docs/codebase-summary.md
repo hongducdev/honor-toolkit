@@ -76,11 +76,22 @@ Tests in `core/quickshare/src/test`: RFC 5869 vectors, key and PIN checks, endpo
 | `gms-check-controller.kt` | `GmsCheckController.check()` builds a `GmsReport` through `AdbShell` |
 | `gms-check-view-model.kt`, `gms-check-screen.kt` | State and Compose sub-page opened from the Apps tab |
 
+## `:feature:tune` (`feature/tune/src/main/kotlin/vn/hongducdev/honortoolkit/feature/tune`)
+
+| File | Concern |
+| --- | --- |
+| `tune-settings.kt` | `TuneCatalog`: the fixed toggles, choices, recommended set, GPS-refresh and restore commands |
+| `tune-parsers.kt` | Batched `settings get` parser and refresh-rate parsing |
+| `tune-controller.kt` | Snapshot, toggle/choice apply with read-back, recommended preset, restore, GPS refresh |
+| `tune-view-model.kt` | Loading state, current values, messages, restore confirmation |
+| `tune-screen.kt` | Compose sub-page opened from the Apps tab (switch rows, chips, GPS action, restore dialog) |
+
 ## `:feature:debloat` (`feature/debloat/src/main/kotlin/vn/hongducdev/honortoolkit/feature/debloat`)
 
 | File | Concern |
 | --- | --- |
 | `debloat-denylist.kt` | Hard denylist (exact names, prefixes) plus runtime "in use" packages |
+| `debloat-suggestions.kt` | Advisory list of China-ROM Honor/Huawei packages with a Vietnamese reason and confidence level |
 | `package-scanner.kt` | `pm list packages -s [-d]`, labels, role holders and default IME lookup |
 | `debloat-controller.kt` | `disable` / `enable` with name validation and denylist re-check |
 | `debloat-journal.kt` | Append-only `files/debloat-journal.tsv`, export text with PC recovery commands |

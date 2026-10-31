@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import vn.hongducdev.honortoolkit.core.adb.AdbSession
 
-enum class DebloatFilter { Enabled, Disabled }
+enum class DebloatFilter { Enabled, Disabled, Suggested }
 
 sealed interface DebloatMessage {
     data class Disabled(val label: String) : DebloatMessage
@@ -36,7 +36,14 @@ data class DebloatUiState(
     val message: DebloatMessage? = null,
 ) {
     val visible: List<PackageEntry>
-        get() = entries.filter { (it.enabled == (filter == DebloatFilter.Enabled)) && it.matches(query) }
+        get() = entries.filter { entry ->
+            val inFilter = when (filter) {
+                DebloatFilter.Enabled -> entry.enabled
+                DebloatFilter.Disabled -> !entry.enabled
+                DebloatFilter.Suggested -> entry.suggestion != null && entry.protection == null
+            }
+            inFilter && entry.matches(query)
+        }
 }
 
 private fun PackageEntry.matches(query: String): Boolean =

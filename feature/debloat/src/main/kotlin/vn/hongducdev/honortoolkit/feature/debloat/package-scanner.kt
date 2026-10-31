@@ -18,6 +18,7 @@ internal class PackageScanner(private val context: Context, private val shell: A
                 enabled = name !in disabled,
                 protection = DebloatDenylist.protectionOf(name, inUse),
                 verified = name in verifiedOnMagic7Pro,
+                suggestion = DebloatSuggestions.of(name),
             )
         }.sortedWith(compareBy({ it.label.lowercase() }, { it.packageName }))
     }

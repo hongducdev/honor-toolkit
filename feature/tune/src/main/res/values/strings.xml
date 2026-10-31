@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tune_title">Tinh chỉnh MagicOS</string>
+    <string name="tune_back">Quay lại</string>
+    <string name="tune_refresh">Tải lại</string>
+    <string name="tune_intro">Các thiết lập dưới đây chỉ đổi bằng ADB. Sau mỗi lần ghi, Honor Toolkit đọc lại để xác nhận máy đã lưu giá trị. Điều này chưa đảm bảo MagicOS thật sự đổi hành vi: một số khoá có thể không có tác dụng trên bản ROM của bạn.</string>
+    <string name="tune_recommended">Tối ưu cho máy nội địa</string>
+    <string name="tune_recommended_desc">Bật nhóm thông báo và dọn giao diện Trung, đặt hoạt ảnh 0,5×, không đổi tần số quét.</string>
+    <string name="tune_recommended_title">Áp dụng thiết lập khuyến nghị?</string>
+    <string name="tune_recommended_body">Áp dụng %1$d thiết lập: nhóm thông báo, dọn giao diện Trung, VoLTE và 5G, tắt quảng cáo cá nhân hoá và đặt tốc độ hoạt ảnh 0,5×. Tần số quét không đổi. Mục nào ROM không hỗ trợ sẽ bị bỏ qua. Dùng “Khôi phục mặc định” để hoàn tác.</string>
+    <string name="tune_recommended_ok">Áp dụng</string>
+    <string name="tune_restore">Khôi phục mặc định</string>
+    <string name="tune_restore_title">Khôi phục mặc định?</string>
+    <string name="tune_restore_body">Xoá mọi thiết lập trang này đã đặt để máy dùng lại giá trị mặc định, gồm hoạt ảnh và tần số quét. Các thay đổi bạn từng làm trong Cài đặt cho những mục này cũng có thể trở về mặc định. Private DNS và cài đặt quảng cáo được giữ nguyên; hãy tắt từng hàng nếu muốn đổi.</string>
+    <string name="tune_restore_ok">Khôi phục</string>
+    <string name="tune_cancel">Huỷ</string>
+
+    <string name="tune_group_performance">Hiệu năng</string>
+    <string name="tune_group_notifications">Thông báo hệ thống</string>
+    <string name="tune_group_china">Dọn giao diện nội địa</string>
+    <string name="tune_group_network">Mạng, GPS và vùng</string>
+
+    <string name="tune_unknown">Chưa có trạng thái: máy này không có khoá tương ứng hoặc chưa được đặt</string>
+    <string name="tune_refresh_rate">Tần số quét</string>
+    <string name="tune_refresh_rate_desc">Động tự đổi 30–120 Hz theo nội dung; 60 Hz tiết kiệm pin hơn.</string>
+    <string name="tune_animation">Tốc độ hoạt ảnh</string>
+    <string name="tune_animation_desc">0,5× cho cảm giác nhanh hơn; 1,0× là mặc định.</string>
+
+    <string name="tune_touch_boost">Tăng độ nhạy cảm ứng</string>
+    <string name="tune_touch_boost_desc">Giảm trễ chạm và tăng phản hồi ở cạnh màn hình.</string>
+    <string name="tune_gentle">Tắt trình sắp xếp thông báo</string>
+    <string name="tune_gentle_desc">Ngăn MagicOS tự phân loại và gộp thông báo; thông báo hiện theo thứ tự thường.</string>
+    <string name="tune_cooldown">Tắt giãn cách thông báo</string>
+    <string name="tune_cooldown_desc">Bỏ khoảng chờ giữa hai thông báo liên tiếp.</string>
+    <string name="tune_heads_up">Bật banner nổi</string>
+    <string name="tune_heads_up_desc">Hiện thông báo ngay trên màn hình khi đang dùng máy.</string>
+    <string name="tune_banner_content">Hiện nội dung banner</string>
+    <string name="tune_banner_content_desc">Banner nổi hiện đầy đủ nội dung thay vì ẩn.</string>
+    <string name="tune_lock_screen">Hiện chi tiết trên màn hình khoá</string>
+    <string name="tune_lock_screen_desc">Hiện nội dung thay vì chỉ tên ứng dụng.</string>
+    <string name="tune_batching">Giảm gom việc nền</string>
+    <string name="tune_batching_desc">Cho JobScheduler chạy việc nền sớm hơn thay vì chờ gom lô.</string>
+
+    <string name="tune_hiboard">Tắt HiBoard</string>
+    <string name="tune_hiboard_desc">Bảng tin tiếng Trung khi vuốt phải ở màn hình chính.</string>
+    <string name="tune_honor_search">Tắt tìm kiếm Honor</string>
+    <string name="tune_honor_search_desc">Vuốt xuống không mở tìm kiếm nội địa.</string>
+    <string name="tune_magazine">Tắt tải tạp chí màn hình khoá</string>
+    <string name="tune_magazine_desc">Không tự tải ảnh nền từ máy chủ Trung Quốc.</string>
+    <string name="tune_yoyo">Tắt đánh thức YOYO</string>
+    <string name="tune_yoyo_desc">Giữ thanh điều hướng không gọi trợ lý YOYO.</string>
+    <string name="tune_market">Chặn tự cập nhật app Honor</string>
+    <string name="tune_market_desc">Không để chợ ứng dụng Honor tự cập nhật và đổi ngôn ngữ ứng dụng.</string>
+    <string name="tune_ads">Tắt quảng cáo cá nhân hoá</string>
+    <string name="tune_ads_desc">Đặt lại mã quảng cáo và tắt theo dõi.</string>
+
+    <string name="tune_captive">Sửa cảnh báo mạng bằng máy chủ Google</string>
+    <string name="tune_captive_desc">Dùng trang kiểm tra mạng của Google thay cho máy chủ nội địa. Chỉ nên bật khi máy có Google và mạng không chặn gstatic.com, nếu không Wi-Fi sẽ bị báo không có Internet.</string>
+    <string name="tune_caller">Khớp số nội địa</string>
+    <string name="tune_caller_desc">Đặt min_match 7 để nhận diện số 9–10 chữ số; không đổi đầu số.</string>
+    <string name="tune_volte">Bật VoLTE và 5G</string>
+    <string name="tune_volte_desc">Chỉ có tác dụng khi nhà mạng và gói cước hỗ trợ.</string>
+    <string name="tune_supl">Dùng SUPL của Google cho GPS</string>
+    <string name="tune_supl_desc">Đổi máy chủ hỗ trợ GPS, Google sẽ nhận vị trí gần đúng; nên khởi động lại máy sau khi bật.</string>
+    <string name="tune_dns">Chặn quảng cáo bằng Private DNS</string>
+    <string name="tune_dns_desc">Dùng DNS AdGuard, mọi tên miền bạn truy cập sẽ đi qua AdGuard; một số Wi-Fi công cộng có thể chặn DNS mã hoá.</string>
+    <string name="tune_gps_reset">Làm mới dữ liệu GPS</string>
+    <string name="tune_gps_reset_desc">Xoá dữ liệu hỗ trợ cũ và yêu cầu tải lại. Ra ngoài trời rồi mở bản đồ để bắt vệ tinh.</string>
+    <string name="tune_gps_reset_action">Làm mới</string>
+
+    <string name="tune_msg_applied_on">Đã ghi giá trị bật và đọc lại đúng</string>
+    <string name="tune_msg_applied_off">Đã ghi giá trị tắt và đọc lại đúng</string>
+    <string name="tune_msg_refused">Máy không lưu giá trị này, thử lại sau khi khởi động lại</string>
+    <string name="tune_msg_shell_failed">Không chạy được lệnh ADB, kiểm tra lại kết nối</string>
+    <string name="tune_msg_preset">Đã ghi %1$d/%2$d mục, bỏ qua %3$d mục máy này không có khoá</string>
+    <string name="tune_msg_unsupported">Máy này không có khoá cài đặt tương ứng, chưa ghi gì</string>
+    <string name="tune_msg_restored">Đã xoá %1$d/%2$d khoá, máy dùng lại mặc định</string>
+    <string name="tune_msg_gps_sent">Đã gửi lệnh làm mới GPS, ra ngoài trời và mở bản đồ</string>
+    <string name="tune_msg_gps_failed">Máy không nhận lệnh làm mới GPS</string>
+</resources>

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.Cloud
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ fun AppsScreen(
     onOpenDebloat: () -> Unit,
     onOpenPermissions: () -> Unit,
     onOpenGmsCheck: () -> Unit,
+    onOpenTune: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(
@@ -57,6 +59,12 @@ fun AppsScreen(
                     stringResource(R.string.home_open_gms_check),
                     stringResource(R.string.home_gms_check_description),
                     onOpenGmsCheck,
+                )
+                NavRow(
+                    Icons.Rounded.Tune,
+                    stringResource(R.string.home_open_tune),
+                    stringResource(R.string.home_tune_description),
+                    onOpenTune,
                 )
             }
         }

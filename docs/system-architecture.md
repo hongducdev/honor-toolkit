@@ -13,6 +13,7 @@ Native Kotlin Android app for the Honor Magic7 Pro (MagicOS China, Android 17) t
 | `:feature:debloat` | Package scan, disable/enable through `AdbShell`, denylist, journal, Compose screen |
 | `:feature:permissions` | Runtime permission grant/revoke and AppOps for third-party apps through `AdbShell`, guard, read-back verification, journal, Compose screen |
 | `:feature:gms-check` | Read-only check of Google Play Services, Services Framework, Play Store (installed, enabled, version) and the number of Google accounts, through `AdbShell` |
+| `:feature:tune` | Fixed MagicOS settings catalogue (performance, system notifications, China-UI cleanup, network/GPS), every write read back, presets and restore, Compose screen |
 | `:feature:circle-search` | Circle to Search trigger (hidden voice-interaction API), Quick Settings tiles, nav-bar strip, offline Vosk wake word ("OK Google"), assistant setup, Compose screen |
 | `:feature:update` | GitHub release check, APK download with SHA-256 check, system installer hand-off, Compose update page and Home banner |
 
@@ -49,6 +50,15 @@ Written from NearDrop's `PROTOCOL.md` and Swift sources (Unlicense) and the prot
 
 `FixStep.StandbyBucket` reads `am get-standby-bucket <pkg>` (satisfied at 20 or lower) and applies `am set-standby-bucket <pkg> active`. Like the other steps it is re-read afterwards, so a ROM that ignores it shows as `Failed`. Not yet verified on MagicOS.
 
+## MagicOS tune (`:feature:tune`)
+
+- `TuneCatalog` is a fixed list of 17 toggles and two choices. Each toggle names the settings it writes and the exact values that count as on and off; a choice maps its options to commands and reads one key back. No shell string is built from user input.
+- Reads are batched: one shell command prints `__HT_<namespace>/<key>=` before each `settings get`, and `parseSettingsDump` splits on the first `=` so values that contain `=` (the JobScheduler constant) survive.
+- `setToggle` and `choose` write, then read the same keys again and return `Applied` only when the ROM kept the value; `Refused` means the phone ignored it. `applyRecommended` and `restoreDefaults` count how many rows match afterwards.
+- The catalogue covers what the China-ROM notification problem actually needs and what MagicTune 2.6 wires on the same firmware: gentle/cooldown switches, heads-up and lock-screen detail, JobScheduler batching, HiBoard/Honor Search/magazine/YOYO wake, Honor Market auto-update, ad personalisation, captive-portal check, `min_match`, VoLTE/5G, Google SUPL and AdGuard Private DNS.
+- Package disabling stays in `:feature:debloat`; the tune page only writes settings. "Khôi phục mặc định" deletes every setting key the page can write so the ROM falls back to its compiled defaults, then counts how many keys are really gone; it does not guess a stock value per row.
+- Not verified on a device. A row whose keys this ROM does not expose is shown as "Không đọc được trạng thái" instead of being guessed as off.
+
 ## Debloat (`:feature:debloat`)
 
 - Disables with `pm disable-user --user 0 <pkg>` and re-enables with `pm enable --user 0 <pkg>`; never uninstalls.
@@ -56,6 +66,7 @@ Written from NearDrop's `PROTOCOL.md` and Swift sources (Unlicense) and the prot
 - Each successful change is appended to `files/debloat-journal.tsv`. "Xuất nhật ký" writes a text file (Storage Access Framework) with `adb shell pm enable --user 0 <pkg>` lines for everything this app still holds disabled.
 - "Khôi phục tất cả" (toolbar action) re-enables, one at a time, the packages the journal still holds disabled that are also currently disabled on the device (`restorePackages`); it stops at the first failure and reports how many were restored.
 - Packages not in `verifiedOnMagic7Pro` are shown as "Chưa đánh giá".
+- `DebloatSuggestions` is an advisory list of Honor/Huawei China packages with a short Vietnamese reason and a "Nên tắt" / "Cân nhắc" level, shown under the package name and reachable through the "Gợi ý dọn" filter. It does not make a package eligible: the denylist and in-use guard still run on every disable, and nothing in the list is claimed as verified on the Magic7 Pro.
 
 ## Self ADB flow (`:core:adb`)
 
