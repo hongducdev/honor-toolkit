@@ -33,7 +33,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
     implementation("org.lsposed.hiddenapibypass:hiddenapibypass:6.1")
     // Offline wake-word engine (Vosk/Kaldi) with the US English mobile model in assets/model-en.
-    implementation("com.alphacephei:vosk-android:0.3.47")
+    implementation("com.alphacephei:vosk-android:0.3.75")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")
 }
