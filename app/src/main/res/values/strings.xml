@@ -44,10 +44,8 @@
     <string name="home_open_connection">Kết nối ADB</string>
     <string name="home_connection_description">Ghép cặp, kết nối lại và kiểm tra quyền shell</string>
     <string name="apps_title">Ứng dụng</string>
-    <string name="home_apps_needs_adb">Cần kết nối ADB trước. Chạm để ghép cặp hoặc kết nối lại</string>
+    <string name="status_needs_adb_hint">Cần ADB để dùng các công cụ trong tab Ứng dụng.</string>
     <string name="home_device_info_description">Model, phiên bản hệ thống và thông số máy</string>
-    <string name="home_open_apps">Ứng dụng</string>
-    <string name="home_apps_description">Fix thông báo, gỡ ứng dụng hệ thống và quản lý quyền</string>
     <string name="home_open_debloat">Gỡ ứng dụng hệ thống</string>
     <string name="home_open_permissions">Quyền ứng dụng</string>
     <string name="home_permissions_description">Cấp hoặc thu hồi quyền và AppOps, mỗi thay đổi đều được đọc lại</string>
@@ -56,8 +54,6 @@
     <string name="home_open_notification_fix">Fix thông báo</string>
     <string name="home_notification_fix_description">Chọn ứng dụng, tự đặt quyền thông báo và chạy nền qua ADB</string>
 
-    <string name="home_open_circle_search">Circle to Search</string>
-    <string name="home_circle_search_description">Mở bằng ô cài đặt nhanh, nút AI, giữ thanh điều hướng hoặc nói “OK Google”</string>
     <string name="shortcut_circle_search">Circle to Search</string>
     <string name="shortcut_gemini">Gemini</string>
     <string name="shortcut_search_live">Search Live</string>

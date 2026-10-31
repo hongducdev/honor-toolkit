@@ -73,6 +73,7 @@ fun ConnectionStatusCard(state: AdbState, busy: Boolean, onReconnect: () -> Unit
                 Text(text = state.message, style = MaterialTheme.typography.bodyMedium)
             }
             if (!connected) {
+                Text(text = stringResource(R.string.status_needs_adb_hint), style = MaterialTheme.typography.bodyMedium)
                 FilledTonalButton(onClick = onReconnect, enabled = !busy) {
                     Text(stringResource(R.string.status_reconnect))
                 }

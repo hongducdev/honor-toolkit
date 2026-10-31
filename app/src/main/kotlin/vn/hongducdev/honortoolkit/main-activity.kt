@@ -203,8 +203,6 @@ class MainActivity : ComponentActivity() {
                             ) { index ->
                                 when (tabs[index]) {
                                     Screen.Home -> HomeScreen(
-                                        onOpenApps = { showTab(Screen.Apps) },
-                                        onOpenCircleSearch = { showTab(Screen.CircleSearch) },
                                         onOpenConnection = { subPage = Screen.Connection },
                                         onOpenDeviceInfo = { subPage = Screen.DeviceInfo },
                                         onOpenQuickShare = { subPage = Screen.QuickShare },

@@ -31,10 +31,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Link
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -62,8 +60,6 @@ import vn.hongducdev.honortoolkit.feature.update.UpdateViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onOpenApps: () -> Unit,
-    onOpenCircleSearch: () -> Unit,
     onOpenConnection: () -> Unit,
     onOpenDeviceInfo: () -> Unit,
     onOpenQuickShare: () -> Unit,
@@ -115,20 +111,6 @@ fun HomeScreen(
             if (pendingUpdate != null) UpdateAvailableCard(pendingUpdate.versionName, onOpenUpdate)
             ConnectionStatusCard(state = state.adb, busy = state.busy, onReconnect = viewModel::reconnect)
             SettingsGroup(stringResource(R.string.home_tools_heading)) {
-                // Circle to Search works without ADB (only setting the assistant needs it), so it is always listed.
-                NavRow(
-                    Icons.Rounded.Search,
-                    stringResource(R.string.home_open_circle_search),
-                    stringResource(R.string.home_circle_search_description),
-                    onOpenCircleSearch,
-                )
-                val adbConnected = state.adb == AdbState.Connected
-                NavRow(
-                    Icons.Rounded.Apps,
-                    stringResource(R.string.home_open_apps),
-                    stringResource(if (adbConnected) R.string.home_apps_description else R.string.home_apps_needs_adb),
-                    if (adbConnected) onOpenApps else onOpenConnection,
-                )
                 NavRow(
                     Icons.Rounded.Info,
                     stringResource(R.string.device_info_title),
@@ -147,7 +129,8 @@ fun HomeScreen(
                     stringResource(R.string.home_connection_description),
                     onOpenConnection,
                 )
-                UpdateNavRow(updateState.currentVersion, pendingUpdate?.versionName, onOpenUpdate)
+                // The banner above already points at the update page when a release is waiting.
+                if (pendingUpdate == null) UpdateNavRow(updateState.currentVersion, null, onOpenUpdate)
             }
         }
         }
